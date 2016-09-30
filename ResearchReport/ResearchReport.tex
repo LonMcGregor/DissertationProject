@@ -12,6 +12,7 @@
  top=1in,
 }
 \newcommand{\titles}{\\\vspace{1cm}}
+\newcommand{\cn}{\textbf{[Citation Needed]}}
 
 \pdfinfo{%
   /Title    (Deliverable 1: Final Year Dissertation)
@@ -21,14 +22,14 @@
 \begin{document}
 
 {\centering\Large
-\includegraphics[width=0.4\textwidth]{hwlogo}\titles
-{\scshape\LARGE Heriot-Watt University\titles}
-{\huge\bfseries Web platform for code peer-testing\titles}
+\includegraphics[width=0.4\textwidth]{../hwu.png}\titles
 Deliverable 1: Final Year Dissertation\titles
+{\huge\bfseries Web platform for code peer-testing\titles}
 L\'eon \textsc{McGregor} - H00152968\titles
 {\large\textit{Supervisor}\\}
-%add a second reader when you get the name
-Manuel \textsc{Maarek}\\
+Manuel \textsc{Maarek}\titles
+{\large\textit{Second Reader}\\}
+Firstname \textsc{Surname}\\
 \vfill
 }
 
@@ -42,7 +43,7 @@ Manuel \textsc{Maarek}\\
 
 
 \section*{Abstract}
-This document will detail the current research environment surrounding the use of peer tesing of code... This document will also set out the plan for the implementation and evaluation of a peer testing framework that students can use to test their code.
+This project aims to build a protoype for a peer assessment website. The website would be used in an educational environment, for example in a Computer Science course, and be used to let students easily perform peer assessment. This document will detail some of the existing relevant research, and detail a plan for development of the new website.
 
 \vfill
 
@@ -60,27 +61,45 @@ Date: \today
 
 
 \section{Introduction}
-The aim of this project is to investigate and develop a Web Platform \& Web Application which will allow for peer testing of programming code. This system should aim to provide an easy way for teacher to request programming assignments, and for students to test each others code. While doing all this, the system should provide easy to understand feedback, to enhance the learning experience during peer testing.\\
+The aim of this project is to investigate and develop a website which will allow for peer assessment within a computer science course. This website will aim to provide an easy way for lecturers to request programming assignments, and for students to respond by submitting completed assignments, and then testing each others code. The peer assessment will allow the students to get fast and easy to understand feedback for assignments, and could be used as a starting point for grading of assignments.\par
+The website will need to handle this code in a secure manner, to prevent either intentional or accidental malicious code from running.\par
+Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
 
-Note the aims and objectives here.
+%summarize the research here
+%Note the aims and objectives here.
 
 \chapter{Background}
-There has been lots of work done in looking into the use of peer testing.
-\section{Peer Assessment as a learning tool}
+There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview.
+\section{Peer Assessment}
+\subsection{Anonymous Peer Assessment}
+When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
+This quasi-experimental study was conducted with some in-training teachers, and aimed to see which is the most effective method of / using / while conducting a peer assessment exercise: Having assessors and assessees know each others identities, remain anonymous, or know identities while having received training.\par
+One concern I have with this study is that it didn't cover the case of being anonymous and getting training. This was because the training was intended as a fallback for when anonymity is not possible. But this does invite the question of just how effective would anonymity be if training were offered as well.\par
 
-\section{Peer Assessment and Program Security}
-Much work has been done in using the concept of Peer Assessment as a tool to learn security.
-\subsection{BiBiFi}
-Build-it, Break-it, Fix-it is a programming contest that uses the concept of Peer Assessment to judge the success of various programming assignments, both in terms of general correctness and specifically in the context of security.
-BiBiFi paper(s)\\
-
+\subsection{}
 
 \subsection{In the Classroom}
 A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build both 
-security mindset and students
+security mindset and student
+
+\section{Implementations}
+
+\subsection{Automated Testing}
+One interesting feature that could be implemented in a peer assessment website would be to integrate an automated testing framework. This would be able to give immediate (though limited in detail) pass/fail information, without having to wait for peers to add their own detailed feedback. The effectiveness of an automated testing tool (in this case not integrate into a competitive environment, not a peer assessment one) was investigated \cite{farnqvist_competition_2016}.\par
+This study investigated how introducing a competitive element to a Data Structures and Algorithms CS course might help students to learn. The survey took place over two runs of the course over 2011 and 2012. In the 2011 course, lab contests were graded manually, and a voluntary contest used an automated grader. In the 2012 course, the lab assignments were marked using an automated grader for testing correctness and efficiency, and by human lab assistants to check code quality.\par
+This test showed the attitudes of some students towards the use of an automated grader.
+
+\subsection{BiBiFi}
+Build-it, Break-it, Fix-it\cite{ruef_build_2016}\cite{ruef_build_2015} is a programming contest that uses the concept of a Peer testing system to judge the success of various programming assignments, both in terms of general correctness and specifically in the context of security. This is somewhat different to the aim of an educational peer assessment website, however it is worth mentioning as ... why?
+BiBiFi paper(s)\par
+
+\subsection{apparmor}
 
 \section{...}
 
+
+\chapter{Evaluation Strategy}
+The aim of this dissertation is to .. .uhh,,,. hmm
 
 \chapter{Development Plan}
 
@@ -88,12 +107,13 @@ security mindset and students
 
 \section{Design}
 
-\section{Evaluation Strategy}
 
 \chapter{Project Management}
 
-\bibliography{lib}{}
+\bibliography{../Dissertation}{}
 \bibliographystyle{plain}
+
+\section*{Acknowledgements}
 
 \section*{Appendices}
 
