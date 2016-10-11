@@ -4,6 +4,7 @@
 \usepackage{graphicx}
 \usepackage{setspace}
 \usepackage{datetime}
+\usepackage{url}
 \usepackage{cite}
 \usepackage{geometry}
 \geometry{
@@ -13,6 +14,7 @@
 }
 \newcommand{\titles}{\\\vspace{1cm}}
 \newcommand{\cn}{\textbf{[Citation Needed]}}
+\newcommand{\objv}[2]{\item \textbf{#1} - #2}
 
 \pdfinfo{%
   /Title    (Deliverable 1: Final Year Dissertation)
@@ -29,7 +31,7 @@ L\'eon \textsc{McGregor} - H00152968\titles
 {\large\textit{Supervisor}\\}
 Manuel \textsc{Maarek}\titles
 {\large\textit{Second Reader}\\}
-Firstname \textsc{Surname}\\
+Ron \textsc{Petrick}\\
 \vfill
 }
 
@@ -65,41 +67,114 @@ The aim of this project is to investigate and develop a website which will allow
 The website will need to handle this code in a secure manner, to prevent either intentional or accidental malicious code from running.\par
 Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
 
-%summarize the research here
+\subsection{Primary Aim}
 %Note the aims and objectives here.
+The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can succesfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
+\begin{enumerate}
+\item Build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
+\item Evaluate whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, determine if it can offer any advantages to the users
+\end{enumerate}
+For the initial prototype of this website and evaluation, I would focus on using a simple python programming exercise.
+\subsection{Overview of background research}
+%summarize the research here
 
 \chapter{Background}
 There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview.
-\section{Peer Assessment}
-\subsection{Anonymous Peer Assessment}
+\subsection{Peer Assessment}
+Peer assessment is a put definition here...\cn
+
+\subsection{li-role-2016}
 When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
 This quasi-experimental study was conducted with some in-training teachers, and aimed to see which is the most effective method of / using / while conducting a peer assessment exercise: Having assessors and assessees know each others identities, remain anonymous, or know identities while having received training.\par
 One concern I have with this study is that it didn't cover the case of being anonymous and getting training. This was because the training was intended as a fallback for when anonymity is not possible. But this does invite the question of just how effective would anonymity be if training were offered as well.\par
 
-\subsection{}
+\subsection{davies-computerized-2000}
+A study by Phil Davies\cite{davies_computerized_2000} was conducted using a peer testing system in a university communications and networking module. This peer testing system aimed to help students easily provide feedback on reports, in addition to attempting to locate plagiarism.\par
+The CAP (Computerized Assessment with Plagiarism) provided an interface to let students read the report of another student. They could then provide feedback on the report and follow references on the report to identify any \textit{copy \& paste} plagiarism. This CAP system is of particular interest as the interface described in Davies' paper is quite similar to what I would aim to test in this project.\par
+This experiment followed the results students achieved over a sequence of 4 tasks:
+\begin{enumerate}
+\item A Report
+\item A multiple choice test
+\item A period for peer marking the reports between students
+\item A final multiple choice test
+\end{enumerate}
+The experiment looked to see if the peer marking was at all helpful in improving the marks of students between the two tests. The results found that the peer marking was very useful for students who had initially performed poorly. Student comments on the experience would suggest that they found the peer assessment process both enjoyable and informative\cn. There is also evidence from this feedback indicating the importance of maintaining anonymity, as some students felt that the feedback given to them was unfair \cn.
 
-\subsection{In the Classroom}
-A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build both 
-security mindset and student
+\subsection{smith-using-2012}
+A study performed in a classroom environment by Smith et al.\cite{smith_using_2012} focused more on the use of peer assessment as a tool for teaching testing of code. Over the course of this study, which took place using coursework from a 12-week university course, the following was completed for each coursework: Submitting solutions, then submitting peer reviews (which includes a description of the testing that they performed on another solution, and the results of this), and then a review of the peer assessment (including what was learned, an evaluation of feedback on their own solution, and optionally a corrected solution).\par
+One particularly noteworthy aspect of this study was the double-blind nature, ensuring anonymity. Students would not be aware of who they were marking, or were marked by. To enforce this completely, submitted code was obfuscated (java sources into byte code). One advantage of this is that it strips out identifying variable names and comments, which could identify other students. However, a downside of using byte code is that it can make it difficult to do in-depth analysis of the source structure which may make it harder to write complete test cases.\par %what do with this info?
+The study identified two key features that assignments for a study of this nature need to have:
+\begin{itemize}
+ \item Well-defined interfaces
+ \item Freedom for implementation
+\end{itemize}
+% put this here or in the planning section? From this, we can define some possible exercises that could be used during an evaluation of a peer assessment website.
+This study found that the process of peer assessment was enjoyed by the students, and it ... %summarize here
 
-\section{Implementations}
 
-\subsection{Automated Testing}
+\subsubsection{li-assessor-2010}
+A study conducted by Li et at. \cite{li_assessor_2010} investigated which part of the peer assessment process is useful to the peers taking part: Being an assessor or an assessee. To study this, students were given the task of creating a webquest project. This was then marked by independent assessors, and the students were given a chance to provide feedback on the work of others. When the feedback was shared back, students were given another chance to improve their project, and it was marked again. The quality of the peer feedback itself was also checked by the independent markers.\par
+The study found that 
+\begin{quote}
+there was a significant relationship between the quality of the peer feed-back the students provided for others and the quality of the students’ own final projects
+\end{quote}
+This suggests that the actual exercise of providing feedback to others (acting as an assessor) is a worthwhile process for learning from. This study also found no evidence that the feedback itself was useful as a learning tool, suggesting that the act of giving feedback itself is more valuable.\par
+%move this?
+
+\subsection{hooshangi-can-2015}
+A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build programs defensively, with the mindset that fellow studetns would later try to break them.\par
+This study found that  - not sure how much I can glean from this one
+
+\subsection{farnqvist-competition-2016}
 One interesting feature that could be implemented in a peer assessment website would be to integrate an automated testing framework. This would be able to give immediate (though limited in detail) pass/fail information, without having to wait for peers to add their own detailed feedback. The effectiveness of an automated testing tool (in this case not integrate into a competitive environment, not a peer assessment one) was investigated \cite{farnqvist_competition_2016}.\par
 This study investigated how introducing a competitive element to a Data Structures and Algorithms CS course might help students to learn. The survey took place over two runs of the course over 2011 and 2012. In the 2011 course, lab contests were graded manually, and a voluntary contest used an automated grader. In the 2012 course, the lab assignments were marked using an automated grader for testing correctness and efficiency, and by human lab assistants to check code quality.\par
 This test showed the attitudes of some students towards the use of an automated grader.
 
-\subsection{BiBiFi}
+\subsection{sitthiworachart-effective-2004}
+Peer assessment with an automatic test as a base for discussion and marking\cite{sitthiworachart_effective_2004}\par
+Students, when asked, want anonymity [ I should blackbox or obfuscate]\par
+
+\subsection{ruef-build-2016}
 Build-it, Break-it, Fix-it\cite{ruef_build_2016}\cite{ruef_build_2015} is a programming contest that uses the concept of a Peer testing system to judge the success of various programming assignments, both in terms of general correctness and specifically in the context of security. This is somewhat different to the aim of an educational peer assessment website, however it is worth mentioning as ... why?
 BiBiFi paper(s)\par
 
-\subsection{apparmor}
+\subsection{sandbox}
+If the website we aim to create is going to integrate built-in running of test cases we will need to make sure to use the right way of doing this.\par
+There are apparmor, selinux and FBAC \cite{schreuders_empowering_2011}. But these are more focused on general applications running.\par
+There is also the idea of running python directly in the browser - I think \url{http://pypyjs.org/} does this all in-memory... right? But problem there is you can't really store the test data, without getting it back in from the browser, then storing... and then you'd have to deal with it having to do possibly extensive operations in-browser blocking everything up (i tested this with a bogo sort, it doesnt work too well).\par
+Another option is to use pypy sandboxing - but this is incomplete and doesn't look to be finished any time soon.\par
 
-\section{...}
+
+\chapter{Project Aims}
+\section{Primary Aim}
+The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.\par
+A teacher will set a coursework assignment. This will be a tasks that requires methods to be produced with well-defined interfaces\cn. From here, students will be able to submit solutions, and then test the code of other students. Students will also be able to see the code of other students. Students will be able to add comments (feedback) to the code of other students. Then, once the peer assessment is complete, students will be able to see feedback for their solution.
+\section{Objectives}
+\begin{itemize}
+ \objv{Build a website}{The prototype website will be used as the main interface which students will interact with.}
+ \objv{File upload}{The website will let students upload python scripts}
+ \objv{Build test cases}{The website will let students build test cases in a simple way - essentially provide the input arguments according to the interface of the assignment, and the expected output}
+ \objv{Run test cases}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
+ \objv{Sandbox the system}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
+ \objv{Display test results}{A submitted test case can run against all of the solutions. Display the results [==/!=/err] on each.}
+ \objv{Show source code}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
+ \objv{Add feedback}{Provide a framework for providing feedback to a specific coursework solution}
+ \objv{Viewing own solution}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
+ \objv{Overview screen}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
+\end{itemize}
+\section{Evaluation}
+This peer assessment process will focus on python scripting exercises. For this I would suggest a binary search tree (BST). The BST has a clear interface (insert, search, remove), but still leaves the internals open for the implementer to have freedom (should it be object oriented, should it include any optimisations, should it use pre or post order traversals, etc.).\par
+From here, test subjects should spend some time implementing a solution. For the purposes of this study, test subjects need not be familiar with python, and their solution need not be complete. This is because the purpose of the test is to see if the website will provide a more valuable experience for:
+\begin{itemize}
+ \item The process of submitting solutions (to a website vs. manually sharing files)
+ \item Automating the testing process (using the web interface vs. editing and running code manually)
+ \item Enhancing the feedback given (seeing if the feedback given through a website is more useful than feedback that is given from manual testing and evaluation)
+ \item Improving the experience as a whole (a subjective check to see if the experience of using a website feels better than manual peer assessment)
+\end{itemize}
+Thinking about it, I'm not sure if it's worthwhile to have a group of students for doing a peer assessment without the website, as I don't really see what could be learned from doing that vs. just having all the test subjects do it with the website.
 
 
 \chapter{Evaluation Strategy}
-The aim of this dissertation is to .. .uhh,,,. hmm
 
 \chapter{Development Plan}
 
