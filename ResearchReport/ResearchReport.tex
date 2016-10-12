@@ -119,7 +119,6 @@ The study found that
 there was a significant relationship between the quality of the peer feed-back the students provided for others and the quality of the students’ own final projects
 \end{quote}
 This suggests that the actual exercise of providing feedback to others (acting as an assessor) is a worthwhile process for learning from. This study also found no evidence that the feedback itself was useful as a learning tool, suggesting that the act of giving feedback itself is more valuable.\par
-%move this?
 
 \subsection{hooshangi-can-2015}
 A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build programs defensively, with the mindset that fellow studetns would later try to break them.\par
@@ -144,6 +143,17 @@ There are apparmor, selinux and FBAC \cite{schreuders_empowering_2011}. But thes
 There is also the idea of running python directly in the browser - I think \url{http://pypyjs.org/} does this all in-memory... right? But problem there is you can't really store the test data, without getting it back in from the browser, then storing... and then you'd have to deal with it having to do possibly extensive operations in-browser blocking everything up (i tested this with a bogo sort, it doesnt work too well).\par
 Another option is to use pypy sandboxing - but this is incomplete and doesn't look to be finished any time soon.\par
 
+\subsection{mogus-impact-2012}
+The use of a virtual learning environment (VLE) can be very valuable to students learning. Analysis performed by Mogus eet al. \cite{mogus_impact_2012} looked at data collected over two semesters of a (what kind) course. It then correlated the use of various tools offered by moodle (the VLE in use) against the success of students in that course (measured by their final grade). The analysis performed revealed that the interactions used within the VLE do have a positive influence on the eventual grades a student receives. It is worth noting this was not determined by using a control group, but by grouping students by their final grade, and then analysing the results.\par
+Given that VLEs can be useful to students, and that the desired peer assessment system would be an online website, it seems that a logical aim would be to build a website that is modular enough that it may be integrated into such a VLE as Moodle \cite{moodle_about_2016}.
+
+\subsection{keppell-peer-2006}
+A research project was conducted by keppel et al.\cite{keppell_peer_2006} which involved some university lecturers re-structure their courses to involve more peer learning, with the aid of a virtual learning environment. 
+Peer assessment should be in the form of feedback, they say, as making this part of the ggrade changes the dynamic.
+study 1: using the vle to upload files, and then criquing files to improve them (in this case fashion designs) - students appreciated the immediate nature of feedback. students also appreciated the fact that this provided a more balanced feedback system than just a teacher telling them. 
+I worry this one might be a bit too off-topic.
+Related as the peer assessmnt website is in and of itself a sort of virtual learning environment, if a bit more restrictive than blackboard. (or not as the case may be, honhonhonhon)
+
 
 \chapter{Project Aims}
 \section{Primary Aim}
@@ -151,6 +161,7 @@ The primary aim of this project is to prototype a website that will help to auto
 A teacher will set a coursework assignment. This will be a tasks that requires methods to be produced with well-defined interfaces\cn. From here, students will be able to submit solutions, and then test the code of other students. Students will also be able to see the code of other students. Students will be able to add comments (feedback) to the code of other students. Then, once the peer assessment is complete, students will be able to see feedback for their solution.
 \section{Objectives}
 \begin{itemize}
+ \objv{Create a modular system}{One motivation for building the system would be to plug it into other learning tools, suuch as moodle}
  \objv{Build a website}{The prototype website will be used as the main interface which students will interact with.}
  \objv{File upload}{The website will let students upload python scripts}
  \objv{Build test cases}{The website will let students build test cases in a simple way - essentially provide the input arguments according to the interface of the assignment, and the expected output}
