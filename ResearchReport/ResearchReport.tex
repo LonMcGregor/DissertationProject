@@ -2,6 +2,8 @@
 
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
+\usepackage{tabularx}
+\usepackage{ltablex}
 \usepackage{setspace}
 \usepackage{datetime}
 \usepackage{url}
@@ -14,8 +16,11 @@
 }
 \newcommand{\titles}{\\\vspace{1cm}}
 \newcommand{\cn}{\textbf{[Citation Needed]}}
-\newcommand{\objv}[2]{\item \textbf{#1} - #2}
+\newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
+\newcommand{\objitem}[4]{\hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline}
+\newcommand{\objts}{\multicolumn{3}{X}{}\\}
 
+\keepXColumns
 \pdfinfo{%
   /Title    (Deliverable 1: Final Year Dissertation)
   /Author   (Leon McGregor)
@@ -68,7 +73,6 @@ The website will need to handle this code in a secure manner, to prevent either 
 Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
 
 \subsection{Primary Aim}
-%Note the aims and objectives here.
 The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can succesfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
 \begin{enumerate}
 \item Build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
@@ -158,38 +162,68 @@ Related as the peer assessmnt website is in and of itself a sort of virtual lear
 \chapter{Project Aims}
 \section{Primary Aim}
 The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.\par
-A teacher will set a coursework assignment. This will be a tasks that requires methods to be produced with well-defined interfaces\cn. From here, students will be able to submit solutions, and then test the code of other students. Students will also be able to see the code of other students. Students will be able to add comments (feedback) to the code of other students. Then, once the peer assessment is complete, students will be able to see feedback for their solution.
-\section{Objectives}
-\begin{itemize}
- \objv{Create a modular system}{One motivation for building the system would be to plug it into other learning tools, suuch as moodle}
- \objv{Build a website}{The prototype website will be used as the main interface which students will interact with.}
- \objv{File upload}{The website will let students upload python scripts}
- \objv{Build test cases}{The website will let students build test cases in a simple way - essentially provide the input arguments according to the interface of the assignment, and the expected output}
- \objv{Run test cases}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
- \objv{Sandbox the system}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
- \objv{Display test results}{A submitted test case can run against all of the solutions. Display the results [==/!=/err] on each.}
- \objv{Show source code}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
- \objv{Add feedback}{Provide a framework for providing feedback to a specific coursework solution}
- \objv{Viewing own solution}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
- \objv{Overview screen}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
-\end{itemize}
-\section{Evaluation}
-This peer assessment process will focus on python scripting exercises. For this I would suggest a binary search tree (BST). The BST has a clear interface (insert, search, remove), but still leaves the internals open for the implementer to have freedom (should it be object oriented, should it include any optimisations, should it use pre or post order traversals, etc.).\par
-From here, test subjects should spend some time implementing a solution. For the purposes of this study, test subjects need not be familiar with python, and their solution need not be complete. This is because the purpose of the test is to see if the website will provide a more valuable experience for:
-\begin{itemize}
- \item The process of submitting solutions (to a website vs. manually sharing files)
- \item Automating the testing process (using the web interface vs. editing and running code manually)
- \item Enhancing the feedback given (seeing if the feedback given through a website is more useful than feedback that is given from manual testing and evaluation)
- \item Improving the experience as a whole (a subjective check to see if the experience of using a website feels better than manual peer assessment)
-\end{itemize}
-Thinking about it, I'm not sure if it's worthwhile to have a group of students for doing a peer assessment without the website, as I don't really see what could be learned from doing that vs. just having all the test subjects do it with the website.
+A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submission are made, the process of peer assessment can begin. This will involve students testing the code of other students, but submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
 
+\section{Objectives}
+\begin{tabularx}{\textwidth}{|l|c|r|}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle}
+\objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will interact with.}
+\objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. This first prototype will focus specifically on python scripts}
+\objitem{Test}{Build test cases}{Medium Priority}{The website will let students build test cases in a simple way. Possible implementations of this include:
+\begin{itemize}
+\item Expected-Actual I/O: The tester will create two files. One containing input, and the other containing output. The results of the test is how the actual output compares with the expected output. The testee needs to build a solution that offers file I/O.
+\item Unit Test: The tester will build a unit test class using an xUnit format. This should test the interface of the solution. The testee needs to build a solution that implements an interface.
+\item Unit Test with Auto-Build of Test Classes: The tester provides the body for various xUnit-style assertions. The system will insert these into a test class. The testee needs to build a solution that implements an interface.
+\item Scenario Testing: The tester builds a program that accesses the solution. The results of the test are up to the tester to display. The testee needs to build a solution that offers some sort of interface.
+\end{itemize}
+\begin{tabular}{c||c|c|c|c}
+Test type & Tests & Solution & Results Useful & System\\\hline
+Expected I/O & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
+Unit & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
+Unit w/ Auto & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
+Scenario & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
+\end{tabular}
+}
+\objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
+\objitem{Sandbox}{Sandbox the system}{Low Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
+\objitem{Results}{Display test results}{Medium Priority}{A submitted test case can run against all of the solutions. Display the results (passed, failed, error, feedback?) on each.}
+\objitem{Source}{Show source code}{Medium Priority}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
+\objitem{Feedback}{Add feedback}{Medium Priority}{Provide a framework for providing feedback to a specific coursework solution}
+\objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
+\objitem{Overview}{Overview screen}{Low Priority}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
+\end{tabularx}
 
 \chapter{Evaluation Strategy}
+
+\subsection{Test Properties}
+In order to test if the website is useful or successful, we wish to test for and see if the following properties are true:
+\begin{tabularx}{\textwidth}{lX}
+ \textbf{TST-Submit} & The process of submitting solutions (to a website vs. manually sharing files)\\
+ \textbf{TST-Automate} & Automating the testing process (using the web interface vs. editing and running code manually)\\
+ \textbf{TST-Enhance} & Enhancing the feedback given (seeing if the feedback given through a website is more useful than feedback that is given from manual testing and evaluation)\\
+ \textbf{TST-Improve} & Improving the experience as a whole (a subjective check to see if the experience of using a website feels better than manual peer assessment)\\
+\end{tabularx}
+
+\subsection{Test Strategy}
+In order to evaluate whether each test property has been met, a good strategy would be to:
+\begin{enumerate}
+ \item Use a simple programming exercise, e.g. a Binary Search Tree
+ \item Have test subjects perform the process of peer assessment each other's solutions without the website
+ \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
+ \item Have test subjects again perform a peer assessment but this time with the website
+\end{enumerate}
+I feel the evaluation would need to be performed in this way (with subjects both using the website, and not using it), as in order to test \textbf{TST-Improve}, as you can only really gauge how the subjects feel about the website if they have tried both with and without it. The issue with testing in this manner is one of learning. As subjects will have completed one task already, their opinions and ability may be skewed by the second task. To mitigate this, we would want to swap the order in which both the tasks and the use of the website occurs (ideally this requires a minimum of 4 pairs of test subjects).\par
+In order to test \textbf{TST-Submit}, this can easily be tested by A) Timing how long it takes subjects to complete the process of submitting files and test cases to the website vs a shared file system, and B) Asking the subjects which method they feel is faster.\par
+\textbf{TST-Enhance} can be tested by A) asking the users which feedback they found more useful, and also by B) having the markers (in this case the evaluation test runner) assess and compare the feedback itself, on an objective level: How detailed is it, Is the feedback correct, etc.\par
+\textbf{TST-Automate} is similar in some ways to \textbf{TST-Submit}, and could use the same evaluation methods, but in addition it is necessary to check that the tests themselves are actually correct and useful. It is possible that the website may guide and improve, or hinder, the production of meaningful test cases during the peer assessment. This could be evaluated in a similar fashion to the evaluation of \textbf{TST-Enhance}.
+
+\subsection{Test Subjects}
+The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
 
 \chapter{Development Plan}
 
 \section{Requirements}
+Based on the objectives outlined in section \textbf{wherever}, I can establish the following system, requirements:
 
 \section{Design}
 
