@@ -3,7 +3,8 @@
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{tabularx}
-\usepackage{ltablex}
+\usepackage{longtable}
+% \usepackage{ltablex}
 \usepackage{setspace}
 \usepackage{datetime}
 \usepackage{url}
@@ -17,10 +18,10 @@
 \newcommand{\titles}{\\\vspace{1cm}}
 \newcommand{\cn}{\textbf{[Citation Needed]}}
 \newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
-\newcommand{\objitem}[4]{\hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline}
+\newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 
-\keepXColumns
+% \keepXColumns
 \pdfinfo{%
   /Title    (Deliverable 1: Final Year Dissertation)
   /Author   (Leon McGregor)
@@ -85,7 +86,12 @@ For the initial prototype of this website and evaluation, I would focus on using
 \chapter{Background}
 There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview.
 \subsection{Peer Assessment}
-Peer assessment is a put definition here...\cn
+Peer assessment is a process in which students work to assess each others work. Sadler \& Good \cite{sadler_impact_2006} have suggested the following concepts that peer assessment can help with
+\begin{itemize}
+ \item Peer assessment is more immediate, so students can get more feedback, and sooner
+ \item 
+\end{itemize}
+
 
 \subsection{li-role-2016}
 When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
@@ -161,15 +167,28 @@ Related as the peer assessmnt website is in and of itself a sort of virtual lear
 
 \chapter{Project Aims}
 \section{Primary Aim}
-The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.\par
+The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.
+\subsection*{Sample use case}
 A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submission are made, the process of peer assessment can begin. This will involve students testing the code of other students, but submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
 
 \section{Objectives}
-\begin{tabularx}{\textwidth}{|l|c|r|}
-\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle}
 \objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will interact with.}
-\objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. This first prototype will focus specifically on python scripts}
-\objitem{Test}{Build test cases}{Medium Priority}{The website will let students build test cases in a simple way. Possible implementations of this include:
+\objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments.}
+\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way.}
+\objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
+\objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
+\objitem{Results}{Display test results}{Medium Priority}{A submitted test case can run against all of the solutions. Display the results (passed, failed, error, feedback?) on each.}
+\objitem{Source}{Show source code}{Medium Priority}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
+\objitem{Feedback}{Add feedback}{Medium Priority}{Provide a framework for providing feedback to a specific coursework solution}
+\objitem{Sandbox}{Sandbox the system}{Low Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
+\objitem{Overview}{Overview screen}{Low Priority}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle}
+
+\subsection{Discussion of Objectives}
+\subsubsection*{OBJ-Upload}
+When the student is submitting a solution, this should be contained within a single file. For this iteration of the project, the upload system will focus on python scripts.
+\subsubsection*{OBJ-Test}
+Possible implementations of this subsystem include:
 \begin{itemize}
 \item Expected-Actual I/O: The tester will create two files. One containing input, and the other containing output. The results of the test is how the actual output compares with the expected output. The testee needs to build a solution that offers file I/O.
 \item Unit Test: The tester will build a unit test class using an xUnit format. This should test the interface of the solution. The testee needs to build a solution that implements an interface.
@@ -183,20 +202,12 @@ Unit & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
 Unit w/ Auto & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
 Scenario & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
 \end{tabular}
-}
-\objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
-\objitem{Sandbox}{Sandbox the system}{Low Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
-\objitem{Results}{Display test results}{Medium Priority}{A submitted test case can run against all of the solutions. Display the results (passed, failed, error, feedback?) on each.}
-\objitem{Source}{Show source code}{Medium Priority}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
-\objitem{Feedback}{Add feedback}{Medium Priority}{Provide a framework for providing feedback to a specific coursework solution}
-\objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
-\objitem{Overview}{Overview screen}{Low Priority}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
-\end{tabularx}
+10.1.1.86.6367 - section 2.3 lists various dependency properties during testing 
 
 \chapter{Evaluation Strategy}
 
 \subsection{Test Properties}
-In order to test if the website is useful or successful, we wish to test for and see if the following properties are true:
+In order to test if the website is useful or successful, we wish to test for and see if the following properties are true:\\
 \begin{tabularx}{\textwidth}{lX}
  \textbf{TST-Submit} & The process of submitting solutions (to a website vs. manually sharing files)\\
  \textbf{TST-Automate} & Automating the testing process (using the web interface vs. editing and running code manually)\\
@@ -208,7 +219,7 @@ In order to test if the website is useful or successful, we wish to test for and
 In order to evaluate whether each test property has been met, a good strategy would be to:
 \begin{enumerate}
  \item Use a simple programming exercise, e.g. a Binary Search Tree
- \item Have test subjects perform the process of peer assessment each other's solutions without the website
+ \item Have test subjects perform the process of peer assessment each others solutions without the website
  \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
  \item Have test subjects again perform a peer assessment but this time with the website
 \end{enumerate}
@@ -220,15 +231,24 @@ In order to test \textbf{TST-Submit}, this can easily be tested by A) Timing how
 \subsection{Test Subjects}
 The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
 
+\subsection{Ethical Analysis}
+Copy in ethical thingy here, or as an appendix
+
 \chapter{Development Plan}
 
 \section{Requirements}
-Based on the objectives outlined in section \textbf{wherever}, I can establish the following system, requirements:
+Based on the objectives outlined in section \textbf{wherever}, I can establish the following system requirements:\par
+\begin{longtable}{ccc}
+\textbf{ID} & \textbf{Description} & \textbf{Priority}\\
+
+\end{longtable}
+
 
 \section{Design}
 
 
 \chapter{Project Management}
+The following deadlines exist for the project:
 
 \bibliography{../Dissertation}{}
 \bibliographystyle{plain}
