@@ -9,6 +9,8 @@
 \usepackage{datetime}
 \usepackage{url}
 \usepackage{cite}
+\usepackage{tikz}
+\usepackage{pgf-umlsd}
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -19,6 +21,7 @@
 \newcommand{\cn}{\textbf{[Citation Needed]}}
 \newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
 \newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
+\newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{RSK-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 
 % \keepXColumns
@@ -60,6 +63,10 @@ I, L\'eon McGregor confirm that this work submitted for assessment is my own and
 Signed: L\'eon McGregor\par
 Date: \today
 
+\vfill
+
+\section*{Acknowledgements}
+
 \pagebreak
 
 \pagestyle{headings}
@@ -74,7 +81,7 @@ The website will need to handle this code in a secure manner, to prevent either 
 Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
 
 \subsection{Primary Aim}
-The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can succesfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
+The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can successfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
 \begin{enumerate}
 \item Build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
 \item Evaluate whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, determine if it can offer any advantages to the users
@@ -85,13 +92,16 @@ For the initial prototype of this website and evaluation, I would focus on using
 
 \chapter{Background}
 There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview.
-\subsection{Peer Assessment}
+\subsection{sadler-impact-2006}
 Peer assessment is a process in which students work to assess each others work. Sadler \& Good \cite{sadler_impact_2006} have suggested the following concepts that peer assessment can help with
 \begin{itemize}
  \item Peer assessment is more immediate, so students can get more feedback, and sooner
- \item 
+ \item Students performing marking can reduce the workload for teachers
+ \item The process of checking and thinking about another students answer can improve a students own understanding
+ \item Peer assessment can help students better understand testing and can become aware of their own strengths and weaknesses
+ \item Following peer assessment students can gain an improved attitude towards the process of learning as a whole
 \end{itemize}
-
+From this, we can see that using peer assessment is definitely a desirable choice. However, given that it requires the participation of students, and sharing of work, this might be tricky to achieve.\cn?
 
 \subsection{li-role-2016}
 When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
@@ -164,6 +174,15 @@ study 1: using the vle to upload files, and then criquing files to improve them 
 I worry this one might be a bit too off-topic.
 Related as the peer assessmnt website is in and of itself a sort of virtual learning environment, if a bit more restrictive than blackboard. (or not as the case may be, honhonhonhon)
 
+\section{testing styles}
+When considering the testing of software, there are several ways that this can be done. To produce a website that enables peer assessment, an appropriate testing methodology will need to be selected. Testing methodologies considered include:\cn
+\begin{itemize}
+ \item Unit testing - The use of xUnit style tests. Often used in test-driven development, these could be useful in detecting flaws if written post-development by a peer assessor
+ \item Expected output testing - Running a program with some input and comparing the output to what is expected. The issue here is that the peer assessor first needs to know what the correct output is. Unlike unit testing, this would simply involve a series of inputs, and a series of expected outputs, and the task of checking the correctness from these tests is left to the website.
+ \item Scenario Testing - Simulate an actual usage scenario. Assessors would use solutions as if they were 3rd party libraries, and develop their own programs that would use these as if in an actual use case. These programs would perform checks to make sure the solutions being tested were running as expected. This is more involved than unit or expected output testing, as it might be better placed to discover side effects of continued use of the solution.
+ \item Property based testing - Using a proof checker, such as QuickCheck (or similar) to ensure that a program is acting correctly. This would place additional overhead onto the students as assessors, as they would need to learn and understand the annotations used by a proof checker.
+\end{itemize}
+In all cases, the solution being tested needs to conform to a standard interface. And in each case, the website running the tests needs to be able to extract some meaningful information. This is simpler in terms of unit and expected output, as these will offer output that will be easily readable (e.g. by diff, a count of pass/fail tests); scenario and property based tests would produce more verbose output, which while may be more informative, would be harder to analyse.
 
 \chapter{Project Aims}
 \section{Primary Aim}
@@ -177,32 +196,27 @@ A teacher will set a coursework assignment. This will be a task that requires a 
 \objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors}
-\objitem{Results}{Display test results}{Medium Priority}{A submitted test case can run against all of the solutions. Display the results (passed, failed, error, feedback?) on each.}
+\objitem{Results}{Display test results}{Medium Priority}{A submitted test case can run against all of the solutions. Display the results (passed, failed, error, feedback?, metadata?) on each.}
 \objitem{Source}{Show source code}{Medium Priority}{A student should be able to read the source code, for example to inspect the coding style (variable names, structure etc.)}
-\objitem{Feedback}{Add feedback}{Medium Priority}{Provide a framework for providing feedback to a specific coursework solution}
-\objitem{Sandbox}{Sandbox the system}{Low Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental)}
-\objitem{Overview}{Overview screen}{Low Priority}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback}
-\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle}
+\objitem{Feedback}{Add feedback}{Medium Priority}{Provide a framework for providing feedback to a specific coursework solution.}
+\objitem{Sandbox}{Sandbox the system}{Low Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental).}
+\objitem{Overview}{Overview screen}{Low Priority}{Provide a way for the teacher who set the coursework to see all of the active solutions and the tests run on each of them, as well as any feedback.}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle.}
+\objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
 
 \subsection{Discussion of Objectives}
 \subsubsection*{OBJ-Upload}
-When the student is submitting a solution, this should be contained within a single file. For this iteration of the project, the upload system will focus on python scripts.
+When the student is submitting a solution, this should be contained within a single file. For this iteration of the project, the upload system will focus on a coursework that is completed using python.
 \subsubsection*{OBJ-Test}
-Possible implementations of this subsystem include:
+As previously discussed in section \cn, possible implementations of this subsystem include: Unit, expected/actual i/o, property based and scenario testing. For the purposes of evaluating this prototype, we will focus on:
+\subsubsection*{OBJ-Feedback}
+An ideal implementation of this would provide a way for students to give feedback to their assessees outwith the confines of test cases. Possible methods of feedback could include:
 \begin{itemize}
-\item Expected-Actual I/O: The tester will create two files. One containing input, and the other containing output. The results of the test is how the actual output compares with the expected output. The testee needs to build a solution that offers file I/O.
-\item Unit Test: The tester will build a unit test class using an xUnit format. This should test the interface of the solution. The testee needs to build a solution that implements an interface.
-\item Unit Test with Auto-Build of Test Classes: The tester provides the body for various xUnit-style assertions. The system will insert these into a test class. The testee needs to build a solution that implements an interface.
-\item Scenario Testing: The tester builds a program that accesses the solution. The results of the test are up to the tester to display. The testee needs to build a solution that offers some sort of interface.
+ \item Attaching comments to (the results of) test cases
+ \item Annotating the source code of solutions (on a line by line basis)
+ \item Providing general comments for a submitted solution
 \end{itemize}
-\begin{tabular}{c||c|c|c|c}
-Test type & Tests & Solution & Results Useful & System\\\hline
-Expected I/O & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
-Unit & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
-Unit w/ Auto & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
-Scenario & Easy - Diff & Easy - Diff & Binary - Detailed & Easy - Diff\\
-\end{tabular}
-10.1.1.86.6367 - section 2.3 lists various dependency properties during testing 
+
 
 \chapter{Evaluation Strategy}
 
@@ -220,8 +234,11 @@ In order to evaluate whether each test property has been met, a good strategy wo
 \begin{enumerate}
  \item Use a simple programming exercise, e.g. a Binary Search Tree
  \item Have test subjects perform the process of peer assessment each others solutions without the website
+ \item Test subjects respond to questionnaire regarding this process
  \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
  \item Have test subjects again perform a peer assessment but this time with the website
+ \item Test subjects respond to questionnaire regarding this process
+ \item Test subjects then (answer questionnaire about comparison OR attend discussion session)
 \end{enumerate}
 I feel the evaluation would need to be performed in this way (with subjects both using the website, and not using it), as in order to test \textbf{TST-Improve}, as you can only really gauge how the subjects feel about the website if they have tried both with and without it. The issue with testing in this manner is one of learning. As subjects will have completed one task already, their opinions and ability may be skewed by the second task. To mitigate this, we would want to swap the order in which both the tasks and the use of the website occurs (ideally this requires a minimum of 4 pairs of test subjects).\par
 In order to test \textbf{TST-Submit}, this can easily be tested by A) Timing how long it takes subjects to complete the process of submitting files and test cases to the website vs a shared file system, and B) Asking the subjects which method they feel is faster.\par
@@ -239,22 +256,78 @@ Copy in ethical thingy here, or as an appendix
 \section{Requirements}
 Based on the objectives outlined in section \textbf{wherever}, I can establish the following system requirements:\par
 \begin{longtable}{ccc}
-\textbf{ID} & \textbf{Description} & \textbf{Priority}\\
-
+\textbf{ID} & \textbf{Description} & \textbf{Priority}\\\hline
+F01 & Log users in & High\\
 \end{longtable}
 
-
 \section{Design}
+Optional. uml diagrams, etc.
+
+\section{Sequence of Operations}
+\begin{sequencediagram}
+\newthread{u}{User}
+\newinst[2]{i}{Interface}
+\newinst[2]{f}{Files}
+\newinst[2]{s}{Shell}
+
+\begin{sdblock}{Submission}{}
+    \begin{call}{u}{Submit solution}{i}{ready}
+        \begin{call}{i}{Store solution}{f}{errors?}
+        \end{call}
+    \end{call}
+\end{sdblock}
+
+\begin{sdblock}{Test Submit}{}
+\begin{messcall}{u}{Submit test}{i}{ready}
+    \begin{call}{i}{Store test}{f}{errors?}
+    \end{call}
+\mess[1]{i}{ready}{u}
+\begin{call}{i}{Execute test}{s}{result}
+    \begin{call}{s}{Get solution and test}{f}{files}
+    \end{call}
+\end{call}
+\begin{call}{i}{Store result}{f}{errors?}
+\end{call}
+\end{messcall}
+
+\end{sdblock}
+
+\end{sequencediagram}
 
 
 \chapter{Project Management}
-The following deadlines exist for the project:
+\section{Timetable}
+The following hard deadlines exist for the project:\\
+\begin{tabularx}{\textwidth}{lX}
+\textbf{Date} & \textbf{Task}\\
+24 Nov 2016 & First Deliverable submitted as a PDF through Vision\\
+25 Nov 2016 & Ethics approval submission made through project system\\
+16 Dec 2016 & Interview with supervisor and second reader completed\\
+17 Mar 2017 & Draft dissertation to supervisor for written feedback\\
+24 Apr 2017 & Dissertation submitted\\
+. & Dissertation submitted as a PDF through Vision\\
+. & Dissertation and ZIP file of all files submitted through Project System\\
+ 5 May 2017 & Poster uploaded through Vision\\
+. & Edinburgh Poster Session
+\end{tabularx}\\
+In addition to these, I have arranged the following self-imposed targets:\\
+A gantt chart is included in the appendices.
+\section{Risk management}
+\riskitem{Eval}{Not enough users for evaluation}{Likely, Big Impact}{It may be the case that I am not able to get a substantial number of participants during the evaluation. In this event, I will have to... get more detailed info from the few participants that I do get...?}
+\riskitem{No-Impl}{No usable implementation for evaluation}{Unlikely, Big Impact}{I may be unable to complete a usable implementation in time for the evaluation. If I suspect this is the case beforehand, I will scale back the scope and focus on implementing core functionality. In the worst case, a wizard-of-oz style system could be set up at the last minute.}
+\section{Issues}
+Detail professional, legal, ethical, etc. issues in this section.\\
+If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
+
+\chapter{Conclusion}
+Do I need this?
 
 \bibliography{../Dissertation}{}
 \bibliographystyle{plain}
 
-\section*{Acknowledgements}
+\appendix
+\section{Gantt Chart}
 
-\section*{Appendices}
+
 
 \end{document}
