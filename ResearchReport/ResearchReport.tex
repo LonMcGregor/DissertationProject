@@ -11,6 +11,9 @@
 \usepackage{cite}
 \usepackage{tikz}
 \usepackage{pgf-umlsd}
+\usepackage{pgfgantt}
+\usepackage{pdflscape}
+\usepackage{showframe}
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -23,6 +26,12 @@
 \newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
 \newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{RSK-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
+
+
+\newcounter{FunCount}
+\newcounter{NFunCount}
+\newcommand{\freq}[2]{\addtocounter{FunCount}{1}F\arabic{FunCount} & #1 & #2\\}
+\newcommand{\nfreq}[2]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & #1 & #2\\}
 
 % \keepXColumns
 \pdfinfo{%
@@ -66,6 +75,7 @@ Date: \today
 \vfill
 
 \section*{Acknowledgements}
+Thanks to Manuel Maarek for helping me to organise this project.
 
 \pagebreak
 
@@ -92,6 +102,7 @@ For the initial prototype of this website and evaluation, I would focus on using
 
 \chapter{Background}
 There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview.
+\section{Motivation}
 \subsection{sadler-impact-2006}
 Peer assessment is a process in which students work to assess each others work. Sadler \& Good \cite{sadler_impact_2006} have suggested the following concepts that peer assessment can help with
 \begin{itemize}
@@ -101,12 +112,41 @@ Peer assessment is a process in which students work to assess each others work. 
  \item Peer assessment can help students better understand testing and can become aware of their own strengths and weaknesses
  \item Following peer assessment students can gain an improved attitude towards the process of learning as a whole
 \end{itemize}
-From this, we can see that using peer assessment is definitely a desirable choice. However, given that it requires the participation of students, and sharing of work, this might be tricky to achieve.\cn?
+From this, we can see that using peer assessment is definitely a desirable activity to include in the educational process. However, given that it requires the participation of students, and sharing of work, this might be tricky to achieve.\cn?
 
-\subsection{li-role-2016}
-When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
-This quasi-experimental study was conducted with some in-training teachers, and aimed to see which is the most effective method of / using / while conducting a peer assessment exercise: Having assessors and assessees know each others identities, remain anonymous, or know identities while having received training.\par
-One concern I have with this study is that it didn't cover the case of being anonymous and getting training. This was because the training was intended as a fallback for when anonymity is not possible. But this does invite the question of just how effective would anonymity be if training were offered as well.\par
+
+\subsubsection{li-assessor-2010}
+A study conducted by Li et at. \cite{li_assessor_2010} investigated the peer assessment process with the aim of discovering which part of it is most useful to the students involved: Being an assessor or an assessee. To study this, students were given the task of creating a webquest project. This was then marked by independent assessors, and the students were given a chance to provide feedback on other students webquests. Following this, the feedback was shared back, students were given another chance to improve their project, and it was marked again. The quality of the peer feedback itself was also checked by the independent markers. The study found that 
+\begin{quote}
+``there was a significant relationship between the quality of the peer feed-back the students provided for others and the quality of the students’ own final projects''
+\end{quote}
+The findings of the investigation would suggest that the actual exercise of providing feedback to others (acting as an assessor) is a worthwhile process for learning from. This study also concluded that there was no reasonable link between the feedback itself as a learning tool, suggesting that the act of giving feedback itself is more valuable and that low quality feedback does not harm the learning experience.\par
+If the act of assessing the work of fellow students does indeed aid in learning, then it is clear that making the process more accessible would be of great value.
+
+%seems rather disjointed
+\subsection{mogus-impact-2012}
+There has been a rapid increase in the use of websites and internet connected services in recent times (is a \cn really needed?). One such style of website is the Virtual Learning Environment (VLE). Examples of such websites could include Moodle, \cite{mooble_about_2016} or Blackboard \cn. The use of a VLE can be very valuable to students learning.\par
+Analysis performed by Mogus et al. \cite{mogus_impact_2012} looked at data collected over two semesters of a (what kind) course. The study then correlated the use of various tools offered by Moodle (the VLE of choice in the study) against the success of students in that course, as measured by their final grade. The analysis 
+revealed that the interactions used within the VLE do have a positive influence on the eventual grades a student receives. It is worth noting this was not determined by using a control group, but by grouping students by their final grade, and then analysing the results.\par
+Given that VLEs can be useful to students, and that the desired peer assessment system would be an online website, it seems that a logical aim would be to build a website that is modular enough that it may be integrated into such a VLE as Moodle \cite{moodle_about_2016}.
+
+\subsection{smith-using-2012}
+A study performed in a classroom environment by Smith et al.\cite{smith_using_2012} focused more on the use of peer assessment as a tool for teaching testing of code. Over the course of this study, which took place using coursework from a 12-week university course, the following was completed for each coursework: Submitting solutions, then submitting peer reviews (which includes a description of the testing that they performed on another solution, and the results of this), and then a review of the peer assessment (including what was learned, an evaluation of feedback on their own solution, and optionally a corrected solution).\par
+One particularly noteworthy aspect of this study was the double-blind nature, ensuring anonymity. Students would not be aware of who they were marking, or were marked by. To enforce this completely, submitted code was obfuscated (java sources into byte code). One advantage of this is that it strips out identifying variable names and comments, which could identify other students. However, a downside of using byte code is that it can make it difficult to do in-depth analysis of the source structure which may make it harder to write complete test cases.\par %what do with this info?
+The study identified two key features that assignments for a study of this nature need to have:
+\begin{itemize}
+ \item Well-defined interfaces
+ \item Freedom for implementation
+\end{itemize}
+% put this here or in the planning section? From this, we can define some possible exercises that could be used during an evaluation of a peer assessment website.
+This study found that the process of peer assessment was enjoyed by the students, and it ... %summarize here
+
+\subsection{hooshangi-can-2015}
+A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build programs defensively, with the mindset that fellow studetns would later try to break them.\par
+This study found that  - not sure how much I can glean from this one
+
+
+\section{Similar Work}
 
 \subsection{davies-computerized-2000}
 A study by Phil Davies\cite{davies_computerized_2000} was conducted using a peer testing system in a university communications and networking module. This peer testing system aimed to help students easily provide feedback on reports, in addition to attempting to locate plagiarism.\par
@@ -120,69 +160,55 @@ This experiment followed the results students achieved over a sequence of 4 task
 \end{enumerate}
 The experiment looked to see if the peer marking was at all helpful in improving the marks of students between the two tests. The results found that the peer marking was very useful for students who had initially performed poorly. Student comments on the experience would suggest that they found the peer assessment process both enjoyable and informative\cn. There is also evidence from this feedback indicating the importance of maintaining anonymity, as some students felt that the feedback given to them was unfair \cn.
 
-\subsection{smith-using-2012}
-A study performed in a classroom environment by Smith et al.\cite{smith_using_2012} focused more on the use of peer assessment as a tool for teaching testing of code. Over the course of this study, which took place using coursework from a 12-week university course, the following was completed for each coursework: Submitting solutions, then submitting peer reviews (which includes a description of the testing that they performed on another solution, and the results of this), and then a review of the peer assessment (including what was learned, an evaluation of feedback on their own solution, and optionally a corrected solution).\par
-One particularly noteworthy aspect of this study was the double-blind nature, ensuring anonymity. Students would not be aware of who they were marking, or were marked by. To enforce this completely, submitted code was obfuscated (java sources into byte code). One advantage of this is that it strips out identifying variable names and comments, which could identify other students. However, a downside of using byte code is that it can make it difficult to do in-depth analysis of the source structure which may make it harder to write complete test cases.\par %what do with this info?
-The study identified two key features that assignments for a study of this nature need to have:
-\begin{itemize}
- \item Well-defined interfaces
- \item Freedom for implementation
-\end{itemize}
-% put this here or in the planning section? From this, we can define some possible exercises that could be used during an evaluation of a peer assessment website.
-This study found that the process of peer assessment was enjoyed by the students, and it ... %summarize here
+
+\subsection{keppell-peer-2006}
+A research project was conducted by keppel et al.\cite{keppell_peer_2006} which involved some university lecturers re-structure their courses to involve more peer learning, with the aid of a virtual learning environment. 
+Peer assessment should be in the form of feedback, they say, as making this part of the ggrade changes the dynamic.
+study 1: using the vle to upload files, and then critiquing files to improve them (in this case fashion designs) - students appreciated the immediate nature of feedback. students also appreciated the fact that this provided a more balanced feedback system than just a teacher telling them. 
+I worry this one might be a bit too off-topic.
+Related as the peer assessmnt website is in and of itself a sort of virtual learning environment, if a bit more restrictive than blackboard. (or not as the case may be, honhonhonhon)
 
 
-\subsubsection{li-assessor-2010}
-A study conducted by Li et at. \cite{li_assessor_2010} investigated which part of the peer assessment process is useful to the peers taking part: Being an assessor or an assessee. To study this, students were given the task of creating a webquest project. This was then marked by independent assessors, and the students were given a chance to provide feedback on the work of others. When the feedback was shared back, students were given another chance to improve their project, and it was marked again. The quality of the peer feedback itself was also checked by the independent markers.\par
-The study found that 
-\begin{quote}
-there was a significant relationship between the quality of the peer feed-back the students provided for others and the quality of the students’ own final projects
-\end{quote}
-This suggests that the actual exercise of providing feedback to others (acting as an assessor) is a worthwhile process for learning from. This study also found no evidence that the feedback itself was useful as a learning tool, suggesting that the act of giving feedback itself is more valuable.\par
-
-\subsection{hooshangi-can-2015}
-A study was conducted by Hooshangi, Weiss and Cappos \cite{hooshangi_can_2015} which investigated how the use of a security-based peer testing would help with teaching how to program securely. By setting assignments which would require the students to build programs defensively, with the mindset that fellow studetns would later try to break them.\par
-This study found that  - not sure how much I can glean from this one
+\subsection{ruef-build-2016}
+Build-it, Break-it, Fix-it\cite{ruef_build_2016}\cite{ruef_build_2015} is a programming contest that uses the concept of a Peer testing system to judge the success of various programming assignments, both in terms of general correctness and specifically in the context of security. This is somewhat different to the aim of an educational peer assessment website, however it is worth mentioning as ... why?
+BiBiFi paper(s)\par
 
 \subsection{farnqvist-competition-2016}
 One interesting feature that could be implemented in a peer assessment website would be to integrate an automated testing framework. This would be able to give immediate (though limited in detail) pass/fail information, without having to wait for peers to add their own detailed feedback. The effectiveness of an automated testing tool (in this case not integrate into a competitive environment, not a peer assessment one) was investigated \cite{farnqvist_competition_2016}.\par
 This study investigated how introducing a competitive element to a Data Structures and Algorithms CS course might help students to learn. The survey took place over two runs of the course over 2011 and 2012. In the 2011 course, lab contests were graded manually, and a voluntary contest used an automated grader. In the 2012 course, the lab assignments were marked using an automated grader for testing correctness and efficiency, and by human lab assistants to check code quality.\par
 This test showed the attitudes of some students towards the use of an automated grader.
 
+
+\section{How to Implement}
+
+\subsection{li-role-2016}
+When developing a peer assessment system, or an assessment system of any kind, it is important to know whether or not to reveal the identities of those being assessed. Very often, assessment marking is done anonymously\cn.A study was conducted\cite{li_role_2016} that aimed to investigate just how effective anonymity is when it comes to making peer assessment more effective, and whether any negative impact from a lack of anonymity can be mitigated.\par
+This quasi-experimental study was conducted with some in-training teachers, and aimed to see which is the most effective method of / using / while conducting a peer assessment exercise: Having assessors and assessees know each others identities, remain anonymous, or know identities while having received training.\par
+One concern I have with this study is that it didn't cover the case of being anonymous and getting training. This was because the training was intended as a fallback for when anonymity is not possible. But this does invite the question of just how effective would anonymity be if training were offered as well.\par
+
 \subsection{sitthiworachart-effective-2004}
 Peer assessment with an automatic test as a base for discussion and marking\cite{sitthiworachart_effective_2004}\par
 Students, when asked, want anonymity [ I should blackbox or obfuscate]\par
 
-\subsection{ruef-build-2016}
-Build-it, Break-it, Fix-it\cite{ruef_build_2016}\cite{ruef_build_2015} is a programming contest that uses the concept of a Peer testing system to judge the success of various programming assignments, both in terms of general correctness and specifically in the context of security. This is somewhat different to the aim of an educational peer assessment website, however it is worth mentioning as ... why?
-BiBiFi paper(s)\par
-
 \subsection{sandbox}
-If the website we aim to create is going to integrate built-in running of test cases we will need to make sure to use the right way of doing this.\par
-There are apparmor, selinux and FBAC \cite{schreuders_empowering_2011}. But these are more focused on general applications running.\par
-There is also the idea of running python directly in the browser - I think \url{http://pypyjs.org/} does this all in-memory... right? But problem there is you can't really store the test data, without getting it back in from the browser, then storing... and then you'd have to deal with it having to do possibly extensive operations in-browser blocking everything up (i tested this with a bogo sort, it doesnt work too well).\par
-Another option is to use pypy sandboxing - but this is incomplete and doesn't look to be finished any time soon.\par
+If the website we aim to create is going to integrate built-in running of test cases we will need to make sure to use the right way of doing this. Because the website we aim to build will accept solutions from students that will need to be executed, it is important that these applications be restricted in terms of the permissions available to them. Restricting how they can interact with the executing computer will prevent malicious attacks or accidental errors in code from damaging the whole system.\par
+Some available security measures include AppArmor, SELinux, FBAC amongst others. A study by \cite{schreuders_empowering_2011} investigated how easy it is to set up the relevant security measures. They found that the FBAC-LSM security model was the best in terms of the ease of setting up, and ensuring that programs worked correctly. The tool offered for FBAC-LSM security set up would be a good candidate for use in a peer assessment system for running programs.\par
+There is also the idea of running programs directly in a browser, using a JavaScript interpreter in a way such as \cn \url{http://pypyjs.org/}. In this manner, the local file system would be protected, as the filespace used by the python interpreter is virtual in memory. However this would not be an ideal solution, as if there were security risks they would simply be placed upon the assessor instead. Additionally, this model of execution would make it more difficult to get and store results of tests and would need to be run synchronously in the website UI. Long operations could also block the browser from functioning\cn {me, bogo sort} .\par
+Another method might be to modify source codes to use a language-specific sandboxing features. One interpreter/compiler \cn is PyPy, which is designed to offer some sandboxing. However, PyPy is still in development and could not be relied upon for our purposes. Look for other language versions?\par
+One issue with sandboxing security mechanisms is that such systems can only protect the executing operating system from programs that access certain API calls, they cannot identify malicious code. For this reason it might be worth integrating some form of anti-malware analysis as well.\par
 
-\subsection{mogus-impact-2012}
-The use of a virtual learning environment (VLE) can be very valuable to students learning. Analysis performed by Mogus eet al. \cite{mogus_impact_2012} looked at data collected over two semesters of a (what kind) course. It then correlated the use of various tools offered by moodle (the VLE in use) against the success of students in that course (measured by their final grade). The analysis performed revealed that the interactions used within the VLE do have a positive influence on the eventual grades a student receives. It is worth noting this was not determined by using a control group, but by grouping students by their final grade, and then analysing the results.\par
-Given that VLEs can be useful to students, and that the desired peer assessment system would be an online website, it seems that a logical aim would be to build a website that is modular enough that it may be integrated into such a VLE as Moodle \cite{moodle_about_2016}.
-
-\subsection{keppell-peer-2006}
-A research project was conducted by keppel et al.\cite{keppell_peer_2006} which involved some university lecturers re-structure their courses to involve more peer learning, with the aid of a virtual learning environment. 
-Peer assessment should be in the form of feedback, they say, as making this part of the ggrade changes the dynamic.
-study 1: using the vle to upload files, and then criquing files to improve them (in this case fashion designs) - students appreciated the immediate nature of feedback. students also appreciated the fact that this provided a more balanced feedback system than just a teacher telling them. 
-I worry this one might be a bit too off-topic.
-Related as the peer assessmnt website is in and of itself a sort of virtual learning environment, if a bit more restrictive than blackboard. (or not as the case may be, honhonhonhon)
 
 \section{testing styles}
 When considering the testing of software, there are several ways that this can be done. To produce a website that enables peer assessment, an appropriate testing methodology will need to be selected. Testing methodologies considered include:\cn
 \begin{itemize}
- \item Unit testing - The use of xUnit style tests. Often used in test-driven development, these could be useful in detecting flaws if written post-development by a peer assessor
+ \item Unit testing - The use of xUnit style tests. Often used in test-driven development, these could be useful in detecting flaws if written post-development by a peer assessor. This would need the assessor to be familiar with how to write xUnit style tests, and how they should be structured, or it would not be viable.
  \item Expected output testing - Running a program with some input and comparing the output to what is expected. The issue here is that the peer assessor first needs to know what the correct output is. Unlike unit testing, this would simply involve a series of inputs, and a series of expected outputs, and the task of checking the correctness from these tests is left to the website.
  \item Scenario Testing - Simulate an actual usage scenario. Assessors would use solutions as if they were 3rd party libraries, and develop their own programs that would use these as if in an actual use case. These programs would perform checks to make sure the solutions being tested were running as expected. This is more involved than unit or expected output testing, as it might be better placed to discover side effects of continued use of the solution.
- \item Property based testing - Using a proof checker, such as QuickCheck (or similar) to ensure that a program is acting correctly. This would place additional overhead onto the students as assessors, as they would need to learn and understand the annotations used by a proof checker.
+ \item Property based testing - Using a proof checker, such as QuickCheck (or a similar implementation for languages other than Haskell) to ensure that a program is acting correctly. This would place additional overhead onto the students as assessors, as they would need to learn and understand the annotations used by a proof checker, but could provide a lot of coverage of possible inputs.
 \end{itemize}
-In all cases, the solution being tested needs to conform to a standard interface. And in each case, the website running the tests needs to be able to extract some meaningful information. This is simpler in terms of unit and expected output, as these will offer output that will be easily readable (e.g. by diff, a count of pass/fail tests); scenario and property based tests would produce more verbose output, which while may be more informative, would be harder to analyse.
+In all cases, the solution being tested needs to conform to a standard interface. And in each case, the website running the tests needs to be able to extract some meaningful information. This is simpler in terms of unit and expected output, as these will offer output that will be easily readable (e.g. by diff, a count of pass/fail tests); scenario and property based tests would produce more verbose output, which while may be more informative, would be harder to analyse and subsequently summarise. 
+
+
 
 \chapter{Project Aims}
 \section{Primary Aim}
@@ -191,7 +217,7 @@ The primary aim of this project is to prototype a website that will help to auto
 A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submission are made, the process of peer assessment can begin. This will involve students testing the code of other students, but submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
 
 \section{Objectives}
-\objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will interact with.}
+\objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will log in and interact with.}
 \objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments.}
 \objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time}
@@ -248,6 +274,9 @@ In order to test \textbf{TST-Submit}, this can easily be tested by A) Timing how
 \subsection{Test Subjects}
 The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
 
+\subsection{Feedback}
+Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment i complete, where participants are invited to openly discuss how they feel about the concepts covered.
+
 \subsection{Ethical Analysis}
 Copy in ethical thingy here, or as an appendix
 
@@ -257,7 +286,27 @@ Copy in ethical thingy here, or as an appendix
 Based on the objectives outlined in section \textbf{wherever}, I can establish the following system requirements:\par
 \begin{longtable}{ccc}
 \textbf{ID} & \textbf{Description} & \textbf{Priority}\\\hline
-F01 & Log users in & High\\
+\freq{Log students in}{High}
+\freq{Log teachers in}{Low}
+\freq{Let teachers set assignments}{Low} %for our purposes, teacher activity can be hard coded, right?
+\freq{Accept student uploads of solutions to assignments}{High}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\freq{}{}
+\nfreq{Accept solutions that are python scripts}{High}
+\nfreq{}{}
+\nfreq{}{}
+\nfreq{}{}
+\nfreq{}{}
+\nfreq{}{}
+\nfreq{}{}
 \end{longtable}
 
 \section{Design}
@@ -315,18 +364,49 @@ A gantt chart is included in the appendices.
 \section{Risk management}
 \riskitem{Eval}{Not enough users for evaluation}{Likely, Big Impact}{It may be the case that I am not able to get a substantial number of participants during the evaluation. In this event, I will have to... get more detailed info from the few participants that I do get...?}
 \riskitem{No-Impl}{No usable implementation for evaluation}{Unlikely, Big Impact}{I may be unable to complete a usable implementation in time for the evaluation. If I suspect this is the case beforehand, I will scale back the scope and focus on implementing core functionality. In the worst case, a wizard-of-oz style system could be set up at the last minute.}
+\riskitem{Loss}{Work (Code or otherwise) is lost}{Possible, Big Impact}{During development of the application, or write-up of a report, work done might become lost, corrupted or ovewritten. To prevent this version control is used, and work is also backed up across a development machine (personal), deployment machine (University server) and cloud storage (GitHub.com). Should one of the sources be lost, the others should still be usable}
+\riskitem{End}{End of the world}{Very unlikely, Large Impact}{In the event of a cosmic gamma ray burst, asteriod impact, nuclear war or otherwise, it may become the case that the project is uncompletable. There is no mitigation strategy for this. Maybe make a deal with Bill or something...}
+\riskitem{Wares}{Software that is needed does not work}{Possible, Large Impact}{A software package that the implementation relies upon is unable to meet the requirements, or has bugs, or simply does not work.}
 \section{Issues}
 Detail professional, legal, ethical, etc. issues in this section.\\
 If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
 
-\chapter{Conclusion}
-Do I need this?
-
 \bibliography{../Dissertation}{}
 \bibliographystyle{plain}
 
+\begin{landscape}
 \appendix
 \section{Gantt Chart}
+\begin{center}
+
+\begin{ganttchart}{1}{33}
+\gantttitle{2016}{13}
+\gantttitle{2017}{20}\\
+\gantttitle{9}{1}
+\gantttitlelist{10,...,12}{4}
+\gantttitlelist{1,...,5}{4} \\
+\gantttitle{4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}
+\gantttitlelist{1,...,4}{1}\\
+
+\ganttgroup{Research Report}{1}{9} \\
+\ganttmilestone{Assign Project}{1}\\
+\ganttlinkedbar{Investigate Background}{2}{8} \\
+\ganttlinkedbar{Task 2}{3}{7} \ganttnewline
+\ganttmilestone{Milestone}{7} \ganttnewline
+\ganttbar{Final Task}{8}{12}
+\ganttlink{elem2}{elem3}
+\ganttlink{elem3}{elem4}
+\end{ganttchart}
+
+\end{center}
+\end{landscape}
 
 
 
