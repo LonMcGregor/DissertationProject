@@ -14,7 +14,7 @@
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
 \usepackage{pdflscape}
-\usepackage{showframe}
+% \usepackage{showframe}
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -102,10 +102,10 @@ The primary aim of this project is to design, build and test a prototype website
 \end{enumerate}
 For the initial prototype of this website and evaluation, I would focus on using a simple python programming exercise.
 \subsection{Overview of background research}
-This document includes some background research from previous studies on the matter of peer assessment, and some notes from previous projects that have created systems similar to the one I wish to implement. 
+This document includes some background research from previous studies on the matter of peer assessment, and some notes from previous projects that have created systems similar to the one I wish to implement.
 
 \chapter{Background}
-There has been lots of work done in looking into the use of peer testing. Introduce the various things I looked at here, as an overview. There is lots of evidence indicating that peer assessment is beneficial to all members of the educational process, helping students to learn from each other, and to reduce the workload on teachers.
+There has been lots of work done in looking into the use of peer assessment. Introduce the various things I looked at here, as an overview. There is lots of evidence indicating that peer assessment is beneficial to all members of the educational process, helping students to learn from each other, and to reduce the workload on teachers.
 \section{Motivation}
 \subsection{What peer assessment offers}
 Peer assessment is a process in which students work to assess each others work. Sadler \& Good \cite{sadler_impact_2006} have suggested the following concepts that peer assessment can help with
@@ -138,10 +138,11 @@ The study identified two key features that assignments for peer assessment need 
 In addition to this, Smith has found that it was possible to integrate the peer assessment process without having to significantly alter the existing course material, and the students taking part enjoyed the experience. This shows promise, as it could indicate many computer science courses (that offer coursework meeting the requirements), could be modified to include their own peer assessment exercises.
 
 \subsection{Internet Based Learning}
+\todo{not sure if this should go here}
 There has been a rapid increase in the use of websites and internet services in recent times, and many of these services can aid in student learning. One such style of website is the Virtual Learning Environment (VLE). Examples of such websites could include Moodle, \cite{moodle_about_2016} or Blackboard \cite{blackboard_blackboard_2016}. The use of a VLE can be very valuable to students learning, as they offer such features as integrated coursework submission systems, discussion forums, sections for storing and displaying class lecture notes and more.\par
 Analysis performed by Mogus et al. \cite{mogus_impact_2012} looked at data collected over two semesters of a teacher education course. The study then collected bulk data regarding usage statistics from the various tools offered by Moodle (the VLE of choice in the study). During analysis, this data was correlated against the success of students in that course, as measured by their final grade. The analysis 
 revealed that the interactions used within the VLE do have a positive influence on the eventual grades a student receives. It is worth noting this was not determined by using a control group, but by grouping students by their final grade, and then analysing the results.\par
-Given that VLEs can be useful to students, and that the desired peer assessment system would be an online website, it seems that a logical aim would be to build a website that is modular enough that it may be integrated into such a VLE as Moodle.
+Given that VLEs can be useful to students, and that the desired peer assessment system would be an online website, it seems that a logical aim would be to build a peer assessment system that is modular enough that it may be integrated into such a VLE as Moodle.
 
 \subsection{Peer Assessment}
 Peer assessment can prove to be a very valuable experience for students. Falchikov has collected various case studies of past peer assessments \cite{falchikov_improving_2013}, and the following aspects can be found:
@@ -149,10 +150,10 @@ Peer assessment can prove to be a very valuable experience for students. Falchik
  \item If the marking criteria are properly explained, there is often no significant difference between the marks awarded by students and those that would be awarded by teachers. This would tend to indicate that students do assess each other fairly.
  \item One of the most important aspects of peer assessment is the ability of the student to learn how to assess other students and then know how to critically assess and improve their own work as a result.
  \item It is important to make sure students feel confident, otherwise they may not assess their peers as honestly as they might otherwise have done. Some students will feel conflicted about marking their peers, particularly if they might have to give low marks.
+ \item During peer assessment more benefits may come from students assessing multiple solutions, rather than each focusing on one.
 \end{itemize}
-\todo{summarize and add MORE. also, may be worth moving some of this somewhere?}
-Falchikov goes on to discuss the different levels of input that students can have while engaging in such assessments. There are some where the teacher provides all of the criteria for marking/assessing; some where there is discussion between the students and teachers, where each decide what criteria are more important; and lastly offering full control of the criteria to mark over to students. \todo{describe impacts of each, suggest which is most useful}
-Falchikov describes some of the ways that students can perform the assessment. For example, using likert scaleS OR CHECKLISTS TO verify the outcome of the assessed work against a marking criteria. Model answers can work, but only for restricted answer style knowledge quizzes.
+
+\todo{need summary here, or big summary of all background at end}
 
 
 \section{Similar Work}
@@ -182,7 +183,7 @@ The project took place over 3 different case studies. The different studies used
 \end{itemize}
 The authors of the project also suggest that unless the peer assessment within the VLEs is a marked process (against a students grade), students may be unwilling to participate. These findings are quite useful, and are a good indicator that the positive aspects of traditional peer assessment are not hindered by using an online system (as opposed to in-person activities).
 
-\subsection{testing system implementation starting model find a better title}
+\subsection{BiBiFi Contest System}
 Build-it, Break-it, Fix-it\cite{ruef_build_2016} is a programming contest that uses the concept of a Peer testing system to judge the success of various programming assignments. This success is measured both in terms of general correctness and specifically in the context of security. This is somewhat different to the aim of an educational peer assessment website, however it is worth mentioning as the implementation used by the project is, I believe, a good starting model for my implementation of a web platform.\par
 The contest requires participants to \textit{build} a working solution that matches functional specifications, as well as being as secure as possible. If the solution can be built and the functionality verified by an automated system, then the team can move on to the next stage. Following this, testers will attempt to \textit{break} the security of the solution, and points will be allocated according to a zero-sum-game. The builders can then gain points by \textit{fixing} their solutions.\par
 Throughout the contest, there is a central web-based infrastructure that manages running the contest website (with scoreboards, etc.), listening to builder git repositories, and also running and recording test results. The basic structure is as follows:
@@ -209,10 +210,26 @@ I believe this advice is quite useful for our purposes. If building such a syste
 Additionally, Goldwasser left the autograder used within his study open for download \cite{goldwasser_autograde_2002}. This script could be used as a starting point for implementation of running test cases. However, it does seem to offer more than I require, such as automatically grading (beyond just verifying test cases), and checking against a model answer.
 
 \subsection{Automated Testing}
-As an aside to peer assessment, one optional feature of such an implementation could be to offer automated testing. If a lecturer so wished, they could use the system with a pre-submitted test case. In effect, acting as a peer to each student, so that they could recieve test results immediately (or as quickly as the test completes) upon submission.\par
+As an aside to peer assessment, one optional feature of such an implementation could be to offer automated testing. If a lecturer so 7wished, they could use the system with a pre-submitted test case. In effect, acting as a peer to each student, so that they could recieve test results immediately (or as quickly as the test completes) upon submission.\par
 The effectiveness of an automated testing tool (as a sole means of feeback, outside peer assessment) was investigated Farnqvist \& Heintz \cite{farnqvist_competition_2016} within a Data Structures Course.\par
 This study investigated how introducing a competitive element to a Data Structures and Algorithms CS course might help students to learn. The survey took place over two runs of the course over 2011 and 2012. In the 2011 course, lab contests were graded manually, and a voluntary contest used an automated grader. In the 2012 course, the lab assignments were marked using an automated grader for testing correctness and efficiency, and by human lab assistants to check code quality. The automated grader in use was Kattis \cite{enstrom_five_2011}\par
 This test showed the attitudes of some students towards the use of an automated grader. Students found this automated grading to be more fair than the manual equivalent. The study also found that ``students put in more effort in the course thanks to automated assessment''. This would suggest that allowing my implementation to be configured to run as an automated tester might be a worthwhile addition.\par
+
+\subsection{Ceilidh}
+In the 1990s, the University of Nottingham, produced a system that had the intent of automating and improving the assessment process for C Language Coursework, with later improvements by Heriot-Watt University adding support for later Standard ML (SML) \cite{foubister_automatic_1997}. This tool was used to guide students through the coursework, and then check the correctness of submissions. Ceilidh offered a skeleton answer to students, which pointed out any special language features that should be used. The submitted solutions are checked for correctness with a mixture of verifying output against a model solution, and checking the style of the code (e.g line count, use of certain function names, etc).  In particular for SML, students were asked to provide the types for written functions, as an additional test of understanding.\par
+A study conducted by Foubister et al. investigated if such a system used for automatic assessment of students would be useful. To check this, the results of the final exam mark were compared to those marks from previous years where Ceilidh was not used. The study found that there was no real improvement made by Ceilidh, but most importantly there were no detrimental effects. Some positive side effects were observed: The time taken for students to receive feedback on the coursework was markedly decreased, and the tracking of progress offered by the tool allowed teachers to more easily identify any students that were having serious difficulties.\par
+Given that I wish to implement a system that is more geared towards peer assessment rather than automated assessment, I think that the most valuable idea to draw from this would be the tracking that is offered to the teacher. Even though it is the students who will be doing the actual assessment, teachers should be able to see how students are progressing with these.
+
+\subsection{Summary}
+There have been many computerised assessment systems that have been produced, covering many aspects from reviewing reports, to testing the security of programs in a contest environment. Many more systems have been created than are covered here. Some of the more important conclusions I draw from existing systems includes:
+\begin{itemize}
+ \item Such automated systems can improve the experience for students by making the assessment process more fair, enjoyable and interactive
+ \item Such systems can be useful for teachers as a way tor educe the overhead in giving feedback to students, and to more easily identify students experiencing difficulties
+ \item Students using such systems benefit from interacting with the work of lots of other students
+ \item In addition to offering a peer assessment system for testing code solutions, it may be worth including a model-answer checker to verify solutions are correct
+ \item . \todo{students learn more from the actual marking than they do from getting the feedback, so having a model answer checker available after might be useful}
+\end{itemize}
+
 
 \section{How to Implement}
 From the previous sections we can see that there is definitely a space for a website to aid in peer testing code. However, there are many issues to consider when choosing how the website should be developed and implemented.
@@ -254,13 +271,22 @@ When considering the testing of software, there are several ways that this can b
 \end{itemize}
 In all cases, the solution being tested needs to conform to a standard interface. And in each case, the website running the tests needs to be able to extract some meaningful information. This is simpler in terms of unit and expected output, as these will offer output that will be easily readable (e.g. by diff, a count of pass/fail tests); scenario and property based tests would produce more verbose output, which while may be more informative, would be harder to analyse and subsequently summarise. 
 
+\subsection{Recording Feedback}
+\todo{add this stuff to the feedback objective + reqs}
+The desired peer assessment system would ideally integrate methods of providing feedback for testers to comment on solutions. There are many different ways this could be achieved however, beyond just receiving and recording a paragraph or two of text from the tester.\par
+\subsubsection*{Inline Code Annotations} - One feature seen in Agile software development cycles is the Code Review.\cn This involves a colleague reviewing new code, and leaving comments for improvements. GitHub enhances this process by offering inline code annotations. These allow for feedback to be more targeted and, from this, likely easier to understand. This could be a useful feature to implement, as student testers could leave comments for the developers where necessary in the code.
+\subsubsection*{Marking Against Criteria} 
+To once again draw on research conducted by Falchikov \cite{falchikov_improving_2013}, they discuss peer assessment traits in terms of the criteria used to mark other students. There are different levels of input that students can receive while engaging in preparations for peer assessments. The teacher may provide all of the criteria for marking/assessing; there may be discussion between the students and teachers, where each decide what criteria are important; and lastly offering full control of the criteria to mark over to students. In an open ended answer situation, as is offered by programming exercises, this may be a good environment to encourage the student to come up with more of the criteria.\par
+Given a criteria to mark against, it would be useful to integrate some simple systems to check that a given solution meets the defined criteria. Falchikov describes that some common methods used are likert scales or checklists, working against a known criteria.\par
+
 
 
 \chapter{Project Aims}
 \section{Primary Aim}
 The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.
 \subsection*{Sample use case}
-A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submission are made, the process of peer assessment can begin. This will involve students testing the code of other students, but submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
+\todo{better title for this section? enumerate the steps? m}
+A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submissions are made, the process of peer assessment can begin. This will involve students testing the code of other students, by submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
 
 \section{Objectives}
 \objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will log in and interact with.}
@@ -286,6 +312,7 @@ An ideal implementation of this would provide a way for testers to give feedback
  \item OBJ-Results: Attaching comments to (the results of) test cases
  \item OBJ-Source: Annotating the source code of solutions (possibly on a line by line basis, or by leaving general comments for a submitted solution).
 \end{itemize}
+\todo{either keep these separate or merge them, adding in references to criteria, as mentioned in the earlier segment}
 
 
 \chapter{Evaluation Strategy}
@@ -402,7 +429,7 @@ Optional. uml diagrams, etc.
 \end{sequencediagram}
 
 \section{System Architecture}
-\todo{Find the best place to put these. also, text descriptions?}
+\todo{Find the best place to put these. also, text descriptions?}\\
 \begin{tikzpicture}
 \tikzstyle{arrow} = [thick,->,>=stealth]
 \tikzstyle{darrow} = [thick,<->,>=stealth]
@@ -442,7 +469,7 @@ In addition to these, I have arranged the following self-imposed targets:\\
 A Gantt chart is included in the appendices.
 
 \section{Risk management}
-This section details some of the risks involved during the project, their likelihood, and a description of possible mitigation and recovery strategies. The following scales are used when measuring likelihood and impact:\\
+This section details some of the risks involved during the project, their likelihood, and a description of possible mitigation and recovery strategies. The following scales are used when measuring likelihood and impact:\\\todo{badbox?}
 \begin{tabular}{c|c|c|c|c}
 Very Unlikely & Unlikely & Possible & Likely & Very Likely
 \end{tabular}\\
