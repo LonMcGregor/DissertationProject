@@ -1,5 +1,12 @@
 \documentclass[a4paper,11pt]{report}
 
+%   _____  _____  ______          __  __ _      ____  ______ 
+%  |  __ \|  __ \|  ____|   /\   |  \/  | |    |  _ \|  ____|
+%  | |__) | |__) | |__     /  \  | \  / | |    | |_) | |__   
+%  |  ___/|  _  /|  __|   / /\ \ | |\/| | |    |  _ <|  __|  
+%  | |    | | \ \| |____ / ____ \| |  | | |____| |_) | |____ 
+%  |_|    |_|  \_\______/_/    \_\_|  |_|______|____/|______|
+
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{tabularx}
@@ -14,7 +21,7 @@
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
 \usepackage{pdflscape}
-% \usepackage{showframe}
+ \usepackage{showframe}
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -42,7 +49,20 @@
   /Author   (Leon McGregor)
 }
 
+
+
+%   _____   ____   _____ _    _ __  __ ______ _   _ _______ 
+%  |  __ \ / __ \ / ____| |  | |  \/  |  ____| \ | |__   __|
+%  | |  | | |  | | |    | |  | | \  / | |__  |  \| |  | |   
+%  | |  | | |  | | |    | |  | | |\/| |  __| | . ` |  | |   
+%  | |__| | |__| | |____| |__| | |  | | |____| |\  |  | |   
+%  |_____/ \____/ \_____|\____/|_|  |_|______|_| \_|  |_|   
+
+
+
 \begin{document}
+\bibliographystyle{plain}
+\pagestyle{empty}
 
 {\centering\Large
 \includegraphics[width=0.4\textwidth]{../hwu.png}\titles
@@ -56,17 +76,14 @@ Ron \textsc{Petrick}\\
 \vfill
 }
 
-\pagebreak
-
+\newpage
 \tableofcontents
-
-
-\pagebreak
+\newpage
 \doublespacing
 
 
 \section*{Abstract}
-This project aims to build a prototype for a peer assessment website. The website would be used in an educational environment, for example in a Computer Science course, and be used to let students easily perform peer assessment. This document will detail some of the existing relevant research, and detail a plan for development of the new website.
+Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to create a website which will be used to allows peers to test each others solutions to such coursework exercises, and to provide useful feedback. This document will detail the background research going into this project, and the plan for developing the website.
 
 \vfill
 
@@ -80,29 +97,53 @@ Date: \today
 \section*{Acknowledgements}
 Thanks to Manuel Maarek for helping me to organise this project.
 
-\pagebreak
+\newpage
 
 \pagestyle{headings}
 \markright{L\'eon McGregor - Deliverable 1: Final Year Dissertation}
 
-
-
+%   _____ _   _ _______ _____   ____  
+%  |_   _| \ | |__   __|  __ \ / __ \ 
+%    | | |  \| |  | |  | |__) | |  | |
+%    | | | . ` |  | |  |  _  /| |  | |
+%   _| |_| |\  |  | |  | | \ \| |__| |
+%  |_____|_| \_|  |_|  |_|  \_\\____/
 
 \section{Introduction}
-The aim of this project is to investigate and develop a web platform (website) which will allow for peer assessment within a computer science course. This website will aim to provide an easy way for lecturers to request programming assignments, and for students to respond by submitting completed assignments, and then testing each others code. The peer assessment will allow the students to get fast and easy to understand feedback for assignments, and could be used as a starting point for grading of assignments.\par
-The website will need to handle this in a secure manner, to prevent people other than students from accessing it. Additional security measures may be needed when running code, to prevent either intentional or accidental malicious actions from happening.\par
-The basic flow of the suggested website is as follows: The \textit{teacher} sets a \textit{coursework} assignment. \textit{Students} act as \textit{developers} (\textit{the \textit{assessees} in peer assessment}and submit \textit{solutions} to this. Then, students take the role of \textit{testers} (the \textit{assessors} in peer assessment) submitting \textit{test cases}. The test cases are run, and the \textit{results} can be displayed. Testers may provide \textit{feedback} based on these results.\par
-Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
+This project aims to create a \textit{Web Platform for Code Peer-Testing}. The web platform (referred to as the website) will be used by undergraduate Computer Science students as they complete coursework exercises. The website will be allow students to engage in peer assessment of each others solutions to exercises (in this case program code) by peer-testing. That is, students will share solutions through the website, view and test solutions for other students, and then give and receive feedback on solutions.\par
+Ideally, the peer assessment that takes place within the website will provide more immediate and useful feedback on coursework than having to wait for a teacher, and the results of testing could be used as a starting point for final grading of the coursework assignment.
 
 \subsection{Primary Aim}
 The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can successfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
 \begin{enumerate}
-\item Build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
-\item Evaluate whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, I can determine if it can offer any advantages to the users
+\item \textbf{Prototype} a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
+\item \textbf{Evaluate} whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, I can determine if it can offer any advantages to the users
 \end{enumerate}
 For the initial prototype of this website and evaluation, I would focus on using a simple python programming exercise.
+
+\subsection{Ideal Usage of Website \& Terminology}
+\begin{enumerate}
+ \item A \textit{teacher} (Course Lecturer/Professor) will set a coursework exercise
+ \item A \textit{student} on the course will act as a \textit{developer}, and create a \textit{solution} to the exercise
+ \item Students will then \textit{upload} the solution to the \textit{website}
+ \item Students take on the role of \textit{testers}. This involves creating and submitting \textit{test cases} to the website
+ \item The website will silently run these test cases and store the \textit{test results}
+ \item Testers can view the test results and the \textit{source code} of the solution
+ \item Testers can add feedback based on what they see from the source code and test results
+ \item A student can then see the feedback for, and the test cases and test results used on, their submission
+ \item A teacher can see all data that has been submitted to the website 
+\end{enumerate}
+Considering this process in terms of a more traditional peer assessment, the testers and developers would be assessors and assessees respectively.
+
 \subsection{Overview of background research}
-This document includes some background research from previous studies on the matter of peer assessment, and some notes from previous projects that have created systems similar to the one I wish to implement.
+Much research has been already completed in the study of Peer Assessment, from the front of being used as an educational tool, to being used as a basis for competition between programmers. Some relevant research into this will be analysed here.
+
+%   ____          _____ _  _______ _____   ____  _    _ _   _ _____  
+%  |  _ \   /\   / ____| |/ / ____|  __ \ / __ \| |  | | \ | |  __ \ 
+%  | |_) | /  \ | |    | ' / |  __| |__) | |  | | |  | |  \| | |  | |
+%  |  _ < / /\ \| |    |  <| | |_ |  _  /| |  | | |  | | . ` | |  | |
+%  | |_) / ____ \ |____| . \ |__| | | \ \| |__| | |__| | |\  | |__| |
+%  |____/_/    \_\_____|_|\_\_____|_|  \_\\____/ \____/|_| \_|_____/
 
 \chapter{Background}
 There has been lots of work done in looking into the use of peer assessment. Introduce the various things I looked at here, as an overview. There is lots of evidence indicating that peer assessment is beneficial to all members of the educational process, helping students to learn from each other, and to reduce the workload on teachers.
@@ -231,7 +272,7 @@ There have been many computerised assessment systems that have been produced, co
 \end{itemize}
 
 
-\section{How to Implement}
+\section{Implementation Considerations}
 From the previous sections we can see that there is definitely a space for a website to aid in peer testing code. However, there are many issues to consider when choosing how the website should be developed and implemented.
 
 \subsection{Anonymity}
@@ -279,7 +320,14 @@ The desired peer assessment system would ideally integrate methods of providing 
 To once again draw on research conducted by Falchikov \cite{falchikov_improving_2013}, they discuss peer assessment traits in terms of the criteria used to mark other students. There are different levels of input that students can receive while engaging in preparations for peer assessments. The teacher may provide all of the criteria for marking/assessing; there may be discussion between the students and teachers, where each decide what criteria are important; and lastly offering full control of the criteria to mark over to students. In an open ended answer situation, as is offered by programming exercises, this may be a good environment to encourage the student to come up with more of the criteria.\par
 Given a criteria to mark against, it would be useful to integrate some simple systems to check that a given solution meets the defined criteria. Falchikov describes that some common methods used are likert scales or checklists, working against a known criteria.\par
 
+\subsection{Summary of Implementation Considerations}
 
+%            _____ __  __  _____ 
+%      /\   |_   _|  \/  |/ ____|
+%     /  \    | | | \  / | (___  
+%    / /\ \   | | | |\/| |\___ \ 
+%   / ____ \ _| |_| |  | |____) |
+%  /_/    \_\_____|_|  |_|_____/ 
 
 \chapter{Project Aims}
 \section{Primary Aim}
@@ -314,6 +362,12 @@ An ideal implementation of this would provide a way for testers to give feedback
 \end{itemize}
 \todo{either keep these separate or merge them, adding in references to criteria, as mentioned in the earlier segment}
 
+%   ________      __     _     _    _      _______ _____ ____  _   _ 
+%  |  ____\ \    / /\   | |   | |  | |  /\|__   __|_   _/ __ \| \ | |
+%  | |__   \ \  / /  \  | |   | |  | | /  \  | |    | || |  | |  \| |
+%  |  __|   \ \/ / /\ \ | |   | |  | |/ /\ \ | |    | || |  | | . ` |
+%  | |____   \  / ____ \| |___| |__| / ____ \| |   _| || |__| | |\  |
+%  |______|   \/_/    \_\______\____/_/    \_\_|  |_____\____/|_| \_|
 
 \chapter{Evaluation Strategy}
 
@@ -350,6 +404,14 @@ Students will be invited to complete a questionnaire at key points during the ev
 
 \subsection{Ethical Analysis}
 Copy in ethical thingy here, or as an appendix
+
+
+%   _____  ________      ________ _      ____  _____  __  __ ______ _   _ _______ 
+%  |  __ \|  ____\ \    / /  ____| |    / __ \|  __ \|  \/  |  ____| \ | |__   __|
+%  | |  | | |__   \ \  / /| |__  | |   | |  | | |__) | \  / | |__  |  \| |  | |   
+%  | |  | |  __|   \ \/ / |  __| | |   | |  | |  ___/| |\/| |  __| | . ` |  | |   
+%  | |__| | |____   \  /  | |____| |___| |__| | |    | |  | | |____| |\  |  | |   
+%  |_____/|______|   \/   |______|______\____/|_|    |_|  |_|______|_| \_|  |_|
 
 \chapter{Development Plan}
 
@@ -448,7 +510,12 @@ Optional. uml diagrams, etc.
 \draw [darrow] (server) -- node[midway, auto] {} (shell);
 \end{tikzpicture}
 
-
+%   _____  _____   ____       _            __  __          _   _ 
+%  |  __ \|  __ \ / __ \     | |          |  \/  |   /\   | \ | |
+%  | |__) | |__) | |  | |    | |  ______  | \  / |  /  \  |  \| |
+%  |  ___/|  _  /| |  | |_   | | |______| | |\/| | / /\ \ | . ` |
+%  | |    | | \ \| |__| | |__| |          | |  | |/ ____ \| |\  |
+%  |_|    |_|  \_\\____/ \____/           |_|  |_/_/    \_\_| \_|
 
 \chapter{Project Management}
 \section{Timetable}
@@ -488,8 +555,8 @@ And also the impact such a risk occurring would have on the project:\\
 Detail professional, legal, ethical, etc. issues in this section.\\
 If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
 
+\singlespacing
 \bibliography{../Dissertation}{}
-\bibliographystyle{plain}
 
 \appendix
 
