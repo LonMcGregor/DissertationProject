@@ -21,6 +21,7 @@
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
 \usepackage{pdflscape}
+\usepackage{pdfpages}
 % \usepackage{showframe}
 \usepackage{geometry}
 \geometry{
@@ -479,9 +480,10 @@ The following prioritisation is used:\\
 Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
 
 \section{Design}
-Optional. uml diagrams, etc.
+Contained herein are some initial ideas as to how the imagines system might be realised.
 
 \section{Sequence of Operations}
+This diagram provides an overview for how a student might interact with with the final, implemented, system.
 \begin{sequencediagram}
 \newthread{u}{User}
 \newinst[2]{i}{Interface}
@@ -553,8 +555,7 @@ The following hard deadlines exist for the project:\\
  5 May 2017 & Poster uploaded through Vision\\
 . & Edinburgh Poster Session
 \end{tabularx}\\
-In addition to these, I have arranged the following self-imposed targets:\\
-A Gantt chart is included in the appendices.
+In addition to these, I have arranged some self-imposed targets. These are included in the Gantt chart located in the appendices.
 
 \section{Risk management}
 This section details some of the risks involved during the project, their likelihood, and a description of possible mitigation and recovery strategies. The following scales are used when measuring likelihood and impact:\\\todo{badbox?}
@@ -577,8 +578,14 @@ Detail professional, legal, ethical, etc. issues in this section.\\
 If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
 
 \singlespacing
+\footnotesize
 \bibliography{../Dissertation}{}
 
 \appendix
+
+\begin{landscape}
+\includepdf[pages={2,3},angle=90]{../Gantt.pdf}
+\end{landscape}
+
 
 \end{document}
