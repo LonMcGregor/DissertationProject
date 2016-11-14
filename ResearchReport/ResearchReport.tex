@@ -8,16 +8,16 @@
 %  |_|    |_|  \_\______/_/    \_\_|  |_|______|____/|______|
 
 \usepackage[utf8]{inputenc}
+\usepackage[backend=bibtex]{biblatex}
+\bibliography{../Dissertation}
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{xcolor}
 \usepackage{wrapfig}
-% \usepackage{ltablex}
 \usepackage{setspace}
 \usepackage{datetime}
 \usepackage{url}
-\usepackage{cite}
 \usepackage{tikz}
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
@@ -45,7 +45,6 @@
 \newcommand{\freq}[3]{\addtocounter{FunCount}{1}F\arabic{FunCount} & OBJ-#1 & #2 & #3\\}
 \newcommand{\nfreq}[3]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & OBJ-#1 & #2 & #3\\}
 
-% \keepXColumns
 \pdfinfo{%
   /Title    (Deliverable 1: Final Year Dissertation)
   /Author   (Leon McGregor)
@@ -63,7 +62,6 @@
 
 
 \begin{document}
-\bibliographystyle{plain}
 \pagestyle{empty}
 
 {\centering\Large
@@ -320,7 +318,7 @@ From the evidence available, I can gather that there is a great importance in cr
 \subsection{Security \& Sandboxing}
 If the website we aim to create is going to integrate built-in running of test cases we will need to make sure to use the right way of doing this. Because the website we aim to build will accept solutions from students that will need to be executed, it is important that these applications be restricted in terms of the permissions available to them. Restricting how they can interact with the executing computer will prevent malicious attacks or accidental errors in code from damaging the whole system.\par
 Some available security measures include AppArmor, SELinux, FBAC amongst others. A study by Schreuders \cite{schreuders_empowering_2011} investigated how easy it is to set up the relevant security measures. They found that the FBAC-LSM security model was the best in terms of the ease of setting up, and ensuring that programs worked correctly. The tool offered for FBAC-LSM security set up would be a good candidate for use in a peer assessment system for running programs.\par
-There is also the idea of running programs directly in a browser, using a JavaScript interpreter in a way such as PyPy.js \cite{pypy_web_2016}. In this manner, the local file system would be protected, as the filespace used by the python interpreter is virtual in memory. However this would not be an ideal solution, as if there were security risks they would simply be placed upon the assessor instead. Additionally, this model of execution would make it more difficult to get and store results of tests and would need to be run synchronously in the website UI. Long operations also block the browser from functioning (having tried this myself, I can see that this would be an issue).\par
+There is also the idea of running programs directly in a browser, using a JavaScript interpreter in a way such as PyPy.js \cite{pypy.js_web_2016}. In this manner, the local file system would be protected, as the filespace used by the python interpreter is virtual in memory. However this would not be an ideal solution, as if there were security risks they would simply be placed upon the assessor instead. Additionally, this model of execution would make it more difficult to get and store results of tests and would need to be run synchronously in the website UI. Long operations also block the browser from functioning (having tried this myself, I can see that this would be an issue).\par
 Another method might be to modify source codes to use a language-specific sandboxing features. One example of such an interpreter/compiler is PyPy\cite{pypy_pypy_2016}, which is designed to offer some sandboxing. However, this is still in development and could not be relied upon for our purposes.\par
 One issue with sandboxing security mechanisms is that such systems can only protect the system by blocking access certain API calls. To put it another way, sandboxes cannot in and of themselves identify malicious code. For this reason it might be worth integrating some form of anti-malware analysis as well.\par
 As an alternative to sandboxing, one common method is to re-map the root directory to prevent an application from accessing files on the system that it should not. This is known as a chroot jail \cite{ubuntu_basic_2016}. This could be a useful way of restricting the solution submitted so that it can only read the relevant files (e.g. compilers/interpreters).
@@ -589,10 +587,7 @@ Detail professional, legal, ethical, etc. issues in this section.\\
 If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
 
 \singlespacing
-\footnotesize
-\bibliography{../Dissertation}{}
-
-\appendix
+\printbibliography
 
 \begin{landscape}
 \includepdf[pages={2,3},angle=90]{../Gantt.pdf}

@@ -8,6 +8,9 @@
 *.bbl
 *.blg
 *.pdf
+*.bcf
+*.run.xml
+*blx.bib
 !hwlogo.pdf
 !Gantt.pdf
 
