@@ -38,12 +38,6 @@
         </task>
         <task id="9" name="Ethical Submission" meeting="false" start="2016-11-25" duration="1" complete="0" expand="true"/>
         <task id="7" name="Second Reader Interview" meeting="false" start="2016-12-16" duration="1" complete="0" expand="true"/>
-        <task id="6" name="Draft Disseration" meeting="false" start="2017-03-17" duration="1" complete="0" expand="true"/>
-        <task id="5" name="Dissertation Submission" meeting="false" start="2017-04-24" duration="1" complete="0" expand="true"/>
-        <task id="2" name="Poster Session" meeting="false" start="2017-05-05" duration="1" complete="0" priority="4" expand="true"/>
-        <task id="10" name="Evaluation Study" color="#8cb6ce" meeting="false" start="2017-02-27" duration="5" complete="0" expand="true"/>
-        <task id="39" name="Finalise website function" color="#8cb6ce" meeting="false" start="2017-02-06" duration="5" complete="0" expand="true"/>
-        <task id="40" name="Prettify website" meeting="false" start="2017-02-13" duration="5" complete="0" expand="true"/>
         <task id="11" name="Basic Website" color="#8cb6ce" meeting="false" start="2016-12-12" duration="5" complete="0" expand="true">
             <depend id="13" type="2" difference="0" hardness="Strong"/>
         </task>
@@ -73,6 +67,15 @@
             <depend id="27" type="2" difference="0" hardness="Strong"/>
         </task>
         <task id="27" name="Display results of test" meeting="false" start="2017-02-03" duration="1" complete="0" expand="true"/>
+        <task id="39" name="Finalise website function" color="#8cb6ce" meeting="false" start="2017-02-06" duration="5" complete="0" expand="true"/>
+        <task id="40" name="Prettify website" meeting="false" start="2017-02-13" duration="5" complete="0" expand="true"/>
+        <task id="41" name="Prepare Evaluation Task" meeting="false" start="2016-12-12" duration="55" complete="0" expand="true">
+            <depend id="10" type="2" difference="0" hardness="Strong"/>
+        </task>
+        <task id="10" name="Evaluation Study" color="#8cb6ce" meeting="false" start="2017-02-27" duration="5" complete="0" expand="true"/>
+        <task id="6" name="Draft Disseration" meeting="false" start="2017-03-17" duration="1" complete="0" expand="true"/>
+        <task id="5" name="Dissertation Submission" meeting="false" start="2017-04-24" duration="1" complete="0" expand="true"/>
+        <task id="2" name="Poster Session" meeting="false" start="2017-05-05" duration="1" complete="0" priority="4" expand="true"/>
     </tasks>
     <resources/>
     <allocations/>

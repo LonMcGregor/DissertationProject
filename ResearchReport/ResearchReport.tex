@@ -33,7 +33,7 @@
 \newcommand{\titles}{\\\vspace{1cm}}
 \newcommand{\cn}{\textcolor{red}{[Citation Needed]}}
 \newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
-\newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{OBJ-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
+\newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{lXr} \textbf{OBJ-#1} & #2 & #3\end{tabularx}\\#4\\}
 \newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{RSK-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 \newcommand{\gi}[2]{\textbf{#1} - #2}
@@ -46,7 +46,7 @@
 \newcommand{\nfreq}[3]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & OBJ-#1 & #2 & #3\\}
 
 \pdfinfo{%
-  /Title    (Deliverable 1: Final Year Dissertation)
+  /Title    (Deliverable 1: Final Year Disserta tion)
   /Author   (Leon McGregor)
 }
 
@@ -79,14 +79,28 @@ Andrew \textsc{Ireland}\\
 \newpage
 {
   \renewcommand{\thispagestyle}[1]{}
-  \tableofcontents
+  \begingroup
+    \makeatletter
+    % Redefine the \chapter* header macro to remove vertical space
+    \def\@makeschapterhead#1{%
+    %\vspace*{50\p@}% Remove the vertical space
+    {\parindent \z@ \raggedright
+        \normalfont
+        \interlinepenalty\@M
+        \Huge \bfseries  #1\par\nobreak
+        \vskip 40\p@
+    }}
+    \makeatother
+
+    \tableofcontents
+  \endgroup
 }
 \newpage
 \doublespacing
 
 
 \section*{Abstract}
-Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to create a website which will be used to allows peers to test each others solutions to such coursework exercises, and to provide useful feedback. This document will detail the background research going into this project, and the plan for developing the website.
+Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to improve this process by facilitating peer testing and peer feedback. The project will achieve this through creation of a website that will let peers assess each others coursework solutions. This document will detail the background research going into this project, and the plan for developing and subsequently evaluating the website.
 
 \vfill
 
@@ -113,18 +127,20 @@ Thanks to Manuel Maarek for helping me to organise this project.
 %  |_____|_| \_|  |_|  |_|  \_\\____/
 
 \section{Introduction}
-This project aims to create a \textit{Web Platform for Code Peer-Testing}. The web platform (referred to as the website) will be used by undergraduate Computer Science students as they complete coursework exercises. The website will be allow students to engage in peer assessment of each others solutions to exercises (in this case program code) by peer-testing. That is, students will share solutions through the website, view and test solutions for other students, and then give and receive feedback on solutions.\par
-Ideally, the peer assessment that takes place within the website will provide more immediate and useful feedback on coursework than having to wait for a teacher, and the results of testing could be used as a starting point for final grading of the coursework assignment.
+In Undergraduate Computer Science courses, students will complete coursework. Some of this coursework may involve programming exercises. This project aims to improve these programming exercises through the involvement of peer assessment. Specifically, peer testing of programs and peer feedback. To facilitate this, the project will create a prototype for a \textit{Web Platform for Code Peer-Testing}.\par
+The web platform (referred to as a website) will allow students to engage in peer assessment of each others solutions to exercises (in this case program code) by peer-testing. That is, students will share solutions through the website, view and test solutions for other students, and then give and receive feedback on solutions.\par
+Ideally, the peer assessment that takes place within the website will provide more immediate and useful feedback on coursework than having to wait for a teacher, and the results of testing could be used as a starting point for final grading of the coursework assignment.\par
 
-\subsection{Primary Aim}
-The primary aim of this project is to design, build and test a prototype website for peer assessment. I will then evaluate the website, to determine if it can successfully automate and enhance the peer assessment experience. This task can be broken down to the following main objectives:
+Much research has been already completed in the study of Peer Assessment, peer testing and technology-enhanced learning environments. Some relevant research into this will be analysed within this document, as well as a discussion of related or similar systems that have previously been implemented by others. I will also look into some aspects relating the the implementation of the desired web platform, such as security, and how program testing can be done.\par
+
+There are two high level aims that make up this project:
 \begin{enumerate}
-\item \textbf{Prototype} a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place
-\item \textbf{Evaluate} whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, I can determine if it can offer any advantages to the users
+\item \textbf{Prototype} - Design and build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place.
+\item \textbf{Evaluate} - Prepare and execute an evaluation study into whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, I can determine if it can offer any advantages to the users.
 \end{enumerate}
-For the initial prototype of this website and evaluation, I would focus on using a simple python programming exercise.
 
-\subsection{Overview of Concept}
+\newpage
+\section{Overview of Concept}
 This is a description of the ideal usage of the website, and identifies some \textit{key terms}:
 \begin{enumerate}
  \item A \textit{teacher} (Course Lecturer/Professor) will set a coursework exercise
@@ -139,8 +155,6 @@ This is a description of the ideal usage of the website, and identifies some \te
 \end{enumerate}
 Considering this process in terms of a more traditional peer assessment, the testers and developers would be assessors and assessees respectively.
 
-\subsection{Overview of background research}
-Much research has been already completed in the study of Peer Assessment, peer testing and technology-enhanced learning environments. Some relevant research into this will be analysed here, as well as a discussion of related systems that have previously been implemented. I will also look into some aspects relating the the implementation of the desired web platform, such as security, and how to actually perform the testing of code.
 
 %   ____          _____ _  _______ _____   ____  _    _ _   _ _____  
 %  |  _ \   /\   / ____| |/ / ____|  __ \ / __ \| |  | | \ | |  __ \ 
@@ -364,37 +378,35 @@ Given the many different aspects covered above, I have identified the following 
 
 \chapter{Project Aims}
 \section{Primary Aim}
-The primary aim of this project is to prototype a website that will help to automate and enhance the process of peer assessment with relation to testing the correctness of code.
-\subsection*{Sample use case}
-\todo{better title for this section? enumerate the steps? I already have one of these in the introduction. repetition?}
-A teacher will set a coursework assignment. This will be a task that requires a class with methods to be produced that conforms with a well-defined interface. Once completed, students will be able to submit solutions to the task to the website. Then, once enough submissions are made, the process of peer assessment can begin. This will involve students testing the code of other students, by submitting test cases to the website. During this, students will also be able to see the code of other students. If they wish, students will be able to provide comments (feedback) to other students. Then, once the peer assessment process is complete, students will be able to see results of the peer assessment (test results, and any feedback) for their solution.
+The primary motivation of this project, as stated in the introduction, is to improve the student experience when completing programming coursework exercises by facilitating peer learning. The main aims for the project derived from this can be stated as:
+\begin{enumerate}
+\item \textbf{Prototype a Website}\par
+Design and build a website that automates peer assessment. This website should combine all the tasks that would normally have to be done manually by students and allows them to be completed from a website interface. This could include file uploads, file viewing, testing of programs and providing feedback. The objectives for the Prototype are broken down further in the next section (\S2.2).
+\item \textbf{Evaluate the Website}\par
+Once a functioning prototype is created, perform a study to determine the effectiveness of the website in terms of how well it enhances peer assessment within the confines of the coursework. This evaluation should involve students who might potentially use this tool in a course. The exact properties we wish to ensure the website has are expanded upon in the evaluation section, \S3.1.
+\end{enumerate}
 
-\section{Objectives}
-\objitem{Website}{Build a website}{High Priority}{The prototype website will be used as the main interface which students will log in and interact with.}
+\section{Prototype Objectives}
+These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the later section on implementation (\S4.1).
 \objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments.}
-\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way.}
+\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S1.3.3, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
 \objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata?) on each test.}
-\objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
-\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. This could include at the results of tests or on the source code.}
-\objitem{Sandbox}{Sandbox the system}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental).}
-\objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
-\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle.}
-\objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
-
-\subsection{Discussion of Objectives}
-\subsubsection*{OBJ-Upload}
-When the student is submitting a solution, this should be contained within a single file. For this iteration of the project, the upload system will focus on a coursework that is completed using python.
-\subsubsection*{OBJ-Test}
-As previously discussed in section \cn, possible implementations of this subsystem include: Unit, expected/actual i/o, property based and scenario testing. For the purposes of evaluating this prototype, we will focus on:
-\subsubsection*{OBJ-Feedback}
+\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it.\par
+While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
+\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. This could include at the results of tests or on the source code.\par
 An ideal implementation of this would provide a way for testers to give feedback to the solutions, within certain places of the peer assessment. Possible objectives that could interact with feedback include:
 \begin{itemize}
  \item OBJ-Results: Once tests are run, the tester could attach comments to the (results of) test cases
  \item OBJ-Source: Annotating the source code of solutions (possibly on a line by line basis, or by leaving general comments for a submitted solution)
  \item OBJ-Teacher: A teacher should be able to view all of the feedback that has been submitted by testers, in all the appropriate places
-\end{itemize}
+\end{itemize}~}
+\objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
+\objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle.}
+\objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
+
 
 %   ________      __     _     _    _      _______ _____ ____  _   _ 
 %  |  ____\ \    / /\   | |   | |  | |  /\|__   __|_   _/ __ \| \ | |
@@ -408,27 +420,27 @@ An ideal implementation of this would provide a way for testers to give feedback
 \section{Evaluation Properties}
 In order to test if the website is useful or successful, we wish to test for and see if the following properties are true:\\
 \begin{tabularx}{\textwidth}{lX}
- \textbf{EVA-Submit} & The process of submitting solutions (to a website vs. manually sharing files)\\
- \textbf{EVA-Automate} & Automating the testing process (using the web interface vs. editing and running code manually)\\
- \textbf{EVA-Enhance} & Enhancing the feedback given (seeing if the feedback given through a website is more useful than feedback that is given from manual testing and evaluation)\\
- \textbf{EVA-Improve} & Improving the experience as a whole (a subjective check to see if the experience of using a website feels better than manual peer assessment)\\
+ \textbf{EVA-Share} & The process of sharing source code and test cases is A) easier and B) faster in a web interface as opposed to sharing via traditional means such as a file system or email.\\
+ \textbf{EVA-Automate} & The automation of running test cases against source codes, and recording/displaying results is: A) Correct, B) Faster than performing this manually.\\
+ \textbf{EVA-Enhance} & The feedback that is given through the website is as useful as, or better, than that given without the website.\\
+ \textbf{EVA-Improve} & Subjectively check if test subjects feel that the peer assessment process is improved by using the website.\\
 \end{tabularx}
 
 \section{Test Strategy}
 In order to evaluate whether each test property has been met, a good strategy would be to:
 \begin{enumerate}
  \item Use a simple programming exercise, e.g. a Binary Search Tree
- \item Have test subjects perform the process of peer assessment each others solutions without the website
+ \item Have test subjects perform the peer assessment each others solutions without the website
  \item Test subjects respond to questionnaire regarding this process
  \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
  \item Have test subjects again perform a peer assessment but this time with the website
  \item Test subjects respond to questionnaire regarding this process
- \item Test subjects then (answer questionnaire about comparison OR attend discussion session)
+ \item Test subjects may then attend a discussion session to debrief after completion
 \end{enumerate}
 I feel the evaluation would need to be performed in this way (with subjects both using the website, and not using it), as in order to test \textbf{EVA-Improve}, as you can only really gauge how the subjects feel about the website if they have tried both with and without it. The issue with testing in this manner is one of learning. As subjects will have completed one task already, their opinions and ability may be skewed by the second task. To mitigate this, we would want to swap the order in which both the tasks and the use of the website occurs (ideally this requires a minimum of 4 pairs of test subjects).\par
-In order to test \textbf{EVA-Submit}, this can easily be tested by A) Timing how long it takes subjects to complete the process of submitting files and test cases to the website vs a shared file system, and B) Asking the subjects which method they feel is faster.\par
-\textbf{EVA-Enhance} can be tested by A) asking the users which feedback they found more useful, and also by B) having the markers (in this case the evaluation test runner) assess and compare the feedback itself, on an objective level: How detailed is it, Is the feedback correct, etc.\par
-\textbf{EVA-Automate} is similar in some ways to \textbf{EVA-Submit}, and could use the same evaluation methods, but in addition it is necessary to check that the tests themselves are actually correct and useful. It is possible that the website may guide and improve, or hinder, the production of meaningful test cases during the peer assessment. This could be evaluated in a similar fashion to the evaluation of \textbf{EVA-Enhance}.
+In order to test \textbf{EVA-Share}, we can test this by A) Observing how files are shared, and seeing if the test subjects understand the website and the website works correctly, and B) timing how long it takes to share files with and without the website.\par
+\textbf{EVA-Enhance} can be tested by A) asking the users which feedback they found more useful, and also by B) having the markers (in this case the evaluation test runner) assess and compare the feedback itself, on a more objective level: How detailed is it, Is the feedback correct, etc.\par
+\textbf{EVA-Automate} is similar in some ways to \textbf{EVA-Submit}, and could use the same evaluation methods, but in addition it is necessary to check that the tests themselves are actually correct and useful. It is possible that the website may guide and improve, or hinder, the production of meaningful test cases during the peer assessment.
 
 \section{Test Subjects}
 The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
@@ -437,7 +449,7 @@ The test strategy would require pairs of 2. At least 4 pairs (To count each comb
 Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment is complete, where participants are invited to openly discuss how they feel about the concepts covered.
 
 \section{Ethical Analysis}
-The ethical analysis form is included as an appendix. \todo{Include this when it is submitted}
+The ethical analysis form for this evaluation study is included as an appendix. \todo{Include this when it is submitted}
 
 
 %   _____  ________      ________ _      ____  _____  __  __ ______ _   _ _______ 
@@ -459,8 +471,8 @@ The following prioritisation is used:\\
 
 \begin{longtable}{cclr}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority}\\\hline
-\freq{Website}{Log students in}{High}
-\freq{Website}{Log teachers in}{Low}
+\freq{Security}{Log students in}{High}
+\freq{Security}{Log teachers in}{Low}
 \freq{Upload}{Accept student uploads of solutions to assignments}{High}
 \freq{Run}{Run submitted test case for the submitted solution}{High}
 \freq{Run}{Record the results of test execution}{High}
@@ -473,8 +485,8 @@ The following prioritisation is used:\\
 \freq{Feedback}{Let submitter of test add/edit feedback}{Mid}
 \freq{Feedback}{Record testers general comments on solution}{Mid}
 \freq{Feedback}{Let tester attach feedback to lines in solution}{Low}
-\freq{Sandbox}{Sandbox the execution of solutions}{Mid}
-\freq{Sandbox}{Use malware detection to prevent malicious uploads}{Mid}
+\freq{Security}{Sandbox the execution of solutions}{Mid}                                                                                                                               
+\freq{Security}{Use malware detection to prevent malicious uploads}{Mid}
 \freq{Teacher}{Let teacher set coursework assignments}{Low}
 \freq{Teacher}{Let teacher see all submitted content}{Low}
 \nfreq{Website}{Operate on Desktop Web Browsers used in classroom}{High}
@@ -491,8 +503,28 @@ Regarding requirements which are prioritised as low, this is because for the pur
 \section{Design}
 Contained herein are some initial ideas as to how the imagines system might be realised.
 
+\section{System Architecture}
+The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. \todo{will a database also be required to keep track of the files on the filesystem?}\\
+\begin{tikzpicture}
+\tikzstyle{arrow} = [thick,->,>=stealth]
+\tikzstyle{darrow} = [thick,<->,>=stealth]
+\tikzstyle{actor} = [draw,outer sep=0,inner sep=2, minimum size=10]
+
+\node(browser)[actor]{Web Browser};
+\node(server)[actor, right of=browser, node distance=4cm]{Web Server};
+\node(filesystem)[actor, right of=server, node distance=4cm]{Filesystem};
+\node(db)[actor, above of=server, node distance=1cm]{Database};
+\node(shell)[actor, below of=server, node distance=1cm]{Test Execution Shell};
+ 
+\draw [arrow] (browser) -- node[midway, auto] {} (server);
+\draw [arrow] (server) -- node[midway, auto] {} (filesystem);
+\draw [arrow] (filesystem) -- node[midway, auto] {} (shell);
+\draw [darrow] (server) -- node[midway, auto] {} (db);
+\draw [darrow] (server) -- node[midway, auto] {} (shell);
+\end{tikzpicture}
+
 \section{Sequence of Operations}
-This diagram provides an overview for how a student might interact with with the final, implemented, system.
+This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. \todo{database?}\\
 \begin{sequencediagram}
 \newthread{u}{User}
 \newinst[2]{i}{Interface}
@@ -522,25 +554,6 @@ This diagram provides an overview for how a student might interact with with the
 \end{sdblock}
 \end{sequencediagram}
 
-\section{System Architecture}
-\todo{Find the best place to put these. also, text descriptions?}\\
-\begin{tikzpicture}
-\tikzstyle{arrow} = [thick,->,>=stealth]
-\tikzstyle{darrow} = [thick,<->,>=stealth]
-\tikzstyle{actor} = [draw,outer sep=0,inner sep=2, minimum size=10]
-
-\node(browser)[actor]{Web Browser};
-\node(server)[actor, right of=browser, node distance=4cm]{Web Server};
-\node(filesystem)[actor, right of=server, node distance=4cm]{Filesystem};
-\node(db)[actor, above of=server, node distance=1cm]{Database};
-\node(shell)[actor, below of=server, node distance=1cm]{Test Execution Shell};
- 
-\draw [arrow] (browser) -- node[midway, auto] {} (server);
-\draw [arrow] (server) -- node[midway, auto] {} (filesystem);
-\draw [arrow] (filesystem) -- node[midway, auto] {} (shell);
-\draw [darrow] (server) -- node[midway, auto] {} (db);
-\draw [darrow] (server) -- node[midway, auto] {} (shell);
-\end{tikzpicture}
 
 %   _____  _____   ____       _            __  __          _   _ 
 %  |  __ \|  __ \ / __ \     | |          |  \/  |   /\   | \ | |
@@ -583,8 +596,8 @@ And also the impact such a risk occurring would have on the project:\\
 \riskitem{Wares}{Software that is needed does not work}{Possible, Large Impact}{A software package that the implementation relies upon is unable to meet the requirements, or has bugs, or simply does not work. To prevent this, possible packages should be thoroughly researched before choosing. If the problems are discovered later, an alternate package could be chosen, or the functionality offered by this could be scaled back or removed.}
 \riskitem{Meet}{Cannot meet with supervisor}{Likely, Small Impact}{There may come a time when I, or the project supervisor are unable to meet and discuss recent developments or issues that have arisen. This may be due to travel, weather etc. In such an event, communication could be done via. email. Given that there is a timetable and plan for this project, I would continue to follow this until such a time as a full meeting could be arranged.}
 \section{Issues}
-Detail professional, legal, ethical, etc. issues in this section.\\
-If the evaluation test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes.
+To my knowledge, there are no legal or ethical issues that might arise from the implementation of this project. However, the data collected during the evaluation will need to be kept anonymous. I will make every effort to keep this information secure once it is collected, and include a method such that I, and only I, may remove participants results if they wish this to happen at a later date.\par
+Additionally, during the evaluation, if the test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes or other coursework. To support this, it will be made clear to participants that their grades will not be affected by taking part.
 
 \singlespacing
 \printbibliography
