@@ -156,6 +156,7 @@ This is a description of the ideal usage of the website, and identifies some \te
 Considering this process in terms of a more traditional peer assessment, the testers and developers would be assessors and assessees respectively.
 
 
+
 %   ____          _____ _  _______ _____   ____  _    _ _   _ _____  
 %  |  _ \   /\   / ____| |/ / ____|  __ \ / __ \| |  | | \ | |  __ \ 
 %  | |_) | /  \ | |    | ' / |  __| |__) | |  | | |  | |  \| | |  | |
@@ -449,7 +450,7 @@ The test strategy would require pairs of 2. At least 4 pairs (To count each comb
 Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment is complete, where participants are invited to openly discuss how they feel about the concepts covered.
 
 \section{Ethical Analysis}
-The ethical analysis form for this evaluation study is included as an appendix. \todo{Include this when it is submitted}
+The ethical analysis form for this evaluation study is included as an appendix. This details any ethical issues that might arise from the study, recruiting participants, and handling data.
 
 
 %   _____  ________      ________ _      ____  _____  __  __ ______ _   _ _______ 
@@ -500,11 +501,10 @@ The following prioritisation is used:\\
 \subsection{Additional Notes on Requirements}
 Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
 
-\section{Design}
-Contained herein are some initial ideas as to how the imagines system might be realised.
-
 \section{System Architecture}
-The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. \todo{will a database also be required to keep track of the files on the filesystem?}\\
+The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. In addition to this, a database may be required to assist in tracking which submissions are uploaded, where they are stored, etc.\\
+\begin{figure}[h]
+\centering
 \begin{tikzpicture}
 \tikzstyle{arrow} = [thick,->,>=stealth]
 \tikzstyle{darrow} = [thick,<->,>=stealth]
@@ -522,9 +522,11 @@ The basic system architecture that will be used is as follows: The website will 
 \draw [darrow] (server) -- node[midway, auto] {} (db);
 \draw [darrow] (server) -- node[midway, auto] {} (shell);
 \end{tikzpicture}
+\end{figure}
+
 
 \section{Sequence of Operations}
-This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. \todo{database?}\\
+This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. This diagram is an early overview of a possible implementation, and will likely be different to the final implementation. This diagram also omits the database and focuses more on interactions related to the functionality users will see.\\
 \begin{sequencediagram}
 \newthread{u}{User}
 \newinst[2]{i}{Interface}
@@ -606,5 +608,36 @@ Additionally, during the evaluation, if the test subjects are students, they wil
 \includepdf[pages={2,3},angle=90]{../Gantt.pdf}
 \end{landscape}
 
+\appendix
+\section{Ethical Analysis}
+\textbf{Student}: L\'eon McGregor\\
+\textbf{Title}: Web platform for code peer-testing\\
+\textbf{Supervisor}: Manuel Maarek\\
+\textbf{Abstract}: Develop a web platform for managing peer-testing and peer-feedback of programming code. The project aims at providing a user-friendly solution for giving and receiving feedback on programming artifacts.\\
+\textbf{Purpose of Study}: The purpose of this study is to investigate the effectiveness of a prototype web platform for peer assessment of programming code. The test subjects will be asked to perform small programming exercises, and peer assess each others work. The test subjects will attempt this without and then with the prototype website, in order to see if the website is effective. Test subjects will also be given some questionnaires to fill out, and may participate in an extended discussion session if they choose.
+
+\subsection*{Screening}
+\textbf{Does the research involve any of the following?}: Human Subjects\\
+\textbf{Interface Only Screening?}: No\\
+\textbf{Full Ethical Screening?}: Other body not required
+
+\subsection*{Use of Human Subjects}
+\textbf{How will participants be recruited?}: Participants will ideally be students of computer science at Heriot-Watt. A general request for participants to join in will be sent out, perhaps through a university emailing list, or by posting flyers. This will be done up to a week before the study is conducted.\\
+\textbf{All participants to be recruited are over 16, able to give informed consent, and have no known impediment that might affect their ability to participate in the study?}: Yes\\
+\textbf{How long will participants have to decide whether to take part in the study?}: 7 Days\\
+\textbf{Does the study involve actively deceiving participants?}: No\\
+\textbf{Will participants be using non-standard hardware?}: No
+
+\subsection*{Data Protection Compliance}
+I confirm that, in accordance with Data Protection legislation:
+\begin{itemize}
+\item Indentifiable data will be stored on a secure machine with restricted access
+\item Data will be anonymised before publication unless consent has been given
+\item Identifiable data will only be retained for the duration of the consent granted by the participant
+\item External data and systems will be used within the licence terms specified
+\end{itemize}
+
+\subsection*{Health and Safety}
+I confirm that the project involves only standard IT equipment and exposes participants to no more hazards than a conventional office environment.
 
 \end{document}
