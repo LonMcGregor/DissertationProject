@@ -475,6 +475,8 @@ The following prioritisation is used:\\
 \freq{Security}{Log students in}{High}
 \freq{Security}{Log teachers in}{Low}
 \freq{Upload}{Accept student uploads of solutions to assignments}{High}
+\freq{Test}{Accept uploads for test case files}{High}
+\freq{Test}{Offer a more guided approach to writing test cases}{Mid}
 \freq{Run}{Run submitted test case for the submitted solution}{High}
 \freq{Run}{Record the results of test execution}{High}
 \freq{Run}{Run submitted test case against all solutions}{Low}
@@ -502,7 +504,6 @@ The following prioritisation is used:\\
 Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
 
 \section{System Architecture}
-The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. In addition to this, a database may be required to assist in tracking which submissions are uploaded, where they are stored, etc.\\
 \begin{figure}[h]
 \centering
 \begin{tikzpicture}
@@ -523,7 +524,7 @@ The basic system architecture that will be used is as follows: The website will 
 \draw [darrow] (server) -- node[midway, auto] {} (shell);
 \end{tikzpicture}
 \end{figure}
-
+The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. In addition to this, a database may be required to assist in tracking which submissions are uploaded, where they are stored, etc.
 
 \section{Sequence of Operations}
 This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. This diagram is an early overview of a possible implementation, and will likely be different to the final implementation. This diagram also omits the database and focuses more on interactions related to the functionality users will see.\\
@@ -555,7 +556,6 @@ This diagram provides an overview for how a student might interact with with the
 
 \end{sdblock}
 \end{sequencediagram}
-
 
 %   _____  _____   ____       _            __  __          _   _ 
 %  |  __ \|  __ \ / __ \     | |          |  \/  |   /\   | \ | |
@@ -604,12 +604,14 @@ Additionally, during the evaluation, if the test subjects are students, they wil
 \singlespacing
 \printbibliography
 
+\addcontentsline{toc}{chapter}{Appendices}
+\addcontentsline{toc}{section}{Gantt Chart}
 \begin{landscape}
 \includepdf[pages={2,3},angle=90]{../Gantt.pdf}
 \end{landscape}
 
-\appendix
-\section{Ethical Analysis}
+\addcontentsline{toc}{section}{Ethical Analysis}
+\section*{Ethical Analysis}
 \textbf{Student}: L\'eon McGregor\\
 \textbf{Title}: Web platform for code peer-testing\\
 \textbf{Supervisor}: Manuel Maarek\\
