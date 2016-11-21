@@ -147,7 +147,11 @@ This is a description of the ideal usage of the website, and identifies some \te
  \item A \textit{teacher} (Course Lecturer/Professor) will set a coursework exercise
  \item A \textit{student} on the course will act as a \textit{developer}, and create a \textit{solution} to the exercise
  \item Students will then \textit{upload} the solution to the \textit{website}
- \item Students take on the role of \textit{testers}. This involves creating and submitting \textit{test cases} to the website
+ \item The website will randomly assign the solution to a different student
+ \item Students take on the role of \textit{testers} for their assigned solution.
+    \begin{itemize}
+    \item This involves creating and submitting \textit{test cases} to the website
+    \end{itemize}
  \item The website will silently run these test cases and store the \textit{test results}
  \item Testers can view the test results and the \textit{source code} of the solution
  \item Testers can add feedback based on what they see from the source code and test results
@@ -390,7 +394,7 @@ Once a functioning prototype is created, perform a study to determine the effect
 
 \section{Prototype Objectives}
 These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the later section on implementation (\S4.1).
-\objitem{Upload}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments.}
+\objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to someone else for assessment.}
 \objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S1.3.3, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
@@ -478,7 +482,8 @@ The following prioritisation is used:\\
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority}\\\hline
 \freq{Security}{Log students in}{High}
 \freq{Security}{Log teachers in}{Low}
-\freq{Upload}{Accept student uploads of solutions to assignments}{High}
+\freq{Submit}{Accept student uploads of solutions to assignments}{High}
+\freq{Submit}{Assign a submission to a student for assessment}{High}
 \freq{Test}{Accept uploads for test case files}{High}
 \freq{Test}{Offer a more guided approach to writing test cases}{Mid}
 \freq{Run}{Run submitted test case for the submitted solution}{High}
@@ -492,14 +497,15 @@ The following prioritisation is used:\\
 \freq{Feedback}{Let submitter of test add/edit feedback}{Mid}
 \freq{Feedback}{Record testers general comments on solution}{Mid}
 \freq{Feedback}{Let tester attach feedback to lines in solution}{Low}
-\freq{Security}{Sandbox the execution of solutions}{Mid}                                                                                                                               
+\freq{Security}{Sandbox the execution of solutions}{Mid}
 \freq{Security}{Use malware detection to prevent malicious uploads}{Mid}
 \freq{Teacher}{Let teacher set coursework assignments}{Low}
 \freq{Teacher}{Let teacher see all submitted content}{Low}
 \nfreq{Website}{Operate on Desktop Web Browsers used in classroom}{High}
 \nfreq{Website}{Operate with multiple users accessing at once}{High}
 \nfreq{Website}{Operate with a classroom of users accessing at once}{Low}
-\nfreq{Upload}{Accept solutions that are python scripts}{High}
+\nfreq{Submit}{Not assign a student to assess their own work}{High}
+\nfreq{Submit}{Accept solutions that are python scripts}{High}
 \nfreq{Run}{Test cases should be run asynchronously}{High}
 \nfreq{Modular}{The system should be built in a modular manner}{Low}
 \end{longtable}
