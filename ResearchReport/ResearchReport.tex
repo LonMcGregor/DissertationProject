@@ -34,7 +34,7 @@
 \newcommand{\cn}{\textcolor{red}{[Citation Needed]}}
 \newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
 \newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{lXr} \textbf{OBJ-#1} & #2 & #3\end{tabularx}\\#4\\}
-\newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{|l|cr|} \hline \textbf{RSK-#1} & #2 & #3 \\ \hline \multicolumn{3}{|X|}{#4} \\ \hline \end{tabularx}}
+\newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{lcr} \textbf{RSK-#1} & #2 & #3 \\  \multicolumn{3}{X}{#4} \\  \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 \newcommand{\gi}[2]{\textbf{#1} - #2}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
@@ -46,7 +46,7 @@
 \newcommand{\nfreq}[3]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & OBJ-#1 & #2 & #3\\}
 
 \pdfinfo{%
-  /Title    (Deliverable 1: Final Year Disserta tion)
+  /Title    (Deliverable 1: Final Year Dissertation - Research Report)
   /Author   (Leon McGregor)
 }
 
@@ -66,7 +66,8 @@
 
 {\centering\Large
 \includegraphics[width=0.4\textwidth]{../hwu.png}\titles
-Deliverable 1: Final Year Dissertation\titles
+Final Year Dissertation\\
+Deliverable 1 - Research Report\titles
 {\huge\bfseries Web Platform for Code Peer-Testing\titles}
 L\'eon \textsc{McGregor} - H00152968\titles
 {\large\textit{Supervisor}\\}
@@ -453,7 +454,7 @@ The test strategy would require pairs of 2. At least 4 pairs (To count each comb
 Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment is complete, where participants are invited to openly discuss how they feel about the concepts covered.
 
 \section{Ethical Analysis}
-The ethical analysis form for this evaluation study is included as an appendix. This details any ethical issues that might arise from the study, recruiting participants, and handling data.
+The ethical analysis form for this evaluation study is included as an appendix. This details any ethical issues that might arise from the study, recruiting participants, and handling data. This ethical analysis has been approved by the Project Supervisor and the University Ethics Coordinator.
 
 
 %   _____  ________      ________ _      ____  _____  __  __ ______ _   _ _______ 
@@ -581,28 +582,32 @@ The following hard deadlines exist for the project:\\
 . & Dissertation and ZIP file of all files submitted through Project System\\
  5 May 2017 & Poster uploaded through Vision\\
 . & Edinburgh Poster Session
-\end{tabularx}\\
-In addition to these, I have arranged some self-imposed targets. These are included in the Gantt chart located in the appendices.
+\end{tabularx}
+\subsection*{Implementation Targets}
+In addition to the above imposed timetable limits, I have arranged some self-imposed targets. These are included in the Gantt chart located in the appendices, and relate to targets of which requirements need to implemented and when. As I am just one developer, most of the functionality will be implemented in series rather than parallel, but some points (such as uploading files) can be developed together. The first item developed will be a basic website with interfaces available to plug in the various other features, as they are implemented.
 
 \section{Risk management}
-This section details some of the risks involved during the project, their likelihood, and a description of possible mitigation and recovery strategies. The following scales are used when measuring likelihood and impact:\\
+This section details some of the risks involved during the project, their likelihood, and a description of possible mitigation and recovery strategies.\\
+The following scales are used when measuring likelihood:\par
+{\centering
 \begin{tabular}{c|c|c|c|c}
 Very Unlikely & Unlikely & Possible & Likely & Very Likely
-\end{tabular}\\
-And also the impact such a risk occurring would have on the project:\\
+\end{tabular}\par\noindent}
+And also the impact such a risk occurring would have on the project:\par
+{\centering
 \begin{tabular}{c|c|c|c|c}
  No Impact & Small Impact & Some Impact & Big Impact & Large Impact\\
  Negligible & ... & ... & ... & Project may fail
-\end{tabular}\\
-\subsection*{Risk Listing}
-\riskitem{Eval}{Not enough users for evaluation}{Likely, Big Impact}{It may be the case that I am not able to get a substantial number of participants during the evaluation. In this event, I will have to... get more detailed info from the few participants that I do get...?}
+\end{tabular}\par\noindent}
+\riskitem{Eval}{Not enough users for evaluation}{Likely, Big Impact}{It may be the case that I am not able to get a substantial number of participants during the evaluation. In this event, I may offer more incentives to get participants and request more detailed information from them when discussing the evaluation.}
 \riskitem{No-Impl}{No usable implementation for evaluation}{Unlikely, Big Impact}{I may be unable to complete a usable implementation in time for the evaluation. If I suspect this is the case beforehand, I will scale back the scope and focus on implementing core functionality. In the worst case, a wizard-of-oz style system could be set up at the last minute.}
-\riskitem{Loss}{Work (Code or otherwise) is lost}{Possible, Big Impact}{During development of the application, or write-up of a report, work done might become lost, corrupted or overwritten. To prevent this version control is used, and work is also backed up across a development machine (personal), deployment machine (University server) and cloud storage (GitHub.com). Should one of the sources be lost, the others should still be usable}
+\riskitem{Loss}{Work (Code or otherwise) is lost}{Possible, Big Impact}{During development of the application, or write-up of a report, work done might become lost, corrupted or overwritten. To prevent this version control is used, and work is also backed up across a development machine (personal), deployment machine (University server) and cloud storage (GitHub.com). Should one of the sources be lost, the others should still be usable.}
 \riskitem{Wares}{Software that is needed does not work}{Possible, Large Impact}{A software package that the implementation relies upon is unable to meet the requirements, or has bugs, or simply does not work. To prevent this, possible packages should be thoroughly researched before choosing. If the problems are discovered later, an alternate package could be chosen, or the functionality offered by this could be scaled back or removed.}
 \riskitem{Meet}{Cannot meet with supervisor}{Likely, Small Impact}{There may come a time when I, or the project supervisor are unable to meet and discuss recent developments or issues that have arisen. This may be due to travel, weather etc. In such an event, communication could be done via. email. Given that there is a timetable and plan for this project, I would continue to follow this until such a time as a full meeting could be arranged.}
 \section{Issues}
-To my knowledge, there are no legal or ethical issues that might arise from the implementation of this project. However, the data collected during the evaluation will need to be kept anonymous. I will make every effort to keep this information secure once it is collected, and include a method such that I, and only I, may remove participants results if they wish this to happen at a later date.\par
-Additionally, during the evaluation, if the test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes or other coursework. To support this, it will be made clear to participants that their grades will not be affected by taking part.
+To my knowledge, there are no legal issues that might arise from the implementation of this project. However, the data collected during the evaluation will need to be kept anonymous. I will make every effort to keep this information secure once it is collected, and include a method such that I, and only I, may identify and remove participants results if they wish this to happen at a later date.\par
+In terms of social and ethical issues, students may be affected. During the evaluation, as the test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes or other coursework. To support this, it will be made clear to participants that their grades will not be affected by taking part, and make it clear that students can withdraw at their own wish.\par
+During both the evaluation and implementation, I will act in a professional manner that is consistent with what is expected by the university: Giving credit for help where it is due, treating people with respect, and being truthful in what I report.
 
 \singlespacing
 \printbibliography
