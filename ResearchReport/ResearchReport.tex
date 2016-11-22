@@ -1,11 +1,7 @@
 \documentclass[a4paper,11pt]{report}
 
-%   _____  _____  ______          __  __ _      ____  ______ 
-%  |  __ \|  __ \|  ____|   /\   |  \/  | |    |  _ \|  ____|
-%  | |__) | |__) | |__     /  \  | \  / | |    | |_) | |__   
-%  |  ___/|  _  /|  __|   / /\ \ | |\/| | |    |  _ <|  __|  
-%  | |    | | \ \| |____ / ____ \| |  | | |____| |_) | |____ 
-%  |_|    |_|  \_\______/_/    \_\_|  |_|______|____/|______|
+% PREAMBLE
+% BEGIN
 
 \usepackage[utf8]{inputenc}
 \usepackage[backend=bibtex]{biblatex}
@@ -38,6 +34,7 @@
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 \newcommand{\gi}[2]{\textbf{#1} - #2}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
+\newcommand{\eva}[2]{\textbf{EVA-#1} & #2\\}
 
 
 \newcounter{FunCount}
@@ -51,17 +48,11 @@
 }
 
 
-
-%   _____   ____   _____ _    _ __  __ ______ _   _ _______ 
-%  |  __ \ / __ \ / ____| |  | |  \/  |  ____| \ | |__   __|
-%  | |  | | |  | | |    | |  | | \  / | |__  |  \| |  | |   
-%  | |  | | |  | | |    | |  | | |\/| |  __| | . ` |  | |   
-%  | |__| | |__| | |____| |__| | |  | | |____| |\  |  | |   
-%  |_____/ \____/ \_____|\____/|_|  |_|______|_| \_|  |_|   
-
-
+% END
+% DOCUMENT START
 
 \begin{document}
+% BEGIN
 \pagestyle{empty}
 
 {\centering\Large
@@ -89,7 +80,7 @@ Andrew \textsc{Ireland}\\
         \normalfont
         \interlinepenalty\@M
         \Huge \bfseries  #1\par\nobreak
-        \vskip 40\p@
+        \vskip 20\p@
     }}
     \makeatother
 
@@ -120,12 +111,9 @@ Thanks to Manuel Maarek for helping me to organise this project.
 \pagestyle{headings}
 \markright{L\'eon McGregor - Deliverable 1: Final Year Dissertation}
 
-%   _____ _   _ _______ _____   ____  
-%  |_   _| \ | |__   __|  __ \ / __ \ 
-%    | | |  \| |  | |  | |__) | |  | |
-%    | | | . ` |  | |  |  _  /| |  | |
-%   _| |_| |\  |  | |  | | \ \| |__| |
-%  |_____|_| \_|  |_|  |_|  \_\\____/
+% END
+% INTRODUCTION
+% BEGIN
 
 \section{Introduction}
 In Undergraduate Computer Science courses, students will complete coursework. Some of this coursework may involve programming exercises. This project aims to improve these programming exercises through the involvement of peer assessment. Specifically, peer testing of programs and peer feedback. To facilitate this, the project will create a prototype for a \textit{Web Platform for Code Peer-Testing}.\par
@@ -162,12 +150,9 @@ Considering this process in terms of a more traditional peer assessment, the tes
 
 
 
-%   ____          _____ _  _______ _____   ____  _    _ _   _ _____  
-%  |  _ \   /\   / ____| |/ / ____|  __ \ / __ \| |  | | \ | |  __ \ 
-%  | |_) | /  \ | |    | ' / |  __| |__) | |  | | |  | |  \| | |  | |
-%  |  _ < / /\ \| |    |  <| | |_ |  _  /| |  | | |  | | . ` | |  | |
-%  | |_) / ____ \ |____| . \ |__| | | \ \| |__| | |__| | |\  | |__| |
-%  |____/_/    \_\_____|_|\_\_____|_|  \_\\____/ \____/|_| \_|_____/
+% END
+% PEER ASSESSMENT BACKGROUND
+% BEGIN
 
 \chapter{Background}
 \section{Peer Assessment}
@@ -188,14 +173,14 @@ Peer assessment is a process with many benefits to participants in education. Sa
  \item Peer assessment can help students better understand testing and can become aware of their own strengths and weaknesses
  \item Following peer assessment students can gain an improved attitude towards the process of learning as a whole
 \end{itemize}
-From this, we can see that using peer assessment is definitely a desirable activity to include in the educational process.\par
+From this, I can see that using peer assessment is definitely a desirable activity to include in the educational process.\par
 
 Peer assessment can offer much help towards education of students, but it would be worthwhile to know just which aspects are the most useful. A study conducted by Li et at. \cite{li_assessor_2010} investigated the peer assessment process with the aim of discovering which part of it is most useful to the students involved: Being an assessor or an assessee. To study this, undergraduate student teachers were given the task of creating a \textit{WebQuest}\footnote{In this context, a \textit{WebQuest} project is an activity created by the student teachers that would be given to their students. Following the \textit{WebQuest} instructions, students are guided through Internet resources, and offered ``scaffolding activities'' to help them learn.} project. This was then marked by independent assessors, and the student teachers were given a chance to provide feedback on other student teachers \textit{WebQuests}. Following this, the feedback was shared back, students teachers were given another chance to improve their project, and it was marked again. The quality of the peer feedback itself was also checked by the independent markers. The study found that 
 \begin{quote}
 ``there was a significant relationship between the quality of the peer feed-back the students provided for others and the quality of the students' own final projects''
 \end{quote}
 The findings of the investigation would suggest that the actual exercise of providing feedback to others (acting as an assessor) is a worthwhile process for learning from. This study also concluded that there was no reasonable link between the feedback itself as a learning tool, suggesting that the act of giving feedback itself is more valuable and that low quality feedback does not harm the learning experience.\par
-From the results of this study, we can gather that the most effective part of peer assessment is the actual act of assessment itself. Therefore, in a system that helps students assess program code, we want to prioritise helping them to perform this assessment over making sure that the feedback the students can provide is useful. Through this, we can ensure that students make the most learning possible out of the system.
+From the results of this study, I can gather that the most effective part of peer assessment is the actual act of assessment itself. Therefore, in a system that helps students assess program code, I want to prioritise helping them to perform this assessment over making sure that the feedback the students can provide is useful. Through this, I can ensure that students make the most learning possible out of the system.
 
 
 \subsection{How to do it?}
@@ -222,10 +207,9 @@ Peer assessment can prove to be a very valuable experience for students. Falchik
 The process of peer assessment holds much value for all of the participants in the educational process, and can provide some skills that can be carried beyond students time in education. It can be used to provide more immediate feedback, help students to learn as they evaluate solutions and create this feedback, and could be integrated with some existing coursework assignments. Beyond just letting students learn about how to grade against a mark scheme, peer assessment can often teach students a lot about the subject material itself, letting them gain a deeper understanding about it. Peer assessment also helps to grow students ability to critically evaluate both their own, and others, work. Students who are to engage in Peer assessment should be given sufficient help so that they can perform the assessment with confidence, and work with multiple peers to get the full positive effects of peer assessment.
 
 
-% ------
-% TECH+ PLATFORM
-% BACKGROUND
-% -----
+% END
+% TECH + PLATFORM BACKGROUND
+% BEGIN
 \section{Technology-Enhanced Learning Platforms}
 \subsection{Virutal Learning Environments}
 There has been a rapid increase in the use of websites and internet services in recent times, and many of these services can aid in student learning. One such style of website is the Virtual Learning Environment (VLE). Examples of such websites could include Moodle, \cite{moodle_about_2016} or Blackboard \cite{blackboard_blackboard_2016}. The use of a VLE can be very valuable to students learning, as they offer such features as integrated coursework submission systems, discussion forums, sections for storing and displaying class lecture notes and more.\par
@@ -310,13 +294,12 @@ There are many advantages, with respect to learning, brought forward by technolo
 
 
 
-% ------
-% IMPLEMENTATION
-% BACKGROUND
-% ------
+% END
+% IMPLEMENTATION BACKGROUND
+% BEGIN
 
 \section{Implementation Considerations}
-From the previous sections we can see that there is definitely a space for a website to aid in peer testing code. However, there are many issues to consider when choosing how the website should be developed and implemented.
+From the previous sections I can see that there is definitely a space for a website to aid in peer testing code. However, there are many issues to consider when choosing how the website should be developed and implemented.
 
 \subsection{Anonymity}
 One issue that can arise when students are interacting with each other from a perspective of evaluating each other is their anonymity. During a peer assessment / automated testing experiment performed by Sitthiworachart et al. \cite{sitthiworachart_effective_2004}, the students remarked about the use of anonymity. One students response suggested that in a non-anonymous peer assessment exercise, their marking would be influenced if they knew who it was they were marking. Another student said they would decline to take part if the peer assessment was not conducted anonymously. What can be drawn from these comments is that anonymity is clearly very important to those taking part in the peer assessment. But the opinions of anonymity might not correlate with the actual effect it has.\par
@@ -336,7 +319,7 @@ The study found:
 From the evidence available, I can gather that there is a great importance in creating a peer assessment system which can function while maintaining anonymity. It might also be worthwhile integrating some form of training, as found in the study by Lan Li, as this might reduce stress during the peer assessment process, as it is not outwith the real of possibility that students might recognise the work of others even if it is anonymous.
 
 \subsection{Security \& Sandboxing}
-If the website we aim to create is going to integrate built-in running of test cases we will need to make sure to use the right way of doing this. Because the website we aim to build will accept solutions from students that will need to be executed, it is important that these applications be restricted in terms of the permissions available to them. Restricting how they can interact with the executing computer will prevent malicious attacks or accidental errors in code from damaging the whole system.\par
+If the website I aim to create is going to integrate built-in running of test cases I will need to make sure to use the right way of doing this. Because the website I aim to build will accept solutions from students that will need to be executed, it is important that these applications be restricted in terms of the permissions available to them. Restricting how they can interact with the executing computer will prevent malicious attacks or accidental errors in code from damaging the whole system.\par
 Some available security measures include AppArmor, SELinux, FBAC amongst others. A study by Schreuders \cite{schreuders_empowering_2011} investigated how easy it is to set up the relevant security measures. They found that the FBAC-LSM security model was the best in terms of the ease of setting up, and ensuring that programs worked correctly. The tool offered for FBAC-LSM security set up would be a good candidate for use in a peer assessment system for running programs.\par
 There is also the idea of running programs directly in a browser, using a JavaScript interpreter in a way such as PyPy.js \cite{pypy.js_web_2016}. In this manner, the local file system would be protected, as the filespace used by the python interpreter is virtual in memory. However this would not be an ideal solution, as if there were security risks they would simply be placed upon the assessor instead. Additionally, this model of execution would make it more difficult to get and store results of tests and would need to be run synchronously in the website UI. Long operations also block the browser from functioning (having tried this myself, I can see that this would be an issue).\par
 Another method might be to modify source codes to use a language-specific sandboxing features. One example of such an interpreter/compiler is PyPy\cite{pypy_pypy_2016}, which is designed to offer some sandboxing. However, this is still in development and could not be relied upon for our purposes.\par
@@ -375,25 +358,84 @@ Given the many different aspects covered above, I have identified the following 
 
 
 
-%            _____ __  __  _____ 
-%      /\   |_   _|  \/  |/ ____|
-%     /  \    | | | \  / | (___  
-%    / /\ \   | | | |\/| |\___ \ 
-%   / ____ \ _| |_| |  | |____) |
-%  /_/    \_\_____|_|  |_|_____/ 
+% END
+% AIMS
+% BEGIN
 
 \chapter{Project Aims}
 \section{Primary Aim}
 The primary motivation of this project, as stated in the introduction, is to improve the student experience when completing programming coursework exercises by facilitating peer learning. The main aims for the project derived from this can be stated as:
 \begin{enumerate}
 \item \textbf{Prototype a Website}\par
-Design and build a website that automates peer assessment. This website should combine all the tasks that would normally have to be done manually by students and allows them to be completed from a website interface. This could include file uploads, file viewing, testing of programs and providing feedback. The objectives for the Prototype are broken down further in the next section (\S2.2).
+Design and build a website that automates peer assessment. This website should combine all the tasks that would normally have to be done manually by students and allows them to be completed from a website interface. This could include file uploads, file viewing, testing of programs and providing feedback. The objectives for the Prototype are broken down further in the following section (\S4.1).
 \item \textbf{Evaluate the Website}\par
-Once a functioning prototype is created, perform a study to determine the effectiveness of the website in terms of how well it enhances peer assessment within the confines of the coursework. This evaluation should involve students who might potentially use this tool in a course. The exact properties we wish to ensure the website has are expanded upon in the evaluation section, \S3.1.
+Once a functioning prototype is created, perform a study to determine the effectiveness of the website in terms of how well it enhances peer assessment within the confines of the coursework. This evaluation should involve students who might potentially use this tool in a course. The exact properties I wish to ensure the website has are expanded upon in the evaluation section, \S3.1.
 \end{enumerate}
 
+\section{High Level Objectives}
+To further break down these aims, I wish for the project to meet the following objectives:
+\begin{itemize}
+\item Create a website
+\item Let developers submit solutions to website
+\item Let testers run test cases against solutions
+\item Let testers give feedback on the solutions
+\item Report this feedback / results of tests to developers
+\item Test the website to make sure it is free of bugs
+\item Test the website to make sure it is useful for peer assessment
+\end{itemize}
+
+
+% END
+% EVALUATION
+% BEGIN
+
+\chapter{Evaluation Strategy}
+
+\section{Evaluation Properties}
+In order to test if the website is useful or successful, I wish to test for and see if the following properties are true:\\
+\begin{tabularx}{\textwidth}{lX}
+\eva{Correct}{The website functions without any bugs or unintended behaviour.}
+\eva{Usable}{The interface of the website is easily understood and usable.}
+\eva{Speed}{Using the website speeds up the process of peer assessment, allowing more time to be allocated to actual testing and feedback, instead of passing files around and fiddling with building and executing files.}
+\eva{Enhance}{The feedback that is given through the website is as useful as, or better, than that given without the website. We also wish to subjectively check if test subjects feel that the peer assessment process is improved by using the website.}
+\eva{Secure}{Just how secure is the system in its current prototype state. Are there any flaws that could be exploited, and what possible steps could be taken to mitigate against these.}
+\end{tabularx}
+
+\section{Test Strategy}
+In order to evaluate whether each test property has been met, a good strategy would be to:
+\begin{enumerate}
+ \item Use a simple programming exercise, e.g. a Binary Search Tree
+ \item Have test subjects perform the peer assessment each others solutions without the website
+ \item Test subjects respond to questionnaire regarding this process
+ \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
+ \item Have test subjects again perform a peer assessment but this time with the website
+ \item Test subjects respond to questionnaire regarding this process
+ \item Test subjects may then attend a discussion session to debrief after completion
+\end{enumerate}
+I feel the evaluation would need to be performed in this way (with subjects both using the website, and not using it), as in order to test many of these properties, I need to get a good sample of test subjects who have both used and not used the website. I feel that having them use both would be useful in terms of offering data about subjective comparison. The issue with testing in this manner is one of learning. As subjects will have completed one task already, their opinions and ability may be skewed by the second task. To mitigate this, I would want to swap the order in which both the tasks and the use of the website occurs (ideally this requires a minimum of 4 pairs of test subjects).\par
+Regarding \textbf{EVA-Correct} and \textbf{EVA-Usable}, I will need to observe the test subjects as they use the website, to look for any bugs that might occur. I will also ask that they note down any odd behaviour that they think should not be happening.\par
+In order to test \textbf{EVA-Speed}, I can test this by timing how long test subjects take while preparing their assessment environment versus how much time is spent actually making tests and giving feedback. Ideally I would have a lower proportion of time spent on preparing for assessment when using a website versus performing the task manually.\par
+\textbf{EVA-Enhance} can be tested by A) asking the users which feedback they found more useful, and also by B) having the markers (in this case the evaluation test runner) assess and compare the feedback itself, on a more objective level: How detailed is it, Is the feedback correct, etc.\par
+Regarding \textbf{EVA-Secure}, I do not feel it would make sense to analyse the security of the system by including other test subjects. Given that the prototype is likely to be deployed on a live system (at Heriot-Watt university), an analysis performed theoretically rather than practically would be desired.\par
+This analysis should cover potential security flaws in terms of potential malicious code students might upload, exploits that could allow students (or other unauthorised actors) to access the system in unintended ways, and also seeing that the running of the website does not interfere with the rest of the live system it will be running on.
+
+\section{Test Subjects}
+The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
+
+\section{Feedback}
+Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment is complete, where participants are invited to openly discuss how they feel about the concepts covered.
+
+\section{Ethical Analysis}
+The ethical analysis form for this evaluation study is included as an appendix. This details any ethical issues that might arise from the study, recruiting participants, and handling data. This ethical analysis has been approved by the Project Supervisor and the University Ethics Coordinator.
+
+
+% END
+% DEVELOPMENT
+% BEGIN
+
+\chapter{Development Plan}
 \section{Prototype Objectives}
-These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the later section on implementation (\S4.1).
+These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the next section on implementation (\S4.2).
 \objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to someone else for assessment.}
 \objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S1.3.3, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
@@ -413,70 +455,9 @@ An ideal implementation of this would provide a way for testers to give feedback
 \objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as moodle.}
 \objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
 
-
-%   ________      __     _     _    _      _______ _____ ____  _   _ 
-%  |  ____\ \    / /\   | |   | |  | |  /\|__   __|_   _/ __ \| \ | |
-%  | |__   \ \  / /  \  | |   | |  | | /  \  | |    | || |  | |  \| |
-%  |  __|   \ \/ / /\ \ | |   | |  | |/ /\ \ | |    | || |  | | . ` |
-%  | |____   \  / ____ \| |___| |__| / ____ \| |   _| || |__| | |\  |
-%  |______|   \/_/    \_\______\____/_/    \_\_|  |_____\____/|_| \_|
-
-\chapter{Evaluation Strategy}
-
-\section{Evaluation Properties}
-In order to test if the website is useful or successful, we wish to test for and see if the following properties are true:\\
-\begin{tabularx}{\textwidth}{lX}
- \textbf{EVA-Share} & The process of sharing source code and test cases is A) easier and B) faster in a web interface as opposed to sharing via traditional means such as a file system or email.\\
- \textbf{EVA-Automate} & The automation of running test cases against source codes, and recording/displaying results is: A) Correct, B) Faster than performing this manually.\\
- \textbf{EVA-Enhance} & The feedback that is given through the website is as useful as, or better, than that given without the website.\\
- \textbf{EVA-Improve} & Subjectively check if test subjects feel that the peer assessment process is improved by using the website.\\
-\textbf{EVA-Secure} & Just how secure is the system in its current prototype state. Are there any flaws that could be exploited, and what possible steps could be taken to mitigate against these.
-\end{tabularx}
-
-\section{Test Strategy}
-In order to evaluate whether each test property has been met, a good strategy would be to:
-\begin{enumerate}
- \item Use a simple programming exercise, e.g. a Binary Search Tree
- \item Have test subjects perform the peer assessment each others solutions without the website
- \item Test subjects respond to questionnaire regarding this process
- \item Perform a different programming exercise, e.g. An auto-balancing Binary Tree
- \item Have test subjects again perform a peer assessment but this time with the website
- \item Test subjects respond to questionnaire regarding this process
- \item Test subjects may then attend a discussion session to debrief after completion
-\end{enumerate}
-I feel the evaluation would need to be performed in this way (with subjects both using the website, and not using it), as in order to test \textbf{EVA-Improve}, as you can only really gauge how the subjects feel about the website if they have tried both with and without it. The issue with testing in this manner is one of learning. As subjects will have completed one task already, their opinions and ability may be skewed by the second task. To mitigate this, we would want to swap the order in which both the tasks and the use of the website occurs (ideally this requires a minimum of 4 pairs of test subjects).\par
-In order to test \textbf{EVA-Share}, we can test this by A) Observing how files are shared, and seeing if the test subjects understand the website and the website works correctly, and B) timing how long it takes to share files with and without the website.\par
-\textbf{EVA-Enhance} can be tested by A) asking the users which feedback they found more useful, and also by B) having the markers (in this case the evaluation test runner) assess and compare the feedback itself, on a more objective level: How detailed is it, Is the feedback correct, etc.\par
-\textbf{EVA-Automate} is similar in some ways to \textbf{EVA-Submit}, and could use the same evaluation methods, but in addition it is necessary to check that the tests themselves are actually correct and useful. It is possible that the website may guide and improve, or hinder, the production of meaningful test cases during the peer assessment.\par
-Regarding \textbf{EVA-Secure}, I do not feel it would make sense to analyse the security of the system by including other test subjects. Given that the prototype is likely to be deployed on a live system (at Heriot-Watt university), an analysis performed theoretically rather than practically would be desired.\par
-This analysis should cover potential security flaws in terms of potential malicious code students might upload, exploits that could allow students (or other unauthorised actors) to access the system in unintended ways, and also seeing that the running of the website does not interfere with the rest of the live system it will be running on.
-
-\section{Test Subjects}
-The test strategy would require pairs of 2. At least 4 pairs (To count each combination of With/without website and task1/task2). It would be useful if the student has some prior knowledge of using python to program, but not be totally necessary. At least some proficiency in an object-oriented language would be needed.
-
-\section{Feedback}
-Students will be invited to complete a questionnaire at key points during the evaluation study. This will help to gauge the immediate reaction to using the system. Also, depending on numbers of involved participants, there may be an open answer discussion session held once the experiment is complete, where participants are invited to openly discuss how they feel about the concepts covered.
-
-\section{Ethical Analysis}
-The ethical analysis form for this evaluation study is included as an appendix. This details any ethical issues that might arise from the study, recruiting participants, and handling data. This ethical analysis has been approved by the Project Supervisor and the University Ethics Coordinator.
-
-
-%   _____  ________      ________ _      ____  _____  __  __ ______ _   _ _______ 
-%  |  __ \|  ____\ \    / /  ____| |    / __ \|  __ \|  \/  |  ____| \ | |__   __|
-%  | |  | | |__   \ \  / /| |__  | |   | |  | | |__) | \  / | |__  |  \| |  | |   
-%  | |  | |  __|   \ \/ / |  __| | |   | |  | |  ___/| |\/| |  __| | . ` |  | |   
-%  | |__| | |____   \  /  | |____| |___| |__| | |    | |  | | |____| |\  |  | |   
-%  |_____/|______|   \/   |______|______\____/|_|    |_|  |_|______|_| \_|  |_|
-
-\chapter{Development Plan}
-
 \section{Requirements}
-Based on the objectives outlined in \S 2.1, I can establish the following system requirements:\par
-The following prioritisation is used:\\
-\begin{tabular}{ccc}
- Low & Mid & High\\
- Possible future addition & Would make a more useful system & Necessary for prototype
-\end{tabular}
+Based on the  prototype objectives previously outlined (\S4.1), I can establish the following system requirements:\par
+The following prioritisation is used: \textbf{Low} - Possible future addition, \textbf{Mid} - Would make a more useful system, \textbf{High} - Necessary for prototype.
 
 \begin{longtable}{cclr}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority}\\\hline
@@ -537,7 +518,7 @@ Regarding requirements which are prioritised as low, this is because for the pur
 The basic system architecture that will be used is as follows: The website will use a client-server model, with the student/teacher's web browser acting as the client. The web server will store any submissions on the filesystem, as well as test results. The server will also contact a shell to run the submitted tests on solutions. In addition to this, a database may be required to assist in tracking which submissions are uploaded, where they are stored, etc.
 
 \section{Sequence of Operations}
-This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. This diagram is an early overview of a possible implementation, and will likely be different to the final implementation. This diagram also omits the database and focuses more on interactions related to the functionality users will see.\\
+This diagram provides an overview for how a student might interact with with the final, implemented, system. It describes the sequence of operations and messages between actors inside the system, in various situations. This diagram is an early overview of a possible implementation, and will likely be different to the final implementation. This diagram also any databases and focuses more on interactions related to the functionality users will see.\\
 \begin{sequencediagram}
 \newthread{u}{User}
 \newinst[2]{i}{Interface}
@@ -567,12 +548,9 @@ This diagram provides an overview for how a student might interact with with the
 \end{sdblock}
 \end{sequencediagram}
 
-%   _____  _____   ____       _            __  __          _   _ 
-%  |  __ \|  __ \ / __ \     | |          |  \/  |   /\   | \ | |
-%  | |__) | |__) | |  | |    | |  ______  | \  / |  /  \  |  \| |
-%  |  ___/|  _  /| |  | |_   | | |______| | |\/| | / /\ \ | . ` |
-%  | |    | | \ \| |__| | |__| |          | |  | |/ ____ \| |\  |
-%  |_|    |_|  \_\\____/ \____/           |_|  |_/_/    \_\_| \_|
+% END
+% PROJECT MANAGEMENT
+% BEGIN
 
 \chapter{Project Management}
 \section{Timetable}
@@ -615,6 +593,9 @@ To my knowledge, there are no legal issues that might arise from the implementat
 In terms of social and ethical issues, students may be affected. During the evaluation, as the test subjects are students, they will be taking part in the evaluation mid-semester. It is important that the impact of having taken part in the evaluation not have an adverse effect on their performance in classes or other coursework. To support this, it will be made clear to participants that their grades will not be affected by taking part, and make it clear that students can withdraw at their own wish.\par
 During both the evaluation and implementation, I will act in a professional manner that is consistent with what is expected by the university: Giving credit for help where it is due, treating people with respect, and being truthful in what I report.
 
+% END
+% APPENDICES AND BIBLIOGRAPHY
+%BEGIN
 \singlespacing
 \printbibliography
 
@@ -657,3 +638,4 @@ I confirm that, in accordance with Data Protection legislation:
 I confirm that the project involves only standard IT equipment and exposes participants to no more hazards than a conventional office environment.
 
 \end{document}
+% END
