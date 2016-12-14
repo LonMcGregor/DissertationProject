@@ -16,3 +16,7 @@ def upload_solution(request):
         return render(request, 'student/upload_solution.html')
     else:
         return render(request, 'student/upload_solution.html')
+
+
+def push_test(request):
+    return render(request, 'student/pushtest.html')
