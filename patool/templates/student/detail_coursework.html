@@ -1,0 +1,24 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>Detail Coursework</title>
+</head>
+<body>
+    <h1>{{ name }}</h1>
+    <p>View descriptor at: <a href="{{ descript }}">{{ descript }}</a></p>
+    <p>Available tasks:</p>
+    {% if completed_submit %}
+        <span>Submission completed</span>
+        {% else %}
+        <a href="/student/cw/{{ cwid }}/submit">Submit Solution</a>
+    {% endif %}
+    <p></p>
+    {% if completed_assess %}
+        <span>Submission completed</span>
+        {% else %}
+        <a href="/student/cw/{{ cwid }}/test">Test a classmate's Solution</a>
+    {% endif %}
+
+</body>
+</html>
