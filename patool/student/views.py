@@ -1,8 +1,7 @@
-from django.http import HttpResponseRedirect
 from django.http import Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from student.models import StoredSolution
+from student.models import *
 
 
 @login_required(login_url='login')
@@ -12,10 +11,10 @@ def index(request):
 
 @login_required(login_url='login')
 def upload_solution(request, singlecw=None):
-    if singlecw is None or singlecw=="":
+    if singlecw is None or singlecw == "":
         return Http404()
     if request.method == 'POST':
-        newsol = StoredSolution(cwid=singlecw, userid="unspec_user", file=request.FILES[
+        newsol = Solution(cwid=singlecw, userid=request.user.id, file=request.FILES[
             'chosenfile'])
         newsol.save()
         detail = {
