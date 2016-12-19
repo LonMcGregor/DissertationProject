@@ -16,15 +16,15 @@
     }
     logToPage("No server updates");
 
-    var sock = new SockJS('http://localhost:8888/notify');
+    var sock = new WebSocket('ws://localhost:8000');
     sock.onopen = function() {
-        logToPage('sockjs object opened');
+        logToPage('socket object opened');
     };
     sock.onmessage = function(e) {
         logToPage('message received: ' + e.data.toString());
     };
     sock.onclose = function() {
-        logToPage('sockjs object closed');
+        logToPage('socket object closed');
     };
 
     b = document.createElement('button');
