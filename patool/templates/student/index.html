@@ -1,4 +1,7 @@
-<h1>This is the student page for the PATool</h1>
+{% extends "student/base.html" %}
+{% block title %}Student Homepage{% endblock %}
+{% block content %}
 <p>You are currently logged in as: <em>{{ request.user }}</em></p>
 <a href="{% url 'logout' %}">logout</a>
 <p> upload a file: </p>
+{% endblock %}

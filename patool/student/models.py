@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 def upload_directory_path(cw, dev, type, filename):
-    return 'user_content/%s/%s/%s/%s' % (cw, dev, type, filename)
+    return 'uploads/%s/%s/%s/%s' % (cw, dev, type, filename)
 
 
 def solution_directory_path(instance, filename):

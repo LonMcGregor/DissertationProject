@@ -1,10 +1,6 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <title>Detail Coursework</title>
-</head>
-<body>
+{% extends "student/base.html" %}
+{% block title %}Detail Coursework{% endblock %}
+{% block content %}
     <h1>{{ name }}</h1>
     <p>View descriptor at: <a href="{{ descript }}">{{ descript }}</a></p>
     <p>Available tasks:</p>
@@ -19,6 +15,4 @@
         {% else %}
         <a href="/student/cw/{{ cwid }}/test">Test a classmate's Solution</a>
     {% endif %}
-
-</body>
-</html>
+{% endblock %}

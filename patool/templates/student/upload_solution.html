@@ -1,3 +1,6 @@
+{% extends "student/base.html" %}
+{% block title %}Upload Solution{% endblock %}
+{% block content %}
 {% if is_upload %}
     <h1>The file has been uploaded successfully:</h1>
     <h2>{{ filename }}</h2>
@@ -7,3 +10,4 @@
     select solution for {{ cw }}: <input type="file" name="chosenfile">
     <input type="submit">
 </form>
+{% endblock %}
