@@ -1,7 +1,6 @@
 from channels.sessions import channel_session
 import time
 import os
-import json
 
 counter = 0
 

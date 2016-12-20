@@ -1,8 +1,6 @@
 from django.db import models as m
 from django.contrib.auth.models import User
 
-# Create your models here.
-
 
 def upload_directory_path(cw, dev, type, filename):
     return 'user_content/%s/%s/%s/%s' % (cw, dev, type, filename)
@@ -61,15 +59,3 @@ class Solution(m.Model):
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     developer = m.ForeignKey(User, m.CASCADE)
     test = m.ForeignKey(TestCase, m.SET_NULL, null=True)
-
-
-class MessageTemplate(m.Model):
-    content = m.CharField(max_length=512)
-    link = m.CharField(max_length=512)
-
-
-class Message(m.Model):
-    template = m.ForeignKey(MessageTemplate)
-    rel = m.CharField(max_length=256)
-    user = m.ForeignKey(User)
-    hasBeenRead = m.BooleanField()
