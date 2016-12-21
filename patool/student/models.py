@@ -22,7 +22,7 @@ def feedback_directory_path(instance, filename):
     return upload_directory_path(instance.coursework, instance.developer, 'feedback', filename)
 
 
-class Module(m.Model):
+class Course(m.Model):
     id = m.CharField(max_length=20, primary_key=True)
     name = m.CharField(max_length=128)
 
@@ -32,13 +32,13 @@ class EnrolledUser(m.Model):
         unique_together = (('login', 'module'),)
 
     login = m.ForeignKey(User, m.CASCADE)
-    module = m.ForeignKey(Module, m.CASCADE)
+    course = m.ForeignKey(Course, m.CASCADE)
 
 
 class Coursework(m.Model):
     name = m.CharField(max_length=128)
     descriptor = m.URLField()
-    module = m.ForeignKey(Module, m.CASCADE)
+    course = m.ForeignKey(Course, m.CASCADE)
 
 
 class TestCase(m.Model):

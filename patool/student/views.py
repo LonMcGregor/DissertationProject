@@ -1,7 +1,7 @@
 from django.http import Http404
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
-from student.models import *
+import student.models as m
 
 
 @login_required(login_url='login')
@@ -11,10 +11,11 @@ def index(request):
 
 @login_required(login_url='login')
 def upload_solution(request, singlecw=None):
+    #todo verify the upload should occur
     if singlecw is None or singlecw == "":
         return Http404()
     if request.method == 'POST':
-        newsol = Solution(cwid=singlecw, userid=request.user.id, file=request.FILES[
+        newsol = m.Solution(cwid=singlecw, userid=request.user.id, file=request.FILES[
             'chosenfile'])
         newsol.save()
         detail = {
@@ -33,16 +34,19 @@ def upload_solution(request, singlecw=None):
 def push_test(request):
     return render(request, 'student/pushtest.html')
 
-#only call from other methods with login, dont use from router [for now]
-def select_coursework(request):
-    available = [("task 1", 123),("task 2", 234), ("task 3", 345)] #get from db
-    return render(request, 'student/choose_coursework.html', {'courseworks': available})
+
+def retrieve_coursework(request):
+    """For a given @request, return a list of courseworks available to the user"""
+    logged_in_user = request.user
+    available = [("task 1", 123),("task 2", 234), ("task 3", 345)]
+    return available
 
 
 @login_required(login_url='login')
 def detail_coursework(request, singlecw=None):
     if singlecw is None or singlecw == "":
-        return select_coursework(request)
+        available = retrieve_coursework(request)
+        return render(request, 'student/choose_coursework.html', {'courseworks': available})
     details = {
         "name": "binary tree",
         "cwid": singlecw,
