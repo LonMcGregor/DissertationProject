@@ -10,7 +10,14 @@
     {% block header %}
         <nav>
             <h1>Student Peer Assessment Site</h1>
-            <div id="userMenu"><a href="#userMenu">Username 🔽</a></div>
+            {% if request.user %}
+                <div id="userMenu">
+                    <a href="#userMenu">{{ request.user }} 🔽</a>
+                    <a href="{% url 'logout'%}">Log out</a>
+                </div>
+            {% else %}
+                <div id="userMenu"><a href="#userMenu">Not logged in</a></div>
+            {% endif %}
         </nav>
     {% endblock %}
     <main>

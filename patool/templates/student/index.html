@@ -2,6 +2,6 @@
 {% block title %}Student Homepage{% endblock %}
 {% block content %}
 <p>You are currently logged in as: <em>{{ request.user }}</em></p>
-<a href="{% url 'logout' %}">logout</a>
+<a href="{% url 'cw' '' %}">See my Courseworks</a>
 <p> upload a file: </p>
 {% endblock %}

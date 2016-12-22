@@ -1,18 +1,28 @@
 {% extends "student/base.html" %}
 {% block title %}Detail Coursework{% endblock %}
 {% block content %}
-    <h1>{{ name }}</h1>
-    <p>View descriptor at: <a href="{{ descript }}">{{ descript }}</a></p>
+    <h1>{{ cw.course.id }}: {{ cw.name }}</h1>
+    <p>View descriptor at: <a href="{{ cw.descriptor }}">{{ cw.descriptor }}</a></p>
+    <p>This coursework is currently in state {{ cw.state }}</p>
     <p>Available tasks:</p>
-    {% if completed_submit %}
+    {% if solution %}
         <span>Submission completed</span>
+        TODO: view own solution
+        {% if test %}
+            {% if assess %}
+                <span>Feedback completed</span> TODO: view test again, no re-submit though
+            {% else %}
+                {% if testrun %}
+                    <a href="{% url 'feedback' cw.id %}">Give feedback on test results</a>
+                {% else %}
+                    <span>The test case you have submitted has not run yet</span>
+                {% endif %}
+            {% endif %}
         {% else %}
-        <a href="/student/cw/{{ cwid }}/submit">Submit Solution</a>
+            <a href="{% url 'test' cw.id %}">Test a classmate's Solution</a>
+        {% endif %}
+    {% else %}
+        <a href="{% url 'solution' cw.id %}">Submit Solution</a>
     {% endif %}
     <p></p>
-    {% if completed_assess %}
-        <span>Submission completed</span>
-        {% else %}
-        <a href="/student/cw/{{ cwid }}/test">Test a classmate's Solution</a>
-    {% endif %}
 {% endblock %}

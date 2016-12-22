@@ -29,7 +29,7 @@ class Course(m.Model):
 
 class EnrolledUser(m.Model):
     class Meta:
-        unique_together = (('login', 'module'),)
+        unique_together = (('login', 'course'),)
 
     login = m.ForeignKey(User, m.CASCADE)
     course = m.ForeignKey(Course, m.CASCADE)
@@ -39,6 +39,22 @@ class Coursework(m.Model):
     name = m.CharField(max_length=128)
     descriptor = m.URLField()
     course = m.ForeignKey(Course, m.CASCADE)
+    INVISIBLE = 'i'
+    CLOSED = 'c'
+    SOL_ONLY = 's'
+    SOL_TEST = 'a'
+    TEST_ONLY = 't'
+    POSSIBLE_STATES = (
+        (INVISIBLE, 'Invisible to Students'),
+        (CLOSED, 'Closed for Submissions'),
+        (SOL_ONLY, 'Accepting Solutions Only'),
+        (SOL_TEST, 'Accepting Solutions and Tests'),
+        (TEST_ONLY, 'Accepting Tests Only'),
+    )
+    state = m.CharField(max_length=1, choices=POSSIBLE_STATES, default=INVISIBLE)
+
+    def is_visible(self):
+        return self.state != self.INVISIBLE
 
 
 class TestCase(m.Model):
