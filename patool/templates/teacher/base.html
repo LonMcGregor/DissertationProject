@@ -1,0 +1,33 @@
+{% load static %}
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <link rel="stylesheet" type="text/css" href="{%  static "student/css/main.css" %}" />
+    <title>{% block title %}TITLE NOT SET{% endblock %}</title>
+</head>
+<body>
+    {% block header %}
+        <nav>
+            <h1>Student Peer Assessment Site - 🐍 Teacher View</h1>
+            {% if request.user %}
+                <div id="userMenu">
+                    <a href="#userMenu">{{ request.user }} 🔽</a>
+                    <a href="{% url 'logout'%}">Log out</a>
+                </div>
+            {% else %}
+                <div id="userMenu"><a href="#userMenu">Not logged in</a></div>
+            {% endif %}
+        </nav>
+    {% endblock %}
+    <main>
+        {% block content %}
+            No content. Click here to go back to homepage:
+            <a href="/teacher">Homepage</a>
+        {% endblock %}
+    </main>
+    {% block footer %}
+        <footer>H0015298 | Heriot-Watt University</footer>
+    {% endblock %}
+</body>
+</html>
