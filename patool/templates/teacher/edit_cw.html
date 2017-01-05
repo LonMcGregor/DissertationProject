@@ -1,0 +1,55 @@
+{% extends "teacher/base.html" %}
+{% block title %}View Course{% endblock %}
+{% block content %}
+<h1>Coursework Details for {{ coursework.name }}:</h1>
+<form method="POST" action="">
+    {% csrf_token %}
+    {{ cw_form }}
+    <input type="submit" value="Save">
+</form>
+<p></p>
+<h1>Coursework Solutions</h1>
+    <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Developer</th>
+            <th>Filepath</th>
+            <th>Test ID</th>
+        </tr>
+    </thead>
+    {% for sol in solutions %}
+        <tr>
+            <td>{{ sol.id }}</td>
+            <td>{{ sol.developer }}</td>
+            <td>{{ sol.filepath }}</td>
+            <td>{{ sol.test }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <p></p>
+    <h1>Coursework Tests</h1>
+    <table>
+    <thead>
+        <tr>
+            <th>ID</th>
+            <th>Tester</th>
+            <th>Filepath</th>
+            <th>Has Run</th>
+            <th>Results</th>
+            <th>Feedback</th>
+            <th>Solution ID</th>
+        </tr>
+    </thead>
+    {% for test in tests %}
+        <tr>
+            <td>{{ test.id }}</td>
+            <td>{{ test.tester }}</td>
+            <td>{{ test.filepath }}</td>
+            <td>{{ test.has_run }}</td>
+            <td>{{ test.results }}</td>
+            <td>{{ test.feedback }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+{% endblock %}

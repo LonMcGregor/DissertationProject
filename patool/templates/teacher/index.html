@@ -1,15 +1,11 @@
 {% extends "teacher/base.html" %}
-{% block title %}Index{% endblock %}
+{% block title %}Teacher Index{% endblock %}
 {% block content %}
-    Your available actions:
-    <ul>
-        <li>
-            Course 1
-            <ul>
-                <li>Coursework</li>
-                <li>+ Coursework</li>
-            </ul>
-        </li>
-        <li>+ Course</li>
-    </ul>
+Your available actions:
+<ul>
+    {% for course in courses %}
+        <li><a href="{% url "edit_course" course.id %}">{{ course.name }}</a></li>
+    {% endfor %}
+    <li><a href="{% url "create_course" %}">+ Create Course</a></li>
+</ul>
 {% endblock %}

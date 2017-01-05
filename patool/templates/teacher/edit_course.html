@@ -1,0 +1,18 @@
+{% extends "teacher/base.html" %}
+{% block title %}View Course{% endblock %}
+{% block content %}
+<h1>Course Details for {{ course_name }}:</h1>
+<form method="POST" action="">
+    {% csrf_token %}
+    {{ uf }}
+    <input type="submit" value="Save">
+</form>
+<p></p>
+<h1>Courseworks on this Course</h1>
+<ul>
+    {% for cw in courseworks %}
+        <li><a href="{% url "edit_cw" cw.id %}">{{ cw.name }}</a></li>
+    {% endfor %}
+    <li><a href="{% url "create_cw" %}">+ Create Course</a></li>
+</ul>
+{% endblock %}
