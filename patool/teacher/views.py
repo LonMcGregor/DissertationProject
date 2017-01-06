@@ -45,12 +45,12 @@ def create_course_update(request, new_details):
     updated_form = f.CourseForm(new_details)
     if not updated_form.is_valid():
         raise Exception("validity problem")
-    new_id = updated_form.cleaned_data['id']
+    new_code = updated_form.cleaned_data['code']
     new_name = updated_form.cleaned_data['name']
     new_students = updated_form.cleaned_data['student'].strip().strip(',').split(',')
     new_students_list = list(map(lambda w: w.strip(), new_students))
 
-    course = m.Course(id=new_id, name=new_name)
+    course = m.Course(code=new_code, name=new_name)
     course.save()
 
     for item in new_students_list:
@@ -62,29 +62,31 @@ def create_course_update(request, new_details):
         new_item = m.EnrolledUser(login=owner, course=course)
         new_item.save()
 
-    return redirect('edit_course', c=new_id)
+    return redirect('edit_course', c=new_code)
 
 
 @login_required()
 @p.is_teacher
 def edit_course(request, kwargs):
-    requested_course_id = kwargs['c']
+    requested_course_code = kwargs['c']
     if request.method == "POST":
-        edit_course_update(request, requested_course_id, request.POST)
-    return edit_course_render(request, requested_course_id)
+        edit_course_update(request, requested_course_code, request.POST)
+    return edit_course_render(request, requested_course_code)
 
 
 @transaction.atomic
-def edit_course_update(request, course_id, new_details):
+def edit_course_update(request, course_code, new_details):
     # todo ADD VALIDATION - dont want overwriting IDs etc.
     owner = request.user
 
-    old_course = m.Course.objects.get(id=course_id)
+    old_course = m.Course.objects.get(code=course_code)
     updated_form = f.CourseForm(new_details)
     if not updated_form.is_valid():
         raise Exception("validity problem")
-    new_id = updated_form.cleaned_data['id']
-    new_name = updated_form.cleaned_data['name']
+    old_course.code = updated_form.cleaned_data['code']
+    old_course.name = updated_form.cleaned_data['name']
+    old_course.save()
+
     new_students = updated_form.cleaned_data['student'].strip().strip(',').split(',')
     new_students_list = list(map(lambda w: w.strip(), new_students))
 
@@ -101,13 +103,9 @@ def edit_course_update(request, course_id, new_details):
             new_item = m.EnrolledUser(login=current_user, course=old_course)
             new_item.save()
 
-    old_course.id = new_id
-    old_course.name = new_name
-    old_course.save()
 
-
-def edit_course_render(request, requested_course_id):
-    course = m.Course.objects.get(id=requested_course_id)
+def edit_course_render(request, requested_course_code):
+    course = m.Course.objects.get(code=requested_course_code)
     enrollments = m.EnrolledUser.objects.filter(course=course)
     students = ""
     for eu in enrollments:
@@ -116,8 +114,8 @@ def edit_course_render(request, requested_course_id):
     initial = {"id": course.id, "name": course.name, "student": students}
     update_form = f.CourseForm(initial)
     detail = {
-        "course_name": course,
-        "course_id": requested_course_id,
+        "course_name": course.name,
+        "course_code": course.code,
         "courseworks": courseworks,
         "uf": update_form
     }
@@ -127,9 +125,9 @@ def edit_course_render(request, requested_course_id):
 @login_required()
 @p.is_teacher
 def create_coursework(request, kwargs):
-    requested_course_id = kwargs['c']
+    requested_course_code = kwargs['c']
     if request.method == "POST":
-        return create_coursework_update(request.POST, requested_course_id)
+        return create_coursework_update(request.POST, requested_course_code)
     return create_coursework_render(request)
 
 
@@ -144,7 +142,7 @@ def create_coursework_render(request):
 
 
 @transaction.atomic
-def create_coursework_update(new_details, course_id):
+def create_coursework_update(new_details, course_code):
     # todo ADD VALIDATION - dont want overwriting IDs etc.
     updated_form = f.CourseworkForm(new_details)
     if not updated_form.is_valid():
@@ -153,7 +151,7 @@ def create_coursework_update(new_details, course_id):
     new_descriptor = updated_form.cleaned_data['descriptor']
     new_state = updated_form.cleaned_data['state']
 
-    course = m.Course.objects.get(id=course_id)
+    course = m.Course.objects.get(code=course_code)
     coursework = m.Coursework(name=new_name, descriptor=new_descriptor, course=course,
                               state=new_state)
     coursework.save()
@@ -180,13 +178,8 @@ def edit_coursework_update(new_details, old_coursework):
 
 
 def edit_coursework_render(request, coursework):
-    solutions = m.Solution.objects.filter(coursework=coursework)
-    tests = []
-    # has solutions
-    # has test cases
-    for solution in solutions:
-        if solution.test is not None:
-            tests.append(solution.test)
+    files = m.File.objects.filter(coursework=coursework)
+    results = m.TestResult.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
                "descriptor": coursework.descriptor,
                "state": coursework.state}
@@ -194,7 +187,7 @@ def edit_coursework_render(request, coursework):
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
-        "solutions": solutions,
-        "tests": tests
+        "files": files,
+        "results": results
     }
     return render(request, 'teacher/edit_cw.html', detail)

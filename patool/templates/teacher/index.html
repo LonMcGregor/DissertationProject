@@ -4,7 +4,7 @@
 Your available actions:
 <ul>
     {% for course in courses %}
-        <li><a href="{% url "edit_course" course.id %}">{{ course.name }}</a></li>
+        <li><a href="{% url "edit_course" course.code %}">{{ course.name }}</a></li>
     {% endfor %}
     <li><a href="{% url "create_course" %}">+ Create Course</a></li>
 </ul>

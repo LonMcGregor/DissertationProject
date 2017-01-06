@@ -2,29 +2,13 @@ from django.db import models as m
 from django.contrib.auth.models import User
 
 
-def upload_directory_path(cw, dev, type, filename):
-    return 'uploads/%s/%s/%s/%s' % (cw, dev, type, filename)
-
-
-def solution_directory_path(instance, filename):
-    return upload_directory_path(instance.coursework, instance.developer, 'solution', filename)
-
-
-def test_directory_path(instance, filename):
-    return upload_directory_path(instance.coursework, instance.developer, 'test', filename)
-
-
-def results_directory_path(instance, filename):
-    return upload_directory_path(instance.coursework, instance.developer, 'testresult', filename)
-
-
-def feedback_directory_path(instance, filename):
-    return upload_directory_path(instance.coursework, instance.developer, 'feedback', filename)
+def upload_directory_path(instance, filename):
+    return 'uploads/%s/%s/%s/%s' % (instance.coursework, instance.creator, instance.type, filename)
 
 
 class Course(m.Model):
-    id = m.CharField(max_length=20, primary_key=True)
     name = m.CharField(max_length=128)
+    code = m.SlugField(max_length=32, unique=True)
 
 
 class EnrolledUser(m.Model):
@@ -35,43 +19,58 @@ class EnrolledUser(m.Model):
     course = m.ForeignKey(Course, m.CASCADE)
 
 
-class Coursework(m.Model):
-    name = m.CharField(max_length=128)
-    descriptor = m.URLField()
-    course = m.ForeignKey(Course, m.CASCADE)
+class CourseworkState:
     INVISIBLE = 'i'
     CLOSED = 'c'
-    SOL_ONLY = 's'
-    SOL_TEST = 'a'
+    SOLUTIONS_ONLY = 's'
+    SOLUTIONS_TEST = 'b'
     TEST_ONLY = 't'
     POSSIBLE_STATES = (
         (INVISIBLE, 'Invisible to Students'),
         (CLOSED, 'Closed for Submissions'),
-        (SOL_ONLY, 'Accepting Solutions Only'),
-        (SOL_TEST, 'Accepting Solutions and Tests'),
+        (SOLUTIONS_ONLY, 'Accepting Solutions Only'),
+        (SOLUTIONS_TEST, 'Accepting Solutions and Tests'),
         (TEST_ONLY, 'Accepting Tests Only'),
     )
-    state = m.CharField(max_length=1, choices=POSSIBLE_STATES, default=INVISIBLE)
+
+
+class Coursework(m.Model):
+    name = m.CharField(max_length=128)
+    descriptor = m.URLField()
+    course = m.ForeignKey(Course, m.CASCADE)
+    state = m.CharField(max_length=1,
+                        choices=CourseworkState.POSSIBLE_STATES,
+                        default=CourseworkState.INVISIBLE)
 
     def is_visible(self):
-        return self.state != self.INVISIBLE
+        return self.state != CourseworkState.INVISIBLE
 
 
-class TestCase(m.Model):
-    filepath = m.FileField(upload_to=test_directory_path, max_length=256)
-    tester = m.ForeignKey(User, m.CASCADE)
-    has_run = m.BooleanField()
-    results = m.FileField(upload_to=results_directory_path, max_length=256, null=True)
-    feedback = m.FileField(upload_to=feedback_directory_path, max_length=256, null=True)
+class FileType:
+    SOLUTION = 's'
+    TEST_CASE = 'c'
+    TEST_RESULT = 'r'
+    FEEDBACK = 'f'
+    POSSIBLE_TYPES = (
+        (SOLUTION, 'Solution to Coursework'),
+        (TEST_CASE, 'Test Case for Solution'),
+        (TEST_RESULT, 'Results of Running Test Case'),
+        (FEEDBACK, 'Feedback for a Solution'),
+    )
 
 
-class Solution(m.Model):
-    class Meta:
-        permissions = (
-            ("view_solution", "Can view this solution"),
-        )
-
-    filepath = m.FileField(upload_to=solution_directory_path, max_length=256)
+class File(m.Model):
+    filepath = m.FileField(upload_to=upload_directory_path)
     coursework = m.ForeignKey(Coursework, m.CASCADE)
-    developer = m.ForeignKey(User, m.CASCADE)
-    test = m.ForeignKey(TestCase, m.SET_NULL, null=True)
+    creator = m.ForeignKey(User, m.CASCADE)
+    type = m.CharField(max_length=1, choices=FileType.POSSIBLE_TYPES)
+
+
+class TestResult(m.Model):
+    coursework = m.ForeignKey(Coursework, m.CASCADE)
+    test = m.ForeignKey(File, m.CASCADE, related_name="test_result_test_file_relation")
+    solution = m.ForeignKey(File, m.CASCADE, related_name="test_result_solution_file_relation")
+    results = m.ForeignKey(File, m.CASCADE, related_name="test_result_results_file_relation")
+    feedback = m.ForeignKey(File, m.CASCADE, related_name="test_result_feedback_file_relation")
+    waiting_to_run = m.BooleanField()
+    error_occurred = m.BooleanField()

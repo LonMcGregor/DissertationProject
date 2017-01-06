@@ -7,7 +7,7 @@
 {% endif %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    select solution for {{ cw }}: <input type="file" name="chosenfile">
+    {{ ff }}
     <input type="submit">
 </form>
 {% endblock %}

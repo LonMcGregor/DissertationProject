@@ -1,11 +1,10 @@
 from django.http import HttpResponseForbidden
-from django.contrib.auth.models import User, Group
+from django.contrib.auth.models import Group
 
 
 def is_teacher(f):
-    teacher_group = Group.objects.get(name="teacher")
-
     def is_teacher_internal(request, **args):
+        teacher_group = Group.objects.get(name="teacher")
         if teacher_group in request.user.groups.all():
             if not args:
                 return f(request)

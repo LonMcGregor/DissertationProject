@@ -3,7 +3,8 @@
 {% block content %}
     {% if courseworks %}
         {% for id, state, course, title in courseworks %}
-            <p><a href="/student/cw/{{ id }}" class="{{ state }}">{{ course }}: {{ title }}</a></p>
+            <p><a href="/student/cw/{{ id }}" class="{{ state }}">{{ course }}:
+                {{ title }}</a></p>
         {% endfor %}
     {% else %}
         <div>No courseworks available right now</div>

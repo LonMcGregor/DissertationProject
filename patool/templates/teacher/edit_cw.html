@@ -8,47 +8,44 @@
     <input type="submit" value="Save">
 </form>
 <p></p>
-<h1>Coursework Solutions</h1>
+    <h1>Coursework Files</h1>
     <table>
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Developer</th>
-            <th>Filepath</th>
-            <th>Test ID</th>
-        </tr>
+    <tr>
+        <th>Filepath</th>
+        <th>Creator</th>
+        <th>Type</th>
+    </tr>
     </thead>
-    {% for sol in solutions %}
+    {% for f in files %}
         <tr>
-            <td>{{ sol.id }}</td>
-            <td>{{ sol.developer }}</td>
-            <td>{{ sol.filepath }}</td>
-            <td>{{ sol.test }}</td>
+        <td><a href="{{ f.filepath }}">{{ f.filepath }}</a></td>
+        <td>{{ f.creator }}</td>
+        <td>{{ f.type }}</td>
         </tr>
     {% endfor %}
     </table>
     <p></p>
-    <h1>Coursework Tests</h1>
+<h1>Coursework Results</h1>
     <table>
     <thead>
-        <tr>
-            <th>ID</th>
-            <th>Tester</th>
-            <th>Filepath</th>
-            <th>Has Run</th>
-            <th>Results</th>
-            <th>Feedback</th>
-            <th>Solution ID</th>
-        </tr>
+    <tr>
+        <th>Test</th>
+        <th>Solution</th>
+        <th>Results</th>
+        <th>Feedback</th>
+        <th>Waiting to Run</th>
+        <th>Error Occurred</th>
+    </tr>
     </thead>
-    {% for test in tests %}
+    {% for f in results %}
         <tr>
-            <td>{{ test.id }}</td>
-            <td>{{ test.tester }}</td>
-            <td>{{ test.filepath }}</td>
-            <td>{{ test.has_run }}</td>
-            <td>{{ test.results }}</td>
-            <td>{{ test.feedback }}</td>
+        <td><a href="{{ f.test.filepath }}">{{ f.test.filepath }}</a></td>
+        <td><a href="{{ f.solution.filepath }}">{{ f.solution.filepath }}</a></td>
+        <td><a href="{{ f.results.filepath }}">{{ f.results.filepath }}</a></td>
+        <td><a href="{{ f.feedback.filepath }}">{{ f.feedback.filepath }}</a></td>
+        <td>{{ f.waiting_to_run }}</td>
+        <td>{{ f.error_occurred }}</td>
         </tr>
     {% endfor %}
     </table>
