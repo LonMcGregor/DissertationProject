@@ -13,6 +13,6 @@
     {% for cw in courseworks %}
         <li><a href="{% url "edit_cw" cw.id %}">{{ cw.name }}</a></li>
     {% endfor %}
-    <li><a href="{% url "create_cw" %}">+ Create Course</a></li>
+    <li><a href="{% url "create_cw" course_id %}">+ Create Coursework</a></li>
 </ul>
 {% endblock %}
