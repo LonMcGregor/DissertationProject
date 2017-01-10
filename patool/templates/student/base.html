@@ -4,12 +4,18 @@
 <head>
     <meta charset="UTF-8">
     <link rel="stylesheet" type="text/css" href="{%  static "student/css/main.css" %}" />
+    <link rel="stylesheet" type="text/css" href="{%  static "student/css/notify_box.css" %}" />
+    <link rel="shortcut icon" type="image/png" href="{% static "favicon.ico" %}" />
     <title>{% block title %}TITLE NOT SET{% endblock %}</title>
+    <script type="text/javascript" src="{% static "student/js/channels_notify.js" %}"></script>
 </head>
 <body>
     {% block header %}
         <nav>
-            <h1>Student Peer Assessment Site</h1>
+            <h1>{% block headertitle %}Student Peer Assessment Site{% endblock %}</h1>
+            <button id="note_count" onclick="toggle_notes_status()">Notifications (0)</button>
+            <div id="note_messages_container" class="collapsed">
+            </div>
             {% if request.user %}
                 <div id="userMenu">
                     <a href="#userMenu">{{ request.user }} 🔽</a>

@@ -45,10 +45,6 @@ def upload_test(request, singlecw):
         return HttpResponseForbidden()
 
 
-def push_test(request):
-    return render(request, 'student/pushtest.html')
-
-
 def retrieve_coursework(request):
     """For a given @request, return a list of courseworks available to the user"""
     logged_in_user = request.user
