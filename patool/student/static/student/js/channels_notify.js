@@ -22,12 +22,12 @@ function html_notify(o){
 
 function html_5_notify(o){
     if(Notification.permission === "granted"){
-        new Notification("HTML5 Notifications:" + o.toString());
+        new Notification(o.toString());
     }
 }
 
-Notification.requestPermission().then(function(result) {
-    notify(Notification.permission);
+Notification.requestPermission().then(function() {
+    notify("HTML5 Notifications:" + Notification.permission);
 });
 
 function toggle_notes_status(){

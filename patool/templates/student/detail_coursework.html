@@ -2,27 +2,45 @@
 {% block title %}Detail Coursework{% endblock %}
 {% block content %}
     <h1>{{ cw.course.id }}: {{ cw.name }}</h1>
-    <p>View descriptor at: <a href="{{ cw.descriptor }}">{{ cw.descriptor }}</a></p>
+    <p>View descriptor at: <a href="{{ cw.descriptor }}">{{ cw.descriptor }}</a> </p>
     <p>This coursework is currently in state {{ cw.state }}</p>
     <p>Available tasks:</p>
-    {% if solution %}
-        <span>Submission completed</span>
-        TODO: view own solution
-        {% if test %}
-            {% if assess %}
-                <span>Feedback completed</span> TODO: view test again, no re-submit though
+
+    <ul>
+    {% if has_submitted_solution %}
+        <li><a href="{{ solution_url }}">View my Solution</a></li>
+
+        {% if has_submitted_test %}
+            <li><a  href="{{ test_url }}">View my test case</a></li>
+
+            {% if waiting_on_test %}
+                <li>Please wait while your test case is run against a solution</li>
             {% else %}
-                {% if testrun %}
-                    <a href="{% url 'feedback' cw.id %}">Give feedback on test results</a>
+                <li><a  href="{{ test_results_url }}">View test results</a></li>
+
+                {% if has_given_feedback %}
+                    <li><a  href="{{ feedback_results_url }}">View feedback for results</a></li>
                 {% else %}
-                    <span>The test case you have submitted has not run yet</span>
+                    <li><a  href="">Submit feedback for results</a></li>
                 {% endif %}
+
             {% endif %}
+
         {% else %}
-            <a href="{% url 'test' cw.id %}">Test a classmate's Solution</a>
+            <li><a  href="">Submit test case</a></li>
         {% endif %}
+
     {% else %}
-        <a href="{% url 'solution' cw.id %}">Submit Solution</a>
+        <li><a  href="{% url 'solution' cw.id %}">Submit Solution</a></li>
     {% endif %}
+    </ul>
     <p></p>
+    <p>Feedback for my solution:</p>
+    <ul>
+    {% if has_own_feedback %}
+        <li><a  href="{{ own_feedback_results_url }}">View feedback for my solution</a></li>
+    {% else %}
+        <li>You do not yet have feedback for your own solution</li>
+    {% endif %}
+    </ul>
 {% endblock %}

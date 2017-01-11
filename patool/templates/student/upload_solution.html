@@ -1,13 +1,12 @@
 {% extends "student/base.html" %}
-{% block title %}Upload Solution{% endblock %}
+{% block title %}Upload Coursework File{% endblock %}
 {% block content %}
-{% if is_upload %}
-    <h1>The file has been uploaded successfully:</h1>
-    <h2>{{ filename }}</h2>
-{% endif %}
+<h1>{{ msg }}</h1>
+    {% if allow_upload %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ ff }}
     <input type="submit">
 </form>
+    {% endif %}
 {% endblock %}

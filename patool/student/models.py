@@ -70,7 +70,9 @@ class TestResult(m.Model):
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     test = m.ForeignKey(File, m.CASCADE, related_name="test_result_test_file_relation")
     solution = m.ForeignKey(File, m.CASCADE, related_name="test_result_solution_file_relation")
-    results = m.ForeignKey(File, m.CASCADE, related_name="test_result_results_file_relation")
-    feedback = m.ForeignKey(File, m.CASCADE, related_name="test_result_feedback_file_relation")
+    results = m.ForeignKey(File, m.CASCADE, null=True,
+                           related_name="test_result_results_file_relation")
+    feedback = m.ForeignKey(File, m.CASCADE, null=True,
+                            related_name="test_result_feedback_file_relation")
     waiting_to_run = m.BooleanField()
     error_occurred = m.BooleanField()
