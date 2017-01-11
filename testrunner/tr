@@ -1,0 +1,19 @@
+#!/bin/bash
+
+solution=$1
+testdir=$2
+testfile=$3
+t_result=$4
+
+
+mkdir tmp
+cp $solution tmp
+cp $testdir/$testfile tmp
+cd tmp
+touch __init__.py
+python -m unittest -v $testfile > test_results 1>test_results 2>test_results
+status=$?
+mv test_results ../$t_result/test_results
+cd ..
+rm -r tmp
+exit $status
