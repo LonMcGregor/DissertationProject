@@ -154,5 +154,4 @@ ENV/
 # Rope project settings
 .ropeproject
 patool/.idea/workspace.xml
-patool/.idea/workspace.xml
-patool/.idea/workspace.xml
+patool/var/

@@ -6,3 +6,4 @@ python manage.py makemigrations student
 python manage.py makemigrations teacher
 python manage.py makemigrations notify
 python manage.py migrate
+python manage.py collectstatic
