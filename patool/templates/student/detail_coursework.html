@@ -21,13 +21,13 @@
                 {% if has_given_feedback %}
                     <li><a  href="{{ feedback_results_url }}">View feedback for results</a></li>
                 {% else %}
-                    <li><a  href="">Submit feedback for results</a></li>
+                    <li><a  href="{% url 'feedback' cw.id %}">Submit feedback for results</a></li>
                 {% endif %}
 
             {% endif %}
 
         {% else %}
-            <li><a  href="">Submit test case</a></li>
+            <li><a  href="{% url 'test' cw.id %}">Submit test case</a></li>
         {% endif %}
 
     {% else %}

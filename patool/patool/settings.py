@@ -137,6 +137,9 @@ STATIC_ROOT = 'C:/Users/lonm/AppData/local/tmp/patool/static'
 MEDIA_URL = '/uploads/'
 MEDIA_ROOT = 'C:/Users/lonm/AppData/local/tmp/patool/uploads'
 
-#URLconf
+# Auth URLconf
 LOGIN_URL = '/student/login'
 LOGOUT_REDIRECT_URL = '/student/'
+
+# Test directories
+TESTING_ROOT = '.'

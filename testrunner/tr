@@ -3,7 +3,8 @@
 solution=$1
 testdir=$2
 testfile=$3
-t_result=$4
+resdir=$4
+resfile=$5
 
 
 mkdir tmp
@@ -11,9 +12,9 @@ cp $solution tmp
 cp $testdir/$testfile tmp
 cd tmp
 touch __init__.py
-python -m unittest -v $testfile > test_results 1>test_results 2>test_results
+python3 -m unittest -v $testfile > $resfile 1>&1 2>&1
 status=$?
-mv test_results ../$t_result/test_results
+mv test_results ../$resdir/$resfile
 cd ..
 rm -r tmp
 exit $status

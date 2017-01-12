@@ -179,7 +179,7 @@ def edit_coursework_update(new_details, old_coursework):
 
 def edit_coursework_render(request, coursework):
     files = m.File.objects.filter(coursework=coursework)
-    results = m.TestResult.objects.filter(coursework=coursework)
+    results = m.TestData.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
                "descriptor": coursework.descriptor,
                "state": coursework.state}

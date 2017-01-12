@@ -66,13 +66,17 @@ class File(m.Model):
     type = m.CharField(max_length=1, choices=FileType.POSSIBLE_TYPES)
 
 
-class TestResult(m.Model):
-    coursework = m.ForeignKey(Coursework, m.CASCADE)
-    test = m.ForeignKey(File, m.CASCADE, related_name="test_result_test_file_relation")
-    solution = m.ForeignKey(File, m.CASCADE, related_name="test_result_solution_file_relation")
+class TestData(m.Model):
+    class Meta:
+        unique_together = (('test', 'solution', 'coursework', 'initiator'),)
+
+    test = m.ForeignKey(File, m.CASCADE, related_name="test_data_test_file_relation")
+    solution = m.ForeignKey(File, m.CASCADE, related_name="test_data_solution_file_relation")
     results = m.ForeignKey(File, m.CASCADE, null=True,
-                           related_name="test_result_results_file_relation")
+                           related_name="test_data_results_file_relation")
     feedback = m.ForeignKey(File, m.CASCADE, null=True,
-                            related_name="test_result_feedback_file_relation")
-    waiting_to_run = m.BooleanField()
-    error_occurred = m.BooleanField()
+                            related_name="test_data_feedback_file_relation")
+    error_level = m.IntegerField(null=True)
+    coursework = m.ForeignKey(Coursework, m.CASCADE, related_name='test_data_coursework_relation')
+    initiator = m.ForeignKey(User, m.CASCADE, related_name='test_data_inititating_user_relation')
+    waiting_to_run = m.BooleanField(default=True)

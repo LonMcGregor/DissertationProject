@@ -15,8 +15,8 @@ def populate_database(request):
     if settings.DEBUG:
 
         User.objects.create_superuser(username='admin',
-                              email='admin@local.host',
-                              password='overwatch')
+                                      email='admin@local.host',
+                                      password='overwatch')
 
         t = Group()
         t.name = "teacher"

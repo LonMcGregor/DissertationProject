@@ -34,8 +34,9 @@
         <th>Solution</th>
         <th>Results</th>
         <th>Feedback</th>
+        <th>Error Level</th>
+        <th>Initiator</th>
         <th>Waiting to Run</th>
-        <th>Error Occurred</th>
     </tr>
     </thead>
     {% for f in results %}
@@ -44,8 +45,9 @@
         <td><a href="{{ f.solution.filepath }}">{{ f.solution.filepath }}</a></td>
         <td><a href="{{ f.results.filepath }}">{{ f.results.filepath }}</a></td>
         <td><a href="{{ f.feedback.filepath }}">{{ f.feedback.filepath }}</a></td>
+        <td>{{ f.error_level }}</td>
+        <td>{{ f.initiator }}</td>
         <td>{{ f.waiting_to_run }}</td>
-        <td>{{ f.error_occurred }}</td>
         </tr>
     {% endfor %}
     </table>
