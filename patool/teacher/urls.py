@@ -9,5 +9,6 @@ urlpatterns = [
     url('course/(?P<c>[0-9a-zA-Z\-_]*)', views.edit_course, name='edit_course'),
     url('create_cw/(?P<c>[0-9a-zA-Z\-_]*)', views.create_coursework, name='create_cw'),
     url('cw/(?P<c>[0-9a-zA-Z\-_]*)', views.edit_coursework, name='edit_cw'),
+    url('test/(?P<t>[0-9a-zA-Z\-_]*)', views.force_start_test_run, name='force_test_run'),
     url(r'^$', views.index, name='index'),
 ]

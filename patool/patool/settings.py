@@ -132,14 +132,14 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
 STATIC_URL = '/static/'
-STATIC_ROOT = 'var/tmp/patool/static'
+STATIC_ROOT = 'var/static'
 
 MEDIA_URL = '/'
-MEDIA_ROOT = 'var/patool/uploads'
+MEDIA_ROOT = 'var/uploads'
+MEDIA_TMP_TEST = 'var/tmp/test'
+
 
 # Auth URLconf
 LOGIN_URL = '/student/login'
 LOGOUT_REDIRECT_URL = '/student/'
 
-# Test directories
-TESTING_ROOT = '.'

@@ -1,6 +1,8 @@
+@echo off
 del db.sqlite3
-del student\migrations
-del notify\migrations
+del /q /s student\migrations\*
+del /q /s notify\migrations\*
+del /q /s var\*
 python manage.py makemigrations
 python manage.py makemigrations student
 python manage.py makemigrations teacher

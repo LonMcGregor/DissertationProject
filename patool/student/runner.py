@@ -2,36 +2,57 @@ from django.conf import settings
 import student.models as m
 import sys
 import subprocess
-from django.core.files import File
+from django.core.files.base import ContentFile
 from django.db import transaction
-import time
+import shutil
 import os
 
 
 @transaction.atomic
 def run_test(test_data_instance):
-    solution_file = test_data_instance.solution.filepath
-    test_path = test_data_instance.test.filepath
-    if sys.platform == "linux":
-        test_file = test_path.split('/')[::-1][0]
-        script = '../../testrunner/tr'
-    elif sys.platform == "win32":
-        test_file = test_path.split('\\')[::-1][0]
-        script = '..\\..\\testrunner\\tr.cmd'
-    else:
-        raise Exception("unsupported operating system")
-    test_result_file = 'results' + str(time.time())
-    test_dir = test_path[:len(test_file)]
-    result = subprocess.run([script, solution_file, test_dir,
-                    test_file, settings.TEST_RESULT_ROOT, test_result_file])
-    result_file_instance = File(open(os.path.join(test_dir, test_result_file)))
-    result_file = m.File(filepath=result_file_instance, coursework=test_data_instance.coursework,
-                         creator=test_data_instance.user, type=m.FileType.TEST_RESULT)
+    script = 'python' if sys.platform == "win32" else 'python3'
+    solution_file = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT,
+                                 str(test_data_instance.solution.filepath))
+    test_path = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT,
+                             str(test_data_instance.test.filepath))
+    test_file = test_path.split('/')[::-1][0]
+    if sys.platform == "win32":
+        solution_file = solution_file.replace("/", "\\")
+        test_path = test_path.replace('/', '\\')
+    result, output = execute(script, solution_file, test_path, test_file)
+    result_file = m.File(filepath=ContentFile(output), coursework=test_data_instance.coursework,
+                         creator=test_data_instance.test.creator, type=m.FileType.TEST_RESULT)
+    # todo who is creator? if in current cw, then it is test writer. if invoked later... is teacher?
     result_file.save()
     test_data_instance.results = result_file
     test_data_instance.error_level = result
     test_data_instance.waiting_to_run = False
     test_data_instance.save()
+
+
+def execute(script, solution_file, test_dir, test_file):
+    # todo FOR NOW ONLY SUPPORT RUNNING THIS ONCE AT A TIME
+    media_dir = os.path.join(settings.BASE_DIR, settings.MEDIA_TMP_TEST)
+    init_dir = os.path.join(media_dir, '__init__.py')
+    if sys.platform == "win32":
+        media_dir = media_dir.replace('/', '\\')
+        init_dir = init_dir.replace('/', '\\')
+    if not os.path.exists(media_dir):
+        os.makedirs(media_dir)
+    else:
+        shutil.rmtree(media_dir)
+        os.makedirs(media_dir)
+    shutil.copy(solution_file, media_dir)
+    shutil.copy(test_dir, media_dir)
+    with open(init_dir, 'w+') as f:
+        f.write('')
+    args = [script, '-m', 'unittest', '-v', test_file]
+    proc = subprocess.Popen(args, cwd=media_dir)
+    outb, errb = proc.communicate()
+    outs = "" if outb is None else outb.decode('utf-8')
+    errs = "" if errb is None else errb.decode('utf-8')
+    output = outs + errs
+    return proc.returncode, output
 
 
 def get_next_unassigned_item(coursework, file_type, user):

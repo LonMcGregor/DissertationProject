@@ -19,7 +19,7 @@
     </thead>
     {% for f in files %}
         <tr>
-        <td><a href="{{ f.filepath }}">{{ f.filepath }}</a></td>
+        <td><a href="/{{ f.filepath }}">{{ f.filepath }}</a></td>
         <td>{{ f.creator }}</td>
         <td>{{ f.type }}</td>
         </tr>
@@ -47,7 +47,11 @@
         <td><a href="/{{ f.feedback.filepath }}">{{ f.feedback.filepath }}</a></td>
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>
-        <td>{{ f.waiting_to_run }}</td>
+            {% if f.waiting_to_run %}
+                <td><a href="{% url 'force_test_run' f.id %}">Run Now</a></td>
+            {% else %}
+                <td>Has Run</td>
+            {% endif %}
         </tr>
     {% endfor %}
     </table>

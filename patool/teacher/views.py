@@ -4,6 +4,8 @@ import teacher.permission as p
 import student.models as m
 import teacher.forms as f
 from django.db import transaction
+import student.runner as r
+from django.http import HttpResponseForbidden, HttpResponse
 
 
 @login_required()
@@ -191,3 +193,15 @@ def edit_coursework_render(request, coursework):
         "results": results
     }
     return render(request, 'teacher/edit_cw.html', detail)
+
+
+@login_required()
+@p.is_teacher
+def force_start_test_run(request, kwargs):
+    requested_test = kwargs['t']
+    test_instance = m.TestData.objects.get(id=requested_test)
+    if not test_instance.waiting_to_run:
+        return HttpResponseForbidden()
+    # todo checks that teacher actually owns coursework
+    r.run_test(test_instance)
+    return HttpResponse("Test Run %s Force Started" % test_instance.id)

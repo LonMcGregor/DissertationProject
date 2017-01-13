@@ -1,3 +1,4 @@
+#!/usr/bin/env bash
 rm db.sqlite3
 rm -r student\migrations
 rm -r notify\migrations

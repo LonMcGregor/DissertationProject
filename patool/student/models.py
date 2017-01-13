@@ -3,7 +3,7 @@ from django.contrib.auth.models import User
 
 
 def upload_directory_path(instance, filename):
-    return 'uploads/%s/%s/%s/%s' % (instance.coursework, instance.creator, instance.type, filename)
+    return '%s/%s/%s/%s' % (instance.coursework.id, instance.creator, instance.type, filename)
 
 
 class Course(m.Model):
