@@ -1,0 +1,45 @@
+#feedback_panels, #feedback_test {
+    display:flex;
+    width: 100%;
+    flex-direction: row;
+    justify-content: space-around;
+}
+
+.feedback_panel {
+    flex-grow: 1;
+    min-width: 350px;
+    min-height: 350px;
+}
+
+#feedback_test {
+    flex-direction: column;
+}
+
+#feedback_form {
+    display: flex;
+    flex-direction: row;
+    justify-content: space-around;
+    height: 300px;
+}
+
+#feedback_form input {
+    height: 100%;
+}
+
+#feedback_form input[name="feedback"] {
+    flex-grow: 9;
+    min-width: 200px;
+}
+
+#feedback_form input[type="submit"] {
+    flex-grow: 1;
+    min-width: 80px;
+}
+
+.feedback_frame_view iframe {
+    border: 0;
+    padding: 0;
+    margin: 0;
+    width: 100%;
+    height: 100%;
+}

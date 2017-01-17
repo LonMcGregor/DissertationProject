@@ -1,0 +1,28 @@
+{% extends 'student/base.html' %}
+{% block title %}Feedback{% endblock %}
+{% block content %}
+    <div id="feedback_panels">
+        <div id="feedback_test" class="feedback_panel">
+            <div id="feedback_test_case" class="feedback_frame_view feedback_panel">
+                <iframe src="/{{ test_data.test.filepath }}" ></iframe>
+            </div>
+            <div id="feedback_test_result" class="feedback_frame_view feedback_panel">
+                <iframe src="/{{ test_data.results.filepath }}" ></iframe>
+            </div>
+        </div>
+        <div id="feedback_solution" class="feedback_frame_view feedback_panel">
+            <iframe src="/{{ test_data.solution.filepath }}"></iframe>
+        </div>
+    </div>
+    {% if can_submit %}
+        <form method="POST" action="" id="feedback_form">
+            {% csrf_token %}
+            <input type="text" name="feedback" placeholder="Please type some feedback here"/>
+            <input type="submit" value="Submit Feedback" />
+        </form>
+    {% else %}
+        <div id="feedback_form" class="feedback_frame_view">
+            <iframe src="/{{ test_data_instance.feedback.filepath }}"></iframe>
+        </div>
+    {% endif %}
+{% endblock %}

@@ -1,4 +1,5 @@
-from django.http import Http404, HttpResponseForbidden
+from django.core.files.base import ContentFile
+from django.http import Http404, HttpResponseForbidden, HttpResponse
 from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
 import student.models as m
@@ -156,3 +157,36 @@ def single_coursework(request, coursework):
         "own_feedback_results_url": path_for_file(own_feedback),
     }
     return render(request, 'student/detail_coursework.html', details)
+
+
+@login_required()
+def feedback(request, test_data):
+    # todo right now this assumes that the user only submits and runs one test_data per coursework
+    test_data_instance = m.TestData.objects.get(coursework=test_data, initiator=request.user)
+    # test_data_instance = m.TestData.objects.get(id=test_data)
+    perm = p.user_feedback_mode(request.user, test_data_instance)
+    if perm == p.UserFeedbackModes.DENY:
+        return HttpResponseForbidden()
+    if perm == p.UserFeedbackModes.WAIT:
+        return HttpResponse("Please wait until the test has finished running")
+    if request.POST:
+        feedback_upload(request, perm, test_data_instance)
+        perm = p.UserFeedbackModes.READ
+    details = {
+        "test_data": test_data_instance,
+        "can_submit": perm == p.UserFeedbackModes.WRITE
+    }
+    return render(request, 'student/feedback.html', details)
+
+
+@transaction.atomic()
+def feedback_upload(request, perm, test_data_instance):
+    if perm != p.UserFeedbackModes.WRITE:
+        return HttpResponseForbidden()
+    feedback_text = request.POST["feedback"]
+    feedback_file = m.File(coursework=test_data_instance.coursework, creator=request.user,
+                           type=m.FileType.FEEDBACK)
+    feedback_file.filepath.save('feedback.txt', ContentFile(feedback_text))
+    feedback_file.save()
+    test_data_instance.feedback = feedback_file
+    test_data_instance.save()

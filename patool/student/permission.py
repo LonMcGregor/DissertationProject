@@ -5,6 +5,7 @@ Methods in here should only ever READ, never WRITE"""
 import student.models as m
 from enum import Enum
 from django.http.response import Http404
+from django.contrib.auth.models import Group
 
 
 def can_view_coursework(user, coursework):
@@ -83,6 +84,11 @@ def user_submitted_solution(user, coursework):
     return None
 
 
+def is_teacher(user):
+    teacher_group = Group.objects.get(name="teacher")
+    return teacher_group in user.groups.all()
+
+
 def user_test_case(user, coursework):
     """return None if @user has not submitted a test case for
     @coursework, else give this test case"""
@@ -91,3 +97,27 @@ def user_test_case(user, coursework):
     if files.count() > 0:
         return files[0]
     return None
+
+
+class UserFeedbackModes(Enum):
+    DENY = 0
+    READ = 1
+    WRITE = 2
+    WAIT = 3
+
+
+def user_feedback_mode(user, test_data_instance):
+    cw = test_data_instance.coursework
+    test_owner = test_data_instance.initiator
+    if not can_view_coursework(user, cw):
+        return UserFeedbackModes.DENY
+    if test_data_instance.waiting_to_run:
+        return UserFeedbackModes.WAIT
+    if is_teacher(user):
+        return UserFeedbackModes.READ
+    if user == test_owner:
+        if test_data_instance.feedback is None:
+            return UserFeedbackModes.WRITE
+        else:
+            return UserFeedbackModes.READ
+    return UserFeedbackModes.DENY
