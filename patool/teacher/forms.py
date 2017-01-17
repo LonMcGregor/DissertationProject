@@ -3,7 +3,7 @@ import student.models as m
 
 
 class CourseForm(f.Form):
-    code = f.CharField(label="Course Code", max_length=32)
+    code = f.SlugField(label="Course Code", max_length=32)
     name = f.CharField(max_length=128, label="Course Name")
     student = f.CharField(widget=f.Textarea, label="Comma-Separated Enrolled Users")
 

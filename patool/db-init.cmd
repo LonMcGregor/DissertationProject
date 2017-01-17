@@ -1,5 +1,5 @@
 @echo off
-del db.sqlite3
+del /s db.sqlite3
 del /q /s student\migrations\*
 del /q /s notify\migrations\*
 del /q /s var\*

@@ -9,7 +9,7 @@ function update_note_count(){
 function notify(o){
     update_note_count();
     html_notify(o);
-    html_5_notify(o);
+    /*html_5_notify(o);*/
 }
 
 function html_notify(o){

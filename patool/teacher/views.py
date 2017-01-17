@@ -6,6 +6,7 @@ import teacher.forms as f
 from django.db import transaction
 import student.runner as r
 from django.http import HttpResponseForbidden, HttpResponse
+import threading
 
 
 @login_required()
@@ -113,7 +114,7 @@ def edit_course_render(request, requested_course_code):
     for eu in enrollments:
         students += str(eu.login) + ", "
     courseworks = m.Coursework.objects.filter(course=course)
-    initial = {"id": course.id, "name": course.name, "student": students}
+    initial = {"code": course.code, "name": course.name, "student": students}
     update_form = f.CourseForm(initial)
     detail = {
         "course_name": course.name,
@@ -199,9 +200,14 @@ def edit_coursework_render(request, coursework):
 @p.is_teacher
 def force_start_test_run(request, kwargs):
     requested_test = kwargs['t']
+    running = threading.Thread(target=force_start_test_run_threaded, args=requested_test)
+    running.start()
+    return HttpResponse("Test Run %s Force Started" % requested_test)
+
+
+def force_start_test_run_threaded(requested_test):
     test_instance = m.TestData.objects.get(id=requested_test)
     if not test_instance.waiting_to_run:
         return HttpResponseForbidden()
     # todo checks that teacher actually owns coursework
     r.run_test(test_instance)
-    return HttpResponse("Test Run %s Force Started" % test_instance.id)

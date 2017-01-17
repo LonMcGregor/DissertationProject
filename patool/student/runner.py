@@ -20,8 +20,9 @@ def run_test(test_data_instance):
         solution_file = solution_file.replace("/", "\\")
         test_path = test_path.replace('/', '\\')
     result, output = execute(script, solution_file, test_path, test_file)
-    result_file = m.File(filepath=ContentFile(output), coursework=test_data_instance.coursework,
+    result_file = m.File(coursework=test_data_instance.coursework,
                          creator=test_data_instance.test.creator, type=m.FileType.TEST_RESULT)
+    result_file.filepath.save('results.txt', ContentFile(output))
     # todo who is creator? if in current cw, then it is test writer. if invoked later... is teacher?
     result_file.save()
     test_data_instance.results = result_file
@@ -46,8 +47,9 @@ def execute(script, solution_file, test_dir, test_file):
     shutil.copy(test_dir, media_dir)
     with open(init_dir, 'w+') as f:
         f.write('')
-    args = [script, '-m', 'unittest', '-v', test_file]
-    proc = subprocess.Popen(args, cwd=media_dir)
+    args = " ".join([script, '-m', 'unittest', '-v', test_file])
+    proc = subprocess.Popen(args, cwd=media_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                            shell=True)
     outb, errb = proc.communicate()
     outs = "" if outb is None else outb.decode('utf-8')
     errs = "" if errb is None else errb.decode('utf-8')
