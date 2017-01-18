@@ -1,8 +1,11 @@
 html, body{
     padding: 0;
-    margin: 0;
+    margin: 0 auto;
     background: #fdfdfd;
-    font-family: Georgia, 'Nimbus Roman No9 L', serif
+    font-family: Georgia, 'Nimbus Roman No9 L', serif;
+    min-height: 100%;
+    width: 100%;
+    max-width: 1800px;
 }
 
 nav {
@@ -11,9 +14,19 @@ nav {
     margin-bottom: 15px;
 }
 
-nav h1 {
+#nav_title {
     float: left;
     margin: 0;
+    height: 40px;
+}
+
+#nav_title h1 {
+    margin: 0;
+}
+
+#nav_title div{
+    float: left;
+    margin-left: 10px;
 }
 
 nav div {
@@ -29,4 +42,8 @@ footer{
 
 *:hover {
     box-shadow: inset indigo 0 0 1px 1px;
+}
+
+main {
+    height: calc(100% - 40px - 20px)
 }

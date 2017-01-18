@@ -17,7 +17,7 @@
     {% if can_submit %}
         <form method="POST" action="" id="feedback_form">
             {% csrf_token %}
-            <input type="text" name="feedback" placeholder="Please type some feedback here"/>
+            <textarea name="feedback" placeholder="Please type some feedback here"></textarea>
             <input type="submit" value="Submit Feedback" />
         </form>
     {% else %}

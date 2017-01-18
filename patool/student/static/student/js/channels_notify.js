@@ -55,7 +55,7 @@ socketMan = {
 };
 
 
-var sock = new WebSocket('ws://localhost:8000/messages');
+/*var sock = new WebSocket('ws://localhost:8000/messages');
 sock.onopen = socketMan.open;
 sock.onmessage = socketMan.msg;
-sock.onclose = socketMan.close;
+sock.onclose = socketMan.close;*/

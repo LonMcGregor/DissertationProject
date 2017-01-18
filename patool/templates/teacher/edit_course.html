@@ -8,11 +8,13 @@
     <input type="submit" value="Save">
 </form>
 <p></p>
+    {% if courseworks is not None %}
 <h1>Courseworks on this Course</h1>
 <ul>
     {% for cw in courseworks %}
         <li><a href="{% url "edit_cw" cw.id %}">{{ cw.name }}</a></li>
     {% endfor %}
-    <li><a href="{% url "create_cw" course_id %}">+ Create Coursework</a></li>
+    <li><a href="{% url "create_cw" course_code %}">+ Create Coursework</a></li>
 </ul>
+    {% endif %}
 {% endblock %}

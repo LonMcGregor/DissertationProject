@@ -34,7 +34,7 @@ def create_course(request):
 def create_course_render(request):
     detail = {
         "course_name": "New Course",
-        "courseworks": [],
+        "courseworks": None,
         "uf": f.CourseForm({"student": str(request.user)+','})
     }
     return render(request, 'teacher/edit_course.html', detail)
