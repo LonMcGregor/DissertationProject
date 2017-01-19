@@ -10,6 +10,7 @@ from django.db import transaction
 from pygments import highlight as pyghi
 from pygments.lexers import python as pyglex
 from pygments.formatters import html as pygform
+import student.helper as h
 
 
 @login_required()
@@ -18,163 +19,135 @@ def index(request):
 
 
 @login_required()
-@p.cw_exists_for_upload
 @transaction.atomic
-def upload_solution(request, singlecw=None):
+def upload_solution(request, cw=None):
     """Given an @request@, generate and handle an upload form
-    for the specified coursework @singlecw@. If there is a
+    for the specified coursework @cw. If there is a
     POST form attached, upload the desired file."""
-    if singlecw is None or singlecw == "":
-        return Http404()
-    cw = m.Coursework.objects.get(id=singlecw)
-    user = request.user
+    no_cws = m.Coursework.objects.filter(id=cw).count() != 1
+    if cw is None or cw == "" or no_cws:
+        return Http404("No coursework has been specified")
+    cw_instance = m.Coursework.objects.get(id=cw)
+    if not p.can_view_coursework(request.user, cw_instance):
+        return HttpResponseForbidden("You are not allowed to see this coursework")
+    state = p.state_of_user_in_coursework(request.user, cw_instance)
+    msg, allow_upload, file_type, error = upload_solution_render(state)
+    if error:
+        return error
     if request.method == 'POST':
-        upload = f.FileUploadForm(request.POST, request.FILES)
-        if not upload.is_valid():
-            return HttpResponseForbidden()
-        if not p.user_can_upload_of_type(user, cw, upload.cleaned_data['file_type']):
-            return HttpResponseForbidden()
-        file_type = upload.cleaned_data['file_type']
-        submission = m.File(coursework=cw, creator=user,
-                            filepath=upload.cleaned_data['chosen_file'],
-                            type=file_type)
-        submission.save()
-
-        if file_type in [m.FileType.TEST_CASE, m.FileType.SOLUTION]:
-            r.new_item_uploaded(user, cw, submission, file_type)
-            # r.run_queued_tests()
-            # todo make this run test happen async and notify @initiator when complete
-
+        result = upload_solution_post(request, cw_instance)
+        if result:
+            return result
         msg = "Upload of %s was completed" % request.FILES['chosen_file'],
         allow_upload = False
-    else:
-        state = p.state_of_user_in_coursework(request.user, cw)
-        if state == p.UserCourseworkState.SOLUTION:
-            msg = "You need to upload a solution for this coursework"
-            allow_upload = True
-        elif state == p.UserCourseworkState.TESTCASE:
-            msg = "You need to upload a test case for this coursework"
-            allow_upload = True
-        elif state == p.UserCourseworkState.TESTWAIT:
-            msg = "Please wait for your test case to be run and results collected"
-            allow_upload = False
-        elif state == p.UserCourseworkState.FEEDBACK:
-            msg = "Please provide feedback for test results"
-            allow_upload = True
-        elif state == p.UserCourseworkState.COMPLETE:
-            msg = "You have completed this coursework"
-            allow_upload = False
-        else:
-            return HttpResponseForbidden()
-
+        file_type = None
     detail = {
-        "ff": f.FileUploadForm,
+        "ff": f.FileUploadForm(file_type=file_type),
         "allow_upload": allow_upload,
         "msg": msg
     }
     return render(request, 'student/upload_solution.html', detail)
 
 
-@login_required()
-def upload_test(request, singlecw):
-    if singlecw is None or singlecw == "":
-        return Http404()
-    if not p.can_view_coursework(request.user, singlecw):
+def upload_solution_post(request, cw_instance):
+    """Handles the POST request of the upload, and
+    saves the file to the system / database. Also
+    starts the job of making / running test data
+    instances. Returns either an Http error code
+    or False, if no error has occurred."""
+    user = request.user
+    upload = f.FileUploadForm(request.POST, request.FILES)
+    if not upload.is_valid():
         return HttpResponseForbidden()
+    if not p.user_can_upload_of_type(user, cw_instance, upload.cleaned_data['file_type']):
+        return HttpResponseForbidden()
+    file_type = upload.cleaned_data['file_type']
+    submission = m.File(coursework=cw_instance, creator=user,
+                        filepath=upload.cleaned_data['chosen_file'],
+                        type=file_type)
+    submission.save()
+    r.new_item_uploaded(user, cw_instance, submission, file_type)
+    return False
 
 
-def retrieve_coursework(request):
-    """For a given @request, return a list of courseworks available to the user"""
-    logged_in_user = request.user
-    enrolled_courses = m.EnrolledUser.objects.filter(login=logged_in_user).values('course')
-    courses_for_user = m.Course.objects.filter(id__in=enrolled_courses)
-    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
-    visible_courseworks = []
-    for item in all_courseworks_for_user:
-        if p.can_view_coursework(logged_in_user, item):
-            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
-    return visible_courseworks
+def upload_solution_render(state):
+    """For a given @state,  determine
+    what message to show on the upload page, and if
+    an upload should be allowed at this stage.
+    Return the message, allowed, and any errors"""
+    if state == p.UserCourseworkState.SOLUTION:
+        msg = "Please upload a solution for this coursework"
+        allow_upload = True
+        file_type = m.FileType.SOLUTION
+    elif state == p.UserCourseworkState.TESTCASE:
+        msg = "Pleaseupload a test case for this coursework"
+        allow_upload = True
+        file_type = m.FileType.TEST_CASE
+    elif state == p.UserCourseworkState.TESTWAIT:
+        msg = "Please wait for your test case to be run and results collected"
+        allow_upload = False
+        file_type = None
+    elif state == p.UserCourseworkState.FEEDBACK:
+        msg = "You may now use the feedback view to submit feedback. Please visit the coursework " \
+              "detail page for more information."
+        allow_upload = False
+        file_type = None
+    elif state == p.UserCourseworkState.COMPLETE:
+        msg = "You have completed this coursework. Well done!"
+        allow_upload = False
+        file_type = None
+    else:
+        return None, None, None, HttpResponseForbidden("Invalid coursework state")
+    return msg, allow_upload, file_type, False
 
 
 @login_required()
-def detail_coursework(request, singlecw=None):
-    if singlecw is None or singlecw == "":
-        available = retrieve_coursework(request)
+def detail_coursework(request, cw=None):
+    """If a coursework @cw is specified,return the page detailing it
+    otherwise return a listing of all currently available tasks. """
+    if cw is None or cw == "":
+        available = h.retrieve_coursework(request)
         return render(request, 'student/choose_coursework.html', {'courseworks': available})
-    return single_coursework(request, singlecw)
-
-
-def path_for_file(file):
-    """For a given @file, return the file id,
-    or empty string is file doesnt exist"""
-    if file is not None:
-        return file.id
-    return ""
-
-
-def get_test_data(user, coursework):
-    """Get the test data for the tester @user, within a given @coursework"""
-    # todo currently this all acts assuming a test case is made once per cw
-    test_results = m.TestData.objects.filter(initiator=user, coursework=coursework)
-    if test_results.count() > 0:
-        return test_results[0]
-    return None
-
-
-def get_feedback_for_solution(coursework, solution):
-    """Get the feedback for the developer, based on a @coursework for a @solution"""
-    # todo assumes someone will only get one feedback per coursework
-    test_results = m.TestData.objects.filter(coursework=coursework, solution=solution)
-    if test_results.count() > 0:
-        return test_results[0].feedback
-    return None
+    return single_coursework(request, cw)
 
 
 def single_coursework(request, coursework):
     cw = m.Coursework.objects.get(id=coursework)
     if not p.can_view_coursework(request.user, cw):
-        return HttpResponseForbidden()
-    sol = p.user_submitted_solution(request.user, cw)
-    test = p.user_test_case(request.user, cw)
-    result = get_test_data(request.user, coursework)
-    if result is not None:
-        waiting = result.waiting_to_run
-        given_feedback = result.feedback
-        results = result.results
-    else:
-        waiting = False
-        given_feedback = None
-        results = None
-    own_feedback = get_feedback_for_solution(coursework, sol)
+        return HttpResponseForbidden("You are not allowed to access this coursework")
+    sol = h.user_submitted_file(request.user, cw, m.FileType.SOLUTION)
+    test = h.user_submitted_file(request.user, cw, m.FileType.TEST_CASE)
+    test_data = h.get_test_data_for_tester(request.user, coursework)
+    results = test_data.results
+    tester_feedback = test_data.feedback
+    dev_test_data = h.get_test_data_for_developer(request.user, coursework)
     details = {
         "cw": cw,
-        "has_submitted_solution": sol is not None,
-        "solution_url": path_for_file(sol),
-        "has_submitted_test": test is not None,
-        "test_url": path_for_file(test),
-        "waiting_on_test": waiting,
-        "test_results_url": path_for_file(results),
-        "has_given_feedback": given_feedback is not None,
-        "feedback_results_url": path_for_file(given_feedback),
-        "has_own_feedback": own_feedback is not None,
-        "own_feedback_results_url": path_for_file(own_feedback),
+        "solution_url": h.string_id(sol),
+        "test_url": h.string_id(test),
+        "test_results_url": h.string_id(results),
+        "feedback_results_url": h.string_id(tester_feedback),
+        "test_data": h.string_id(test_data),
+        "own_feedback_data": h.string_id(dev_test_data)
     }
     return render(request, 'student/detail_coursework.html', details)
 
 
 @login_required()
 def feedback(request, test_data):
-    # todo right now this assumes that the user only submits and runs one test_data per coursework
-    test_data_instance = m.TestData.objects.get(coursework=test_data, initiator=request.user)
-    # test_data_instance = m.TestData.objects.get(id=test_data)
+    """Render the page that allows a user to give feedback to a certain
+    test data instance. Also handle the case of POST data upload."""
+    test_data_instance = m.TestData.objects.get(id=test_data)
     perm = p.user_feedback_mode(request.user, test_data_instance)
     if perm == p.UserFeedbackModes.DENY:
-        return HttpResponseForbidden()
+        return HttpResponseForbidden("You are not allowed to see this test data")
     if perm == p.UserFeedbackModes.WAIT:
         return HttpResponse("Please wait until the test has finished running")
     if request.POST:
-        feedback_upload(request, perm, test_data_instance)
-        perm = p.UserFeedbackModes.READ
+        if perm != p.UserFeedbackModes.WRITE:
+            return HttpResponseForbidden("You are not allowed to submit feedback")
+        feedback_upload(request, test_data_instance)
+        return HttpResponse("Your feedback has been recorded")
     details = {
         "test_data": test_data_instance,
         "can_submit": perm == p.UserFeedbackModes.WRITE
@@ -183,9 +156,9 @@ def feedback(request, test_data):
 
 
 @transaction.atomic()
-def feedback_upload(request, perm, test_data_instance):
-    if perm != p.UserFeedbackModes.WRITE:
-        return HttpResponseForbidden()
+def feedback_upload(request, test_data_instance):
+    """Once the user has uploaded their feedback, write it
+    to a file and update the database"""
     feedback_text = request.POST["feedback"]
     feedback_file = m.File(coursework=test_data_instance.coursework, creator=request.user,
                            type=m.FileType.FEEDBACK)
@@ -197,30 +170,25 @@ def feedback_upload(request, perm, test_data_instance):
 
 @login_required()
 def show_file(request, file_id):
-    # todo may want permission mixin - make it so only creator, tester or teacher can view
+    """For a given @file_id, access the filesystem and
+    print out the contents of this file as a text document"""
     file = m.File.objects.get(id=file_id)
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden()
-    content = read_file_by_line(file.filepath)
+    content = h.read_file_by_line(file.filepath)
     return HttpResponse(content_type="text/plain", charset="utf-8", content=content)
 
 
 @login_required()
 def render_file(request, file_id):
+    """For a given @file_id, access the filesystem and
+    read the contents. Then pretty print the contents
+    of the file as an HTML page using pygments"""
     file = m.File.objects.get(id=file_id)
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden()
-    content = read_file_by_line(file.filepath)
+    content = h.read_file_by_line(file.filepath)
     detail = {
         "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter())
     }
     return render(request, 'student/pretty_file.html', detail)
-
-
-def read_file_by_line(file):
-    content = ""
-    while True:
-        buf = file.readline()
-        content += buf.decode('utf-8')
-        if buf == b'':
-            return content

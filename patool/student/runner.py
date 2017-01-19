@@ -10,6 +10,12 @@ import os
 
 @transaction.atomic
 def run_test(test_data_instance):
+    """Go through the @test_data_instance and run the
+    test case against the solution. Store the data setting
+    the results to be created by the initiator (which will
+     likely be the test creator). Then update the database"""
+    if not test_data_instance.waiting_to_run:
+        return
     script = 'python' if sys.platform == "win32" else 'python3'
     solution_file = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT,
                                  str(test_data_instance.solution.filepath))
@@ -21,9 +27,8 @@ def run_test(test_data_instance):
         test_path = test_path.replace('/', '\\')
     result, output = execute(script, solution_file, test_path, test_file)
     result_file = m.File(coursework=test_data_instance.coursework,
-                         creator=test_data_instance.test.creator, type=m.FileType.TEST_RESULT)
+                         creator=test_data_instance.initiator, type=m.FileType.TEST_RESULT)
     result_file.filepath.save('results.txt', ContentFile(output))
-    # todo who is creator? if in current cw, then it is test writer. if invoked later... is teacher?
     result_file.save()
     test_data_instance.results = result_file
     test_data_instance.error_level = result
@@ -32,7 +37,14 @@ def run_test(test_data_instance):
 
 
 def execute(script, solution_file, test_dir, test_file):
-    # todo FOR NOW ONLY SUPPORT RUNNING THIS ONCE AT A TIME
+    """Given specific argument as to how to run the test,
+    move all of the files into the correct directories and
+    execute the unit test. Note that care needs to be taken
+    with regards to which operating system filepaths used.
+    @script - which python executable to use
+    @solution_file - point to the solution file to test
+    @test_dir - the directory holding the test case
+    @test_file - the name of the file containing the test"""
     media_dir = os.path.join(settings.BASE_DIR, settings.MEDIA_TMP_TEST)
     init_dir = os.path.join(media_dir, '__init__.py')
     if sys.platform == "win32":
@@ -61,15 +73,15 @@ def get_next_unassigned_item(coursework, file_type, user):
     """for a given @coursework, get the next unassigned
     item, if any. Exclude items created by the @user
     who will be using this item"""
+    if file_type not in [m.FileType.SOLUTION, m.FileType.TEST_CASE]:
+        raise Exception("bas file type")
     items = m.File.objects.filter(coursework=coursework, type=file_type).exclude(creator=user)
     for item in items:
         kwargs = {"coursework": coursework}
         if file_type == m.FileType.SOLUTION:
             kwargs["solution"] = item
-        elif file_type == m.FileType.TEST_CASE:
-            kwargs["test"] = item
         else:
-            raise Exception("bad arguments")
+            kwargs["test"] = item
         if m.TestData.objects.filter(**kwargs).count() == 0:
             return item
     return None
@@ -84,7 +96,7 @@ def new_item_uploaded(user, coursework, item, item_type):
     elif item_type == m.FileType.TEST_CASE:
         match = m.FileType.SOLUTION
     else:
-        raise Exception("invalid type")
+        return
     matching_item = get_next_unassigned_item(coursework, match, user)
     if matching_item is None:
         return
@@ -96,11 +108,6 @@ def new_item_uploaded(user, coursework, item, item_type):
         raise Exception("invalid type")
     tr = m.TestData(coursework=coursework, **details)
     tr.save()
-
-    # todo call to test runner to start going through run queue
-    # todo   this needs to be done in such a way if it is already
-    # todo   running we don't restart it
-    # todo !! if this method is trans atomic, we cant call the starter from here
 
 
 def run_queued_tests():

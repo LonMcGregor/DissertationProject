@@ -3,6 +3,7 @@ from django.contrib.auth.decorators import login_required
 import teacher.permission as p
 import student.models as m
 import teacher.forms as f
+import student.permission as sp
 from django.db import transaction
 import student.runner as r
 from django.http import HttpResponseForbidden, HttpResponse
@@ -12,11 +13,10 @@ import threading
 @login_required()
 @p.is_teacher
 def index(request):
-    me = request.user
-    enrolled_in = m.EnrolledUser.objects.filter(login=me)
-    my_courses = []
-    for enrollment in enrolled_in:
-        my_courses.append(enrollment.course)
+    """Show all of the courses available for the
+    logged in teacher as a list"""
+    enrolled_in = m.EnrolledUser.objects.filter(login=request.user)
+    my_courses = [x.course for x in enrolled_in]
     detail = {
         "courses": my_courses
     }
@@ -26,12 +26,14 @@ def index(request):
 @login_required()
 @p.is_teacher
 def create_course(request):
+    """Handle the creation of a course, or create the form to do so"""
     if request.method == "POST":
         return create_course_update(request, request.POST)
     return create_course_render(request)
 
 
 def create_course_render(request):
+    """Generate the form used to create a course"""
     detail = {
         "course_name": "New Course",
         "courseworks": None,
@@ -42,9 +44,10 @@ def create_course_render(request):
 
 @transaction.atomic
 def create_course_update(request, new_details):
+    """Given the @new_details from a course, create a new course.
+    Also handle enrolling all of the specified users. The
+    owner of the course is not allowed to remove themselves"""
     owner = request.user
-
-    # todo ADD VALIDATION - dont want overwriting IDs etc.
     updated_form = f.CourseForm(new_details)
     if not updated_form.is_valid():
         raise Exception("validity problem")
@@ -71,6 +74,7 @@ def create_course_update(request, new_details):
 @login_required()
 @p.is_teacher
 def edit_course(request, kwargs):
+    """Handle creation of form, or post request for editing a course"""
     requested_course_code = kwargs['c']
     if request.method == "POST":
         edit_course_update(request, requested_course_code, request.POST)
@@ -79,9 +83,10 @@ def edit_course(request, kwargs):
 
 @transaction.atomic
 def edit_course_update(request, course_code, new_details):
-    # todo ADD VALIDATION - dont want overwriting IDs etc.
+    """Given the @new_details for @course_code, update
+    these details in the database, and handle any updates
+    needed with regards to enrolled users"""
     owner = request.user
-
     old_course = m.Course.objects.get(code=course_code)
     updated_form = f.CourseForm(new_details)
     if not updated_form.is_valid():
@@ -108,6 +113,9 @@ def edit_course_update(request, course_code, new_details):
 
 
 def edit_course_render(request, requested_course_code):
+    """Get the details of @requested_course_code, coursework
+    items and all the enrolled users and then
+    populate the form before displaying it to user"""
     course = m.Course.objects.get(code=requested_course_code)
     enrollments = m.EnrolledUser.objects.filter(course=course)
     students = ""
@@ -128,6 +136,7 @@ def edit_course_render(request, requested_course_code):
 @login_required()
 @p.is_teacher
 def create_coursework(request, kwargs):
+    """Handle form for creating a coursework in course @[c]"""
     requested_course_code = kwargs['c']
     if request.method == "POST":
         return create_coursework_update(request.POST, requested_course_code)
@@ -135,6 +144,7 @@ def create_coursework(request, kwargs):
 
 
 def create_coursework_render(request):
+    """Generate an empty form for editing a coursework"""
     detail = {
         "courseworks": {"name": "New Coursework"},
         "cw_form": f.CourseworkForm(),
@@ -146,14 +156,14 @@ def create_coursework_render(request):
 
 @transaction.atomic
 def create_coursework_update(new_details, course_code):
-    # todo ADD VALIDATION - dont want overwriting IDs etc.
+    """Given the @new_details for a coursework, and
+    the @course_code we want to add it to, update the db"""
     updated_form = f.CourseworkForm(new_details)
     if not updated_form.is_valid():
         raise Exception("validity problem")
     new_name = updated_form.cleaned_data['name']
     new_descriptor = updated_form.cleaned_data['descriptor']
     new_state = updated_form.cleaned_data['state']
-
     course = m.Course.objects.get(code=course_code)
     coursework = m.Coursework(name=new_name, descriptor=new_descriptor, course=course,
                               state=new_state)
@@ -164,6 +174,7 @@ def create_coursework_update(new_details, course_code):
 @login_required()
 @p.is_teacher
 def edit_coursework(request, kwargs=None):
+    """Prepare a page to view and edit coursework @[c]"""
     coursework = m.Coursework.objects.get(id=kwargs['c'])
     if request.method == "POST":
         edit_coursework_update(request.POST, coursework)
@@ -171,6 +182,8 @@ def edit_coursework(request, kwargs=None):
 
 
 def edit_coursework_update(new_details, old_coursework):
+    """Given the @new_details, update the database for
+    the details o @old_coursework"""
     updated_form = f.CourseworkForm(new_details)
     if not updated_form.is_valid():
         raise Exception("validity problem")
@@ -181,6 +194,10 @@ def edit_coursework_update(new_details, old_coursework):
 
 
 def edit_coursework_render(request, coursework):
+    """Get all of the necessary details to display a
+    page for a given @coursework, including the
+    file suploaded for it, test data instances and
+    of course the metadata about the coursework itself"""
     files = m.File.objects.filter(coursework=coursework)
     results = m.TestData.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
@@ -199,15 +216,18 @@ def edit_coursework_render(request, coursework):
 @login_required()
 @p.is_teacher
 def force_start_test_run(request, kwargs):
-    requested_test = kwargs['t']
+    """Given a particular test data id @[t], force it to run"""
+    requested_test = request, kwargs['t']
     running = threading.Thread(target=force_start_test_run_threaded, args=requested_test)
     running.start()
-    return HttpResponse("Test Run %s Force Started" % requested_test)
+    return HttpResponse("Test Run %s Force Started" % kwargs['t'])
 
 
-def force_start_test_run_threaded(requested_test):
+def force_start_test_run_threaded(request, requested_test):
+    """Force a test to run within another thread"""
     test_instance = m.TestData.objects.get(id=requested_test)
     if not test_instance.waiting_to_run:
-        return HttpResponseForbidden()
-    # todo checks that teacher actually owns coursework
+        return HttpResponseForbidden("Test has already been run")
+    if not sp.can_view_coursework(request.user, test_instance.coursework):
+        return HttpResponseForbidden("You are not enrolled on this course")
     r.run_test(test_instance)

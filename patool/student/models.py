@@ -3,6 +3,9 @@ from django.contrib.auth.models import User
 
 
 def upload_directory_path(instance, filename):
+    """For a given @instance of File, and a client-side @filename,
+    generate a path where the file should be stored on the system
+    This will be appended to the settings BASE_DIR and MEDIA_ROOT"""
     return '%s/%s/%s/%s' % (instance.coursework.id, instance.creator, instance.type, filename)
 
 
@@ -22,15 +25,11 @@ class EnrolledUser(m.Model):
 class CourseworkState:
     INVISIBLE = 'i'
     CLOSED = 'c'
-    SOLUTIONS_ONLY = 's'
-    SOLUTIONS_TEST = 'b'
-    TEST_ONLY = 't'
+    ACTIVE = 'a'
     POSSIBLE_STATES = (
         (INVISIBLE, 'Invisible to Students'),
         (CLOSED, 'Closed for Submissions'),
-        (SOLUTIONS_ONLY, 'Accepting Solutions Only'),
-        (SOLUTIONS_TEST, 'Accepting Solutions and Tests'),
-        (TEST_ONLY, 'Accepting Tests Only'),
+        (ACTIVE, 'Accepting Submissions'),
     )
 
 
@@ -60,7 +59,7 @@ class FileType:
 
 
 class File(m.Model):
-    filepath = m.FileField(upload_to=upload_directory_path)
+    file = m.FileField(upload_to=upload_directory_path)
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=FileType.POSSIBLE_TYPES)

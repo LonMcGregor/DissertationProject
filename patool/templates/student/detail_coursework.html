@@ -7,22 +7,24 @@
     <p>Available tasks:</p>
 
     <ul>
-    {% if has_submitted_solution %}
+    {% if solution_url %}
         <li><a href="{% url 'render_file' solution_url %}">View my Solution</a></li>
 
-        {% if has_submitted_test %}
+        {% if test_url %}
             <li><a  href="{% url 'render_file' test_url %}">View my test case</a></li>
 
-            {% if waiting_on_test %}
-                <li>Please wait while your test case is run against a solution</li>
-            {% else %}
+            {% if test_results_url %}
                 <li><a  href="{% url 'render_file' test_results_url %}">View test results</a></li>
 
-                {% if has_given_feedback %}
+                {% if feedback_results_url %}
                     <li><a  href="{% url 'render_file' feedback_results_url %}">View feedback for results</a></li>
+                    <li><a  href="{% url 'feedback' feedback_results_url %}">Combined View</a></li>
                 {% else %}
-                    <li><a  href="{% url 'feedback' cw.id %}">Submit feedback for results</a></li>
+                    <li><a  href="{% url 'feedback' test_data %}">Submit feedback for results</a></li>
                 {% endif %}
+
+            {% else %}
+                <li>Please wait while your test case is run against a solution</li>
 
             {% endif %}
 
@@ -37,8 +39,8 @@
     <p></p>
     <p>Feedback for my solution:</p>
     <ul>
-    {% if has_own_feedback %}
-        <li><a  href="{% url 'render_file' own_feedback_results_url %}">View feedback for my solution</a></li>
+    {% if own_feedback_data %}
+        <li><a  href="{% url 'feedback' own_feedback_data %}">View feedback for my solution</a></li>
     {% else %}
         <li>You do not yet have feedback for your own solution</li>
     {% endif %}

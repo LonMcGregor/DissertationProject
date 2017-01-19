@@ -4,30 +4,22 @@ Methods in here should only ever READ, never WRITE"""
 
 import student.models as m
 from enum import Enum
-from django.http.response import Http404
 from django.contrib.auth.models import Group
+import student.helper as h
 
 
 def can_view_coursework(user, coursework):
-    """BOOL: Check if the given @user@ instance is
-    allowed to view the specified @coursework@ instance"""
+    """BOOL: Check if the given @user instance is
+    allowed to view the specified @coursework instance"""
     is_enrolled = m.EnrolledUser.objects.filter(login=user).filter(course=coursework.course)
     if is_enrolled.count() != 1:
         return False
-    return coursework.is_visible()
-
-
-def cw_exists_for_upload(fun):
-    def cw_exists_internal(request, singlecw):
-        no_cws = m.Coursework.objects.filter(id=singlecw).count() != 1
-        if singlecw is None or singlecw == "" or no_cws:
-            return Http404()
-        else:
-            return fun(request, singlecw)
-    return cw_exists_internal
+    return True if is_teacher(user) else coursework.is_visible()
 
 
 class UserCourseworkState(Enum):
+    """Define which state a user is in in relation to a coursework
+    e.g. what is the next item of input required from them"""
     NOACCESS = 0
     SOLUTION = 1
     TESTCASE = 2
@@ -40,48 +32,34 @@ def state_of_user_in_coursework(user, coursework):
     """@user is a user model instance,
     @coursework is a coursework model instance
     determine where in the sequence of using
-    the application a user is right now"""
-    # todo note that this may be a temp setup to facilitate evaluation
+    the application a user is right now."""
+    # todo this method relies on only one file per type per coursework
     if not can_view_coursework(user, coursework):
         return UserCourseworkState.NOACCESS
-    files = m.File.objects.filter(coursework=coursework).filter(creator=user)
+    files = m.File.objects.filter(coursework=coursework, creator=user)
     if files.filter(type=m.FileType.SOLUTION).count() != 1:
         return UserCourseworkState.SOLUTION
-    tests = files.filter(type=m.FileType.TEST_CASE)
-    if tests.count() == 0:
+    if files.filter(type=m.FileType.TEST_CASE).count() != 1:
         return UserCourseworkState.TESTCASE
-    # todo for now just use first found test - may wish to extend at future date to support multiple
-    test = tests[0]
-    results = m.TestData.objects.filter(coursework=coursework).filter(test=test)
-    result = results[0]
-    if result.waiting_to_run:
+    test_data = h.get_test_data_for_tester(user, coursework)
+    if test_data.waiting_to_run:
         return UserCourseworkState.TESTWAIT
-    if not result.feedback:
+    if not test_data.feedback:
         return UserCourseworkState.FEEDBACK
     return UserCourseworkState.COMPLETE
 
 
 def user_can_upload_of_type(user, coursework, up_type):
-    if up_type not in [m.FileType.SOLUTION, m.FileType.TEST_CASE, m.FileType.FEEDBACK]:
+    """For a given @user, within the scope of a @coursework,
+    determine whether or not they are allowed to upload an @up_type file"""
+    if up_type not in [m.FileType.SOLUTION, m.FileType.TEST_CASE]:
         return False
     state = state_of_user_in_coursework(user, coursework)
     if up_type == m.FileType.SOLUTION and state == UserCourseworkState.SOLUTION:
         return True
     if up_type == m.FileType.TEST_CASE and state == UserCourseworkState.TESTCASE:
         return True
-    if up_type == m.FileType.FEEDBACK and state == UserCourseworkState.FEEDBACK:
-        return True
     return False
-
-
-def user_submitted_solution(user, coursework):
-    """return None if @user hasnt submitted a
-    solution for @coursework else give the solution"""
-    files = m.File.objects.filter(coursework=coursework).filter(
-        creator=user).filter(type=m.FileType.SOLUTION)
-    if files.count() > 0:
-        return files[0]
-    return None
 
 
 def is_teacher(user):
@@ -89,49 +67,57 @@ def is_teacher(user):
     return teacher_group in user.groups.all()
 
 
-def user_test_case(user, coursework):
-    """return None if @user has not submitted a test case for
-    @coursework, else give this test case"""
-    files = m.File.objects.filter(coursework=coursework).filter(
-        creator=user).filter(type=m.FileType.TEST_CASE)
-    if files.count() > 0:
-        return files[0]
-    return None
-
-
 class UserFeedbackModes(Enum):
+    """Enumerate possible actions a user has with regards
+    to providing feedback on a test data instance. """
     DENY = 0
     READ = 1
     WRITE = 2
-    WAIT = 3
+    WAIT_TEST = 3
+    WAIT_FEEDBACK = 4
+
+
+def is_owner_of_solution(user, test_data_instance):
+    """For a given @user, are they the owner of the solution
+    in the @test_data_instance"""
+    return test_data_instance.solution.creator == user
 
 
 def user_feedback_mode(user, test_data_instance):
+    """Return the status that the @user has in relation
+    to a particular @test_data_instance wrt feedback"""
     cw = test_data_instance.coursework
-    test_owner = test_data_instance.initiator
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
-    if test_data_instance.waiting_to_run:
-        return UserFeedbackModes.WAIT
     if is_teacher(user):
         return UserFeedbackModes.READ
-    if user == test_owner:
-        if test_data_instance.feedback is None:
-            return UserFeedbackModes.WRITE
-        else:
+    if is_owner_of_solution(user, test_data_instance):
+        if test_data_instance.feedback:
             return UserFeedbackModes.READ
-    return UserFeedbackModes.DENY
+        return UserFeedbackModes.WAIT_FEEDBACK
+    if test_data_instance.initiator != user:
+        return UserFeedbackModes.DENY
+    if test_data_instance.waiting_to_run:
+        return UserFeedbackModes.WAIT_TEST
+    # todo currently do not allow changing of feedback.
+    # todo could allow in future until status of cw set to closed
+    if test_data_instance.feedback is None:
+        return UserFeedbackModes.WRITE
+    else:
+        return UserFeedbackModes.READ
 
 
 def can_view_file(user, file):
+    """Determine if a @user should be allowed to view a given @file"""
     if not can_view_coursework(user, file.coursework):
         return False
     if is_teacher(user):
         return True
     if user == file.creator:
         return True
-    tests_for_user = m.TestData.objects.filter(initiator=user, coursework=file.coursework,
-                                               solution=file)
-    if tests_for_user.count() == 1:
+    test_containing_file = h.get_test_data_with_associated_file(file)
+    if test_containing_file.test.creator == user:
+        return True
+    if test_containing_file.solution.creator == user and test_containing_file.feedback:
         return True
     return False

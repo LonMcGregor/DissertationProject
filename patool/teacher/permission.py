@@ -3,6 +3,9 @@ from django.contrib.auth.models import Group
 
 
 def is_teacher(f):
+    """Mixin to prevent pages from being viewed if the
+    currently logged in user is not in the teacher group.
+    Passes rest of args on as a dictionary"""
     def is_teacher_internal(request, **args):
         teacher_group = Group.objects.get(name="teacher")
         if teacher_group in request.user.groups.all():

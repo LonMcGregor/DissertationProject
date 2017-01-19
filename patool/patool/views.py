@@ -7,11 +7,14 @@ from student import models as m
 
 
 def default_index(request):
+    """Show a basic index page for the application"""
     return render(request, 'registration/landing.html')
 
 
 @transaction.atomic
 def populate_database(request):
+    """Populate the database with some testing data.
+    Creates some teacher, some students, and some coursework tasks"""
     if settings.DEBUG:
 
         User.objects.create_superuser(username='admin',
@@ -30,11 +33,9 @@ def populate_database(request):
         w = cu("winston", password="primalrage")
         w.groups.add(t)
         w.save()
-
         z = cu("zenyatta", password="transcendence")
         z.groups.add(t)
         z.save()
-
         sy = cu("symmetra", password="teleporter")
         sy.groups.add(t)
         sy.save()
@@ -42,67 +43,36 @@ def populate_database(request):
         a = cu("ana", password="nanoboost")
         a.groups.add(s)
         a.save()
-
         tr = cu("tracer", password="pulsebomb")
         tr.groups.add(s)
         tr.save()
-
         l = cu("lucio", password="soundbarrier")
         l.groups.add(s)
         l.save()
+        l = cu("sombra", password="electromagneticpulse")
+        l.groups.add(s)
+        l.save()
 
-        aa = m.Course(code="F20AA-2016_17", name="test course for AA")
+        aa = m.Course(code="F20AA-2016_17", name="Advanced Algorithms")
         aa.save()
-        bb = m.Course(code="F20BB-2016_17", name="test course for BB")
+        bb = m.Course(code="F20BB-2016_17", name="Building Blocks")
         bb.save()
-        cc = m.Course(code="F20CC-2016_17", name="test course CC with no students")
+        cc = m.Course(code="F20CC-2016_17", name="Code Classes")
         cc.save()
 
-        eu1 = m.EnrolledUser(login=w, course=aa)
-        eu1.save()
-        eu2 = m.EnrolledUser(login=z, course=bb)
-        eu2.save()
-        eu3 = m.EnrolledUser(login=sy, course=cc)
-        eu3.save()
-        eu4 = m.EnrolledUser(login=a, course=aa)
-        eu4.save()
-        eu5 = m.EnrolledUser(login=a, course=bb)
-        eu5.save()
-        eu6 = m.EnrolledUser(login=tr, course=bb)
-        eu6.save()
-        eu7 = m.EnrolledUser(login=l, course=aa)
-        eu7.save()
+        m.EnrolledUser(login=w, course=aa).save()
+        m.EnrolledUser(login=z, course=bb).save()
+        m.EnrolledUser(login=sy, course=cc).save()
 
-        cwa1 = m.Coursework(name="defend the objective",
-                            descriptor="http://uni.lonm.uk/example_aa1.pdf",
-                            course=aa,
-                            state=m.CourseworkState.SOLUTIONS_ONLY)
-        cwa1.save()
-        cwa2 = m.Coursework(name="students cant see this one yet",
-                            descriptor="http://uni.lonm.uk/example_aa2.pdf",
-                            course=aa,
-                            state=m.CourseworkState.INVISIBLE)
-        cwa2.save()
-        cwa3 = m.Coursework(name="attack the objective",
-                            descriptor="http://uni.lonm.uk/example_aa3.pdf",
-                            course=aa,
-                            state=m.CourseworkState.CLOSED)
-        cwa3.save()
-        cwb1 = m.Coursework(name="deliver the payload",
-                            descriptor="http://uni.lonm.uk/example_bb1.pdf",
-                            course=bb,
-                            state=m.CourseworkState.SOLUTIONS_ONLY)
-        cwb1.save()
-        cwb2 = m.Coursework(name="secure the payload",
-                            descriptor="http://uni.lonm.uk/example_bb2.pdf",
-                            course=bb,
-                            state=m.CourseworkState.CLOSED)
-        cwb2.save()
-        cwc1 = m.Coursework(name="no-one can see this except teacher for cc",
-                            descriptor="http://uni.lonm.uk/example_cc1.pdf",
-                            course=cc,
-                            state=m.CourseworkState.INVISIBLE)
-        cwc1.save()
+        m.EnrolledUser(login=a, course=aa).save()
+        m.EnrolledUser(login=tr, course=aa).save()
+        m.EnrolledUser(login=l, course=aa).save()
+        m.EnrolledUser(login=l, course=aa).save()
+
+        m.Coursework(name="Build a binary tree",
+                     descriptor="http://uni.lonm.uk/example_aa1.pdf",
+                     course=aa,
+                     state=m.CourseworkState.SOLUTIONS_ONLY).save()
 
         return HttpResponse("DB populated")
     else:
