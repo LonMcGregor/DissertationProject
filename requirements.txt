@@ -8,6 +8,7 @@ Django==1.10.5
 incremental==16.10.1
 msgpack-python==0.4.8
 pkg-resources==0.0.0
+Pygments==2.1.3
 redis==2.10.5
 six==1.10.0
 Twisted==16.6.0

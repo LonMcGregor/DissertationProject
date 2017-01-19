@@ -121,3 +121,17 @@ def user_feedback_mode(user, test_data_instance):
         else:
             return UserFeedbackModes.READ
     return UserFeedbackModes.DENY
+
+
+def can_view_file(user, file):
+    if not can_view_coursework(user, file.coursework):
+        return False
+    if is_teacher(user):
+        return True
+    if user == file.creator:
+        return True
+    tests_for_user = m.TestData.objects.filter(initiator=user, coursework=file.coursework,
+                                               solution=file)
+    if tests_for_user.count() == 1:
+        return True
+    return False

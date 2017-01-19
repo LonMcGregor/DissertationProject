@@ -89,12 +89,12 @@ def new_item_uploaded(user, coursework, item, item_type):
     if matching_item is None:
         return
     if item_type == m.FileType.SOLUTION:
-        details = {'solution': item, 'test': matching_item}
+        details = {'solution': item, 'test': matching_item, 'initiator': matching_item.creator}
     elif item_type == m.FileType.TEST_CASE:
-        details = {'solution': matching_item, 'test': item}
+        details = {'solution': matching_item, 'test': item, 'initiator': item.creator}
     else:
         raise Exception("invalid type")
-    tr = m.TestData(coursework=coursework, initiator=user, **details)
+    tr = m.TestData(coursework=coursework, **details)
     tr.save()
 
     # todo call to test runner to start going through run queue

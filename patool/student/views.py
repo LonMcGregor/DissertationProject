@@ -7,6 +7,9 @@ import student.permission as p
 import student.forms as f
 import student.runner as r
 from django.db import transaction
+from pygments import highlight as pyghi
+from pygments.lexers import python as pyglex
+from pygments.formatters import html as pygform
 
 
 @login_required()
@@ -102,10 +105,10 @@ def detail_coursework(request, singlecw=None):
 
 
 def path_for_file(file):
-    """For a given @file, return the file path,
+    """For a given @file, return the file id,
     or empty string is file doesnt exist"""
     if file is not None:
-        return file.filepath
+        return file.id
     return ""
 
 
@@ -136,11 +139,11 @@ def single_coursework(request, coursework):
     result = get_test_data(request.user, coursework)
     if result is not None:
         waiting = result.waiting_to_run
-        feedback = result.feedback
+        given_feedback = result.feedback
         results = result.results
     else:
         waiting = False
-        feedback = None
+        given_feedback = None
         results = None
     own_feedback = get_feedback_for_solution(coursework, sol)
     details = {
@@ -151,8 +154,8 @@ def single_coursework(request, coursework):
         "test_url": path_for_file(test),
         "waiting_on_test": waiting,
         "test_results_url": path_for_file(results),
-        "has_given_feedback": feedback is not None,
-        "feedback_results_url": path_for_file(feedback),
+        "has_given_feedback": given_feedback is not None,
+        "feedback_results_url": path_for_file(given_feedback),
         "has_own_feedback": own_feedback is not None,
         "own_feedback_results_url": path_for_file(own_feedback),
     }
@@ -190,3 +193,34 @@ def feedback_upload(request, perm, test_data_instance):
     feedback_file.save()
     test_data_instance.feedback = feedback_file
     test_data_instance.save()
+
+
+@login_required()
+def show_file(request, file_id):
+    # todo may want permission mixin - make it so only creator, tester or teacher can view
+    file = m.File.objects.get(id=file_id)
+    if not p.can_view_file(request.user, file):
+        return HttpResponseForbidden()
+    content = read_file_by_line(file.filepath)
+    return HttpResponse(content_type="text/plain", charset="utf-8", content=content)
+
+
+@login_required()
+def render_file(request, file_id):
+    file = m.File.objects.get(id=file_id)
+    if not p.can_view_file(request.user, file):
+        return HttpResponseForbidden()
+    content = read_file_by_line(file.filepath)
+    detail = {
+        "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter())
+    }
+    return render(request, 'student/pretty_file.html', detail)
+
+
+def read_file_by_line(file):
+    content = ""
+    while True:
+        buf = file.readline()
+        content += buf.decode('utf-8')
+        if buf == b'':
+            return content

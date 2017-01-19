@@ -12,16 +12,20 @@
     <table>
     <thead>
     <tr>
+        <th>ID</th>
         <th>Filepath</th>
         <th>Creator</th>
         <th>Type</th>
+        <th>View</th>
     </tr>
     </thead>
     {% for f in files %}
         <tr>
-        <td><a href="/{{ f.filepath }}">{{ f.filepath }}</a></td>
+        <td>{{ f.id }}</td>
+        <td>{{ f.filepath }}</td>
         <td>{{ f.creator }}</td>
         <td>{{ f.type }}</td>
+        <td><a href="{% url 'render_file' f.id %}">Html</a> <a href="{% url 'show_file' f.id %}">Raw</a></td>
         </tr>
     {% endfor %}
     </table>
@@ -41,10 +45,18 @@
     </thead>
     {% for f in results %}
         <tr>
-        <td><a href="/{{ f.test.filepath }}">{{ f.test.filepath }}</a></td>
-        <td><a href="/{{ f.solution.filepath }}">{{ f.solution.filepath }}</a></td>
-        <td><a href="/{{ f.results.filepath }}">{{ f.results.filepath }}</a></td>
-        <td><a href="/{{ f.feedback.filepath }}">{{ f.feedback.filepath }}</a></td>
+        <td>{%  if f.test %}
+            <a href="{% url 'render_file' f.test.id %}">View ({{ f.test.id }})</a>
+        {% endif %}</td>
+        <td>{%  if f.solution %}
+            <a href="{% url 'render_file' f.solution.id %}">View ({{ f.solution.id }})</a>
+        {% endif %}</td>
+        <td>{%  if f.results %}
+            <a href="{% url 'show_file' f.results.id %}">View ({{ f.results.id }})</a>
+        {% endif %}</td>
+        <td>{%  if f.feedback %}
+            <a href="{% url 'show_file' f.feedback.id %}">View ({{ f.feedback.id }})</a>
+        {% endif %}</td>
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>
             {% if f.waiting_to_run %}
