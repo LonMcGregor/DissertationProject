@@ -3,20 +3,6 @@ functionality of the program, but in and of themselves
 do not actually offer services to views, permissions etc."""
 
 import student.models as m
-import student.permission as p
-
-
-def retrieve_coursework(request):
-    """For a given @request, return a list of coursework available to the user"""
-    logged_in_user = request.user
-    enrolled_courses = m.EnrolledUser.objects.filter(login=logged_in_user).values('course')
-    courses_for_user = m.Course.objects.filter(id__in=enrolled_courses)
-    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
-    visible_courseworks = []
-    for item in all_courseworks_for_user:
-        if p.can_view_coursework(logged_in_user, item):
-            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
-    return visible_courseworks
 
 
 def string_id(item):
@@ -73,12 +59,12 @@ def get_test_data_with_associated_file(file):
     """Given a certain @file within the scope of a @coursework,
     get the test data file that contains it. This assumes
     that a file will only be used once"""
-    if file.file_type == m.FileType.SOLUTION:
+    if file.type == m.FileType.SOLUTION:
         return first_model_item_or_none(m.TestData.objects.filter(solution=file))
-    if file.file_type == m.FileType.TEST_CASE:
+    if file.type == m.FileType.TEST_CASE:
         return first_model_item_or_none(m.TestData.objects.filter(test=file))
-    if file.file_type == m.FileType.TEST_RESULT:
+    if file.type == m.FileType.TEST_RESULT:
         return first_model_item_or_none(m.TestData.objects.filter(results=file))
-    if file.file_type == m.FileType.FEEDBACK:
+    if file.type == m.FileType.FEEDBACK:
         return first_model_item_or_none(m.TestData.objects.filter(feedback=file))
     raise Exception("You shouldn't have reached here")

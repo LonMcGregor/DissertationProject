@@ -6,4 +6,4 @@ class FileUploadForm(f.Form):
     """A form that can be used to allow a student to upload a file,
     for example a solution or a test case for a coursework"""
     chosen_file = f.FileField(label="Selected File")
-    file_type = f.HiddenInput()
+    file_type = f.CharField(widget=f.HiddenInput(), max_length=1)

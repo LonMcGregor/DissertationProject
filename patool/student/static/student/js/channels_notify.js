@@ -16,7 +16,7 @@ function notify(o){
     /* fire a notification */
     update_note_count();
     html_notify(o);
-    /*html_5_notify(o);*/
+    html_5_notify(o);
 }
 
 function html_notify(o){
@@ -67,7 +67,7 @@ socketMan = {
 
 
 /* actually connect to socket on page load */
-/*var sock = new WebSocket('ws://localhost:8000/messages');
+var sock = new WebSocket('ws://localhost:8000/messages');
 sock.onopen = socketMan.open;
 sock.onmessage = socketMan.msg;
-sock.onclose = socketMan.close;*/
+sock.onclose = socketMan.close;

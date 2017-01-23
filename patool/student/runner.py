@@ -18,9 +18,9 @@ def run_test(test_data_instance):
         return
     script = 'python' if sys.platform == "win32" else 'python3'
     solution_file = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT,
-                                 str(test_data_instance.solution.filepath))
+                                 str(test_data_instance.solution.file))
     test_path = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT,
-                             str(test_data_instance.test.filepath))
+                             str(test_data_instance.test.file))
     test_file = test_path.split('/')[::-1][0]
     if sys.platform == "win32":
         solution_file = solution_file.replace("/", "\\")
@@ -28,7 +28,7 @@ def run_test(test_data_instance):
     result, output = execute(script, solution_file, test_path, test_file)
     result_file = m.File(coursework=test_data_instance.coursework,
                          creator=test_data_instance.initiator, type=m.FileType.TEST_RESULT)
-    result_file.filepath.save('results.txt', ContentFile(output))
+    result_file.file.save('results.txt', ContentFile(output))
     result_file.save()
     test_data_instance.results = result_file
     test_data_instance.error_level = result

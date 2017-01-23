@@ -30,6 +30,8 @@ def upload_solution(request, cw=None):
     cw_instance = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(request.user, cw_instance):
         return HttpResponseForbidden("You are not allowed to see this coursework")
+    if cw_instance.state != m.CourseworkState.ACTIVE:
+        return HttpResponseForbidden("This coursework is not currently accepting submissions")
     state = p.state_of_user_in_coursework(request.user, cw_instance)
     msg, allow_upload, file_type, error = upload_solution_render(state)
     if error:
@@ -42,7 +44,7 @@ def upload_solution(request, cw=None):
         allow_upload = False
         file_type = None
     detail = {
-        "ff": f.FileUploadForm(file_type=file_type),
+        "ff": f.FileUploadForm({"file_type":file_type}),
         "allow_upload": allow_upload,
         "msg": msg
     }
@@ -63,7 +65,7 @@ def upload_solution_post(request, cw_instance):
         return HttpResponseForbidden()
     file_type = upload.cleaned_data['file_type']
     submission = m.File(coursework=cw_instance, creator=user,
-                        filepath=upload.cleaned_data['chosen_file'],
+                        file=upload.cleaned_data['chosen_file'],
                         type=file_type)
     submission.save()
     r.new_item_uploaded(user, cw_instance, submission, file_type)
@@ -106,7 +108,7 @@ def detail_coursework(request, cw=None):
     """If a coursework @cw is specified,return the page detailing it
     otherwise return a listing of all currently available tasks. """
     if cw is None or cw == "":
-        available = h.retrieve_coursework(request)
+        available = retrieve_coursework(request)
         return render(request, 'student/choose_coursework.html', {'courseworks': available})
     return single_coursework(request, cw)
 
@@ -118,9 +120,12 @@ def single_coursework(request, coursework):
     sol = h.user_submitted_file(request.user, cw, m.FileType.SOLUTION)
     test = h.user_submitted_file(request.user, cw, m.FileType.TEST_CASE)
     test_data = h.get_test_data_for_tester(request.user, coursework)
-    results = test_data.results
-    tester_feedback = test_data.feedback
+    results = test_data.results if test_data is not None else None
+    tester_feedback = test_data.feedback if test_data is not None else None
     dev_test_data = h.get_test_data_for_developer(request.user, coursework)
+    if dev_test_data is not None and p.user_feedback_mode(
+            request.user, dev_test_data) != p.UserFeedbackModes.READ:
+        dev_test_data = None
     details = {
         "cw": cw,
         "solution_url": h.string_id(sol),
@@ -128,9 +133,23 @@ def single_coursework(request, coursework):
         "test_results_url": h.string_id(results),
         "feedback_results_url": h.string_id(tester_feedback),
         "test_data": h.string_id(test_data),
-        "own_feedback_data": h.string_id(dev_test_data)
+        "own_feedback_data": h.string_id(dev_test_data),
+        "subs_open": cw.state == m.CourseworkState.ACTIVE
     }
     return render(request, 'student/detail_coursework.html', details)
+
+
+def retrieve_coursework(request):
+    """For a given @request, return a list of coursework available to the user"""
+    logged_in_user = request.user
+    enrolled_courses = m.EnrolledUser.objects.filter(login=logged_in_user).values('course')
+    courses_for_user = m.Course.objects.filter(id__in=enrolled_courses)
+    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
+    visible_courseworks = []
+    for item in all_courseworks_for_user:
+        if p.can_view_coursework(logged_in_user, item):
+            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
+    return visible_courseworks
 
 
 @login_required()
@@ -141,8 +160,11 @@ def feedback(request, test_data):
     perm = p.user_feedback_mode(request.user, test_data_instance)
     if perm == p.UserFeedbackModes.DENY:
         return HttpResponseForbidden("You are not allowed to see this test data")
-    if perm == p.UserFeedbackModes.WAIT:
+    if perm == p.UserFeedbackModes.WAIT_TEST:
         return HttpResponse("Please wait until the test has finished running")
+    if perm == p.UserFeedbackModes.WAIT_FEEDBACK:
+        return HttpResponse("Please wait until the feedback has been written")
+        # todo what if the coursework is finished and no feedback was given, but a test was run?
     if request.POST:
         if perm != p.UserFeedbackModes.WRITE:
             return HttpResponseForbidden("You are not allowed to submit feedback")
@@ -162,7 +184,7 @@ def feedback_upload(request, test_data_instance):
     feedback_text = request.POST["feedback"]
     feedback_file = m.File(coursework=test_data_instance.coursework, creator=request.user,
                            type=m.FileType.FEEDBACK)
-    feedback_file.filepath.save('feedback.txt', ContentFile(feedback_text))
+    feedback_file.file.save('feedback.txt', ContentFile(feedback_text))
     feedback_file.save()
     test_data_instance.feedback = feedback_file
     test_data_instance.save()
@@ -175,7 +197,7 @@ def show_file(request, file_id):
     file = m.File.objects.get(id=file_id)
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden()
-    content = h.read_file_by_line(file.filepath)
+    content = h.read_file_by_line(file.file)
     return HttpResponse(content_type="text/plain", charset="utf-8", content=content)
 
 
@@ -187,7 +209,7 @@ def render_file(request, file_id):
     file = m.File.objects.get(id=file_id)
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden()
-    content = h.read_file_by_line(file.filepath)
+    content = h.read_file_by_line(file.file)
     detail = {
         "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter())
     }

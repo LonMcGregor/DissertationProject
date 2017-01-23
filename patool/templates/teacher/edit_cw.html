@@ -22,7 +22,7 @@
     {% for f in files %}
         <tr>
         <td>{{ f.id }}</td>
-        <td>{{ f.filepath }}</td>
+        <td>{{ f.file }}</td>
         <td>{{ f.creator }}</td>
         <td>{{ f.type }}</td>
         <td><a href="{% url 'render_file' f.id %}">Html</a> <a href="{% url 'show_file' f.id %}">Raw</a></td>
@@ -34,6 +34,7 @@
     <table>
     <thead>
     <tr>
+        <th>ID</th>
         <th>Test</th>
         <th>Solution</th>
         <th>Results</th>
@@ -45,6 +46,7 @@
     </thead>
     {% for f in results %}
         <tr>
+        <td>{{ f.id }}</td>
         <td>{%  if f.test %}
             <a href="{% url 'render_file' f.test.id %}">View ({{ f.test.id }})</a>
         {% endif %}</td>

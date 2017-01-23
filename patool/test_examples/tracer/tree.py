@@ -1,4 +1,6 @@
-class BrokenTree:
+# CHEER UP LUV, THE CAVALRY'S HERE!
+
+class Tree:
     
     def __init__(self, value):
         self.value = value

@@ -1,8 +1,11 @@
+# ANA
+# TEST
+
 import unittest as ut
-from broken_tree import BrokenTree
+from tree import Tree
 
 class TestBrokenTreee(ut.TestCase):
     
     def test_add(self):
-        b = BrokenTree(4)
+        b = Tree(4)
         self.assertTrue(b.search(4))

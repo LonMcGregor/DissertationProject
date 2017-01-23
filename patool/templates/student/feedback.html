@@ -22,7 +22,7 @@
         </form>
     {% else %}
         <div id="feedback_form" class="feedback_frame_view">
-            <iframe src="{% url 'show_file' test_data_instance.feedback.id %}"></iframe>
+            <iframe src="{% url 'show_file' test_data.feedback.id %}"></iframe>
         </div>
     {% endif %}
 {% endblock %}

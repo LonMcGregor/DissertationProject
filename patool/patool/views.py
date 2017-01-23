@@ -49,9 +49,9 @@ def populate_database(request):
         l = cu("lucio", password="soundbarrier")
         l.groups.add(s)
         l.save()
-        l = cu("sombra", password="electromagneticpulse")
-        l.groups.add(s)
-        l.save()
+        sm = cu("sombra", password="electromagneticpulse")
+        sm.groups.add(s)
+        sm.save()
 
         aa = m.Course(code="F20AA-2016_17", name="Advanced Algorithms")
         aa.save()
@@ -67,12 +67,12 @@ def populate_database(request):
         m.EnrolledUser(login=a, course=aa).save()
         m.EnrolledUser(login=tr, course=aa).save()
         m.EnrolledUser(login=l, course=aa).save()
-        m.EnrolledUser(login=l, course=aa).save()
+        m.EnrolledUser(login=sm, course=aa).save()
 
         m.Coursework(name="Build a binary tree",
                      descriptor="http://uni.lonm.uk/example_aa1.pdf",
                      course=aa,
-                     state=m.CourseworkState.SOLUTIONS_ONLY).save()
+                     state=m.CourseworkState.ACTIVE).save()
 
         return HttpResponse("DB populated")
     else:

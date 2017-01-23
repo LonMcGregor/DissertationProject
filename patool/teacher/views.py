@@ -3,7 +3,6 @@ from django.contrib.auth.decorators import login_required
 import teacher.permission as p
 import student.models as m
 import teacher.forms as f
-import student.permission as sp
 from django.db import transaction
 import student.runner as r
 from django.http import HttpResponseForbidden, HttpResponse
@@ -76,6 +75,9 @@ def create_course_update(request, new_details):
 def edit_course(request, kwargs):
     """Handle creation of form, or post request for editing a course"""
     requested_course_code = kwargs['c']
+    cw = m.Course.objects.get(code=requested_course_code)
+    if not p.is_enrolled_on_course(request.user, cw):
+        return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
         edit_course_update(request, requested_course_code, request.POST)
     return edit_course_render(request, requested_course_code)
@@ -138,6 +140,9 @@ def edit_course_render(request, requested_course_code):
 def create_coursework(request, kwargs):
     """Handle form for creating a coursework in course @[c]"""
     requested_course_code = kwargs['c']
+    cw = m.Course.objects.get(code=requested_course_code)
+    if not p.is_enrolled_on_course(request.user, cw):
+        return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
         return create_coursework_update(request.POST, requested_course_code)
     return create_coursework_render(request)
@@ -176,6 +181,8 @@ def create_coursework_update(new_details, course_code):
 def edit_coursework(request, kwargs=None):
     """Prepare a page to view and edit coursework @[c]"""
     coursework = m.Coursework.objects.get(id=kwargs['c'])
+    if not p.is_enrolled_on_course(request.user, coursework.course):
+        return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
         edit_coursework_update(request.POST, coursework)
     return edit_coursework_render(request, coursework)
@@ -217,17 +224,17 @@ def edit_coursework_render(request, coursework):
 @p.is_teacher
 def force_start_test_run(request, kwargs):
     """Given a particular test data id @[t], force it to run"""
-    requested_test = request, kwargs['t']
-    running = threading.Thread(target=force_start_test_run_threaded, args=requested_test)
+    requested_test = kwargs['t']
+    test_instance = m.TestData.objects.get(id=requested_test)
+    if not test_instance.waiting_to_run:
+        return HttpResponseForbidden("Test has already been run")
+    if not p.is_enrolled_on_course(request.user, test_instance.coursework):
+        return HttpResponseForbidden("You are not enrolled on this course")
+    running = threading.Thread(target=force_start_test_run_threaded, args=test_instance)
     running.start()
     return HttpResponse("Test Run %s Force Started" % kwargs['t'])
 
 
 def force_start_test_run_threaded(request, requested_test):
-    """Force a test to run within another thread"""
-    test_instance = m.TestData.objects.get(id=requested_test)
-    if not test_instance.waiting_to_run:
-        return HttpResponseForbidden("Test has already been run")
-    if not sp.can_view_coursework(request.user, test_instance.coursework):
-        return HttpResponseForbidden("You are not enrolled on this course")
-    r.run_test(test_instance)
+    """Force a @requested_test instance to run within another thread"""
+    r.run_test(requested_test)

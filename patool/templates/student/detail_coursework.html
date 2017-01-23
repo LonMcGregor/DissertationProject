@@ -18,9 +18,11 @@
 
                 {% if feedback_results_url %}
                     <li><a  href="{% url 'render_file' feedback_results_url %}">View feedback for results</a></li>
-                    <li><a  href="{% url 'feedback' feedback_results_url %}">Combined View</a></li>
+                    <li><a  href="{% url 'feedback' test_data %}">Combined View</a></li>
                 {% else %}
-                    <li><a  href="{% url 'feedback' test_data %}">Submit feedback for results</a></li>
+                    {% if subs_open %}
+                        <li><a  href="{% url 'feedback' test_data %}">Submit feedback for results</a></li>
+                    {% endif %}
                 {% endif %}
 
             {% else %}
@@ -29,11 +31,15 @@
             {% endif %}
 
         {% else %}
-            <li><a  href="{% url 'test' cw.id %}">Submit test case</a></li>
+            {% if subs_open %}
+                <li><a  href="{% url 'test' cw.id %}">Submit test case</a></li>
+            {% endif %}
         {% endif %}
 
     {% else %}
-        <li><a  href="{% url 'solution' cw.id %}">Submit Solution</a></li>
+        {% if subs_open %}
+            <li><a  href="{% url 'solution' cw.id %}">Submit Solution</a></li>
+        {% endif %}
     {% endif %}
     </ul>
     <p></p>

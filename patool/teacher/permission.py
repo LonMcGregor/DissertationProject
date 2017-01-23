@@ -1,5 +1,6 @@
 from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
+import student.models as m
 
 
 def is_teacher(f):
@@ -17,3 +18,8 @@ def is_teacher(f):
             return HttpResponseForbidden()
 
     return is_teacher_internal
+
+
+def is_enrolled_on_course(user, course):
+    is_enrolled = m.EnrolledUser.objects.filter(login=user).filter(course=course)
+    return is_enrolled.count() == 1
