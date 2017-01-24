@@ -4,7 +4,7 @@
 import unittest as ut
 from tree import Treee
 
-class TestBrokenTreee(ut.TestCase):
+class TestTreee(ut.TestCase):
     
     def test_add(self):
         b = Treee(4)

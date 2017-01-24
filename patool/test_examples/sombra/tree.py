@@ -9,7 +9,7 @@ class Tree:
         self.right = None
     
     def add_child(self, value):
-        self.left = BrokenTree(value)
+        self.left = Tree(value)
     
     def search(self, needle):
         if self.value == needle:
