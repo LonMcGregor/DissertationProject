@@ -36,7 +36,8 @@ def create_course_render(request):
     detail = {
         "course_name": "New Course",
         "courseworks": None,
-        "uf": f.CourseForm({"student": str(request.user)+','})
+        "uf": f.CourseForm({"student": str(request.user)+','}),
+        "crumbs": [("Homepage", "/teacher")]
     }
     return render(request, 'teacher/edit_course.html', detail)
 
@@ -130,7 +131,8 @@ def edit_course_render(request, requested_course_code):
         "course_name": course.name,
         "course_code": course.code,
         "courseworks": courseworks,
-        "uf": update_form
+        "uf": update_form,
+        "crumbs": [("Homepage", "/teacher")]
     }
     return render(request, 'teacher/edit_course.html', detail)
 
@@ -145,16 +147,17 @@ def create_coursework(request, kwargs):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
         return create_coursework_update(request.POST, requested_course_code)
-    return create_coursework_render(request)
+    return create_coursework_render(request, requested_course_code)
 
 
-def create_coursework_render(request):
-    """Generate an empty form for editing a coursework"""
+def create_coursework_render(request, code):
+    """Generate an empty form for creating a coursework for course @code"""
     detail = {
         "courseworks": {"name": "New Coursework"},
         "cw_form": f.CourseworkForm(),
         "solutions": [],
-        "tests": []
+        "tests": [],
+        "crumbs": [("Homepage", "/teacher"), ("Course", "/teacher/course/%s" % code)]
     }
     return render(request, 'teacher/edit_cw.html', detail)
 
@@ -215,7 +218,9 @@ def edit_coursework_render(request, coursework):
         "coursework": coursework,
         "cw_form": cw_form,
         "files": files,
-        "results": results
+        "results": results,
+        "crumbs": [("Homepage", "/teacher"),
+                   ("Course", "/teacher/course/%s" % coursework.course.code)]
     }
     return render(request, 'teacher/edit_cw.html', detail)
 

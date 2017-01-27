@@ -10,7 +10,7 @@ urlpatterns = [
     url(r'^student/', include('student.urls')),
     url(r'^teacher/', include('teacher.urls')),
     url(r'^prepdb', views.populate_database, name='prepdb'),
-    url(r'^$', views.default_index),
+    url(r'^$', views.default_index, name='site_root'),
 ] + static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT
     )

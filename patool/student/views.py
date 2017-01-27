@@ -15,7 +15,7 @@ import student.helper as h
 
 @login_required()
 def index(request):
-    return render(request, 'student/index.html')
+    return detail_coursework(request)
 
 
 @login_required()
@@ -46,7 +46,8 @@ def upload_solution(request, cw=None):
     detail = {
         "ff": f.FileUploadForm({"file_type":file_type}),
         "allow_upload": allow_upload,
-        "msg": msg
+        "msg": msg,
+        "crumbs": [("Homepage", "/student"), ("Coursework", "/student/cw/%s"%cw)]
     }
     return render(request, 'student/upload_solution.html', detail)
 
@@ -134,7 +135,8 @@ def single_coursework(request, coursework):
         "feedback_results_url": h.string_id(tester_feedback),
         "test_data": h.string_id(test_data),
         "own_feedback_data": h.string_id(dev_test_data),
-        "subs_open": cw.state == m.CourseworkState.ACTIVE
+        "subs_open": cw.state == m.CourseworkState.ACTIVE,
+        "crumbs": [("Homepage", "/student")]
     }
     return render(request, 'student/detail_coursework.html', details)
 
@@ -172,7 +174,9 @@ def feedback(request, test_data):
         return HttpResponse("Your feedback has been recorded")
     details = {
         "test_data": test_data_instance,
-        "can_submit": perm == p.UserFeedbackModes.WRITE
+        "can_submit": perm == p.UserFeedbackModes.WRITE,
+        "crumbs": [("Homepage", "/student"),
+                   ("Coursework", "/student/cw/%s"%test_data_instance.coursework.id)]
     }
     return render(request, 'student/feedback.html', details)
 
@@ -211,6 +215,6 @@ def render_file(request, file_id):
         return HttpResponseForbidden()
     content = h.read_file_by_line(file.file)
     detail = {
-        "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter())
+        "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))
     }
     return render(request, 'student/pretty_file.html', detail)

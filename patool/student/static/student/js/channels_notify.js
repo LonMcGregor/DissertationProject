@@ -37,7 +37,7 @@ function html_5_notify(o){
 
 /* on page load double-check notification permissions */
 Notification.requestPermission().then(function() {
-    notify("HTML5 Notifications:" + Notification.permission);
+    /*notify("HTML5 Notifications:" + Notification.permission);*/
 });
 
 function toggle_notes_status(){
@@ -53,7 +53,7 @@ function toggle_notes_status(){
 /* object offering functionality for connecting to sockets */
 socketMan = {
     open: function() {
-        notify('Notifications Socket Opened');
+        /*notify('Notifications Socket Opened');*/
     },
 
     msg: function(e) {

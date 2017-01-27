@@ -3,7 +3,7 @@ Styles relating to the panelled feedback page
  & associated forms/iframes students will use
 */
 
-#feedback_panels, #feedback_test {
+#feedback_panels, #feedback_test, #feedback_form {
     display:flex;
     width: 100%;
     flex-direction: row;
@@ -14,25 +14,26 @@ Styles relating to the panelled feedback page
     flex-direction: column;
 }
 
+.feedback_panel {
+    flex: 2 1 auto;
+    padding: 10px;
+    box-shadow: inset #edecd6 5px 5px;
+    min-width: 50%;
+}
+
 #feedback_form {
-    display: flex;
-    flex-direction: row;
-    justify-content: space-around;
     height: 100px;
 }
 
-#feedback_form input {
+#feedback_form textarea {
+    flex-grow: 4;
     height: 100%;
 }
 
-#feedback_form input[name="feedback"] {
-    flex-grow: 9;
-    min-width: 200px;
-}
-
-#feedback_form input[type="submit"] {
+#feedback_form input {
     flex-grow: 1;
     min-width: 80px;
+    height: 100%;
 }
 
 .feedback_frame_view iframe {

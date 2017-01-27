@@ -12,5 +12,5 @@ urlpatterns = [
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)', views.detail_coursework, name='cw'),
     url('file/(?P<file_id>[0-9a-zA-Z\-_]*)/raw', views.show_file, name='show_file'),
     url('file/(?P<file_id>[0-9a-zA-Z\-_]*)/pretty', views.render_file, name='render_file'),
-    url(r'^$', views.index, name='index'),
+    url(r'^$', views.index, name='student_index'),
 ]

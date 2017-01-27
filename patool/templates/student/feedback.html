@@ -4,16 +4,21 @@
     <div id="feedback_panels">
         <div id="feedback_test" class="feedback_panel">
             <div id="feedback_test_case" class="feedback_frame_view feedback_panel">
+                <p>Test Case</p>
                 <iframe src="{% url 'render_file' test_data.test.id %}" ></iframe>
             </div>
             <div id="feedback_test_result" class="feedback_frame_view feedback_panel">
+                <p>Test Results</p>
                 <iframe src="{% url 'show_file' test_data.results.id %}" ></iframe>
             </div>
         </div>
         <div id="feedback_solution" class="feedback_frame_view feedback_panel">
+            <p>Solution Source Code</p>
             <iframe src="{% url 'render_file' test_data.solution.id %}"></iframe>
         </div>
     </div>
+        <div id="feedback_form_container" class="feedback_frame_view">
+        <p>Feedback</p>
     {% if can_submit %}
         <form method="POST" action="" id="feedback_form">
             {% csrf_token %}
@@ -21,8 +26,7 @@
             <input type="submit" value="Submit Feedback" />
         </form>
     {% else %}
-        <div id="feedback_form" class="feedback_frame_view">
             <iframe src="{% url 'show_file' test_data.feedback.id %}"></iframe>
-        </div>
     {% endif %}
+        </div>
 {% endblock %}
