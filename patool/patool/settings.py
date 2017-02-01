@@ -58,8 +58,7 @@ ROOT_URLCONF = 'patool.urls'
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
-        'DIRS': [os.path.join(BASE_DIR, 'templates')]
-        ,
+        'DIRS': [os.path.join(BASE_DIR, 'templates')],
         'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
@@ -143,3 +142,6 @@ MEDIA_TMP_TEST = 'var/tmp/test'
 LOGIN_URL = '/student/login'
 LOGOUT_REDIRECT_URL = '/student/'
 
+# at most 20 1mb files per upload
+MAX_FILES_PER_SUBMISSION = 20
+MAX_FILESIZE_FOR_UPLOADS = 1024 * 1024 * 1

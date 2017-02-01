@@ -27,7 +27,7 @@ def run_test(test_data_instance):
         test_path = test_path.replace('/', '\\')
     result, output = execute(script, solution_file, test_path, test_file)
     result_file = m.File(coursework=test_data_instance.coursework,
-                         creator=test_data_instance.initiator, type=m.FileType.TEST_RESULT)
+                         creator=test_data_instance.initiator, type=m.SubmissionType.TEST_RESULT)
     result_file.file.save('results.txt', ContentFile(output))
     result_file.save()
     test_data_instance.results = result_file

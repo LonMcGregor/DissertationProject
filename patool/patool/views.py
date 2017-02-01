@@ -27,6 +27,18 @@ def populate_database(request):
         s = Group()
         s.name = "student"
         s.save()
+        fem = Group()
+        fem.name = "female"
+        fem.save()
+        mal = Group()
+        mal.name = "male"
+        mal.save()
+        edi = Group()
+        edi.name = "edinburgh"
+        edi.save()
+        dub = Group()
+        dub.name = "dubai"
+        dub.save()
 
         cu = User.objects.create_user
 
@@ -68,11 +80,6 @@ def populate_database(request):
         m.EnrolledUser(login=tr, course=aa).save()
         m.EnrolledUser(login=l, course=aa).save()
         m.EnrolledUser(login=sm, course=aa).save()
-
-        m.Coursework(name="Build a binary tree",
-                     descriptor="http://uni.lonm.uk/example_aa1.pdf",
-                     course=aa,
-                     state=m.CourseworkState.ACTIVE).save()
 
         return HttpResponse("DB populated")
     else:

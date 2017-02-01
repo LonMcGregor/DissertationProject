@@ -12,21 +12,56 @@
     <table>
     <thead>
     <tr>
-        <th>ID</th>
+        <th>SUBID</th>
         <th>Filepath</th>
         <th>Creator</th>
         <th>Type</th>
         <th>View</th>
     </tr>
     </thead>
+    {% for s, files in results %}
     {% for f in files %}
         <tr>
         <td>{{ f.id }}</td>
         <td>{{ f.file }}</td>
-        <td>{{ f.creator }}</td>
-        <td>{{ f.type }}</td>
-        <td><a href="{% url 'render_file' f.id %}">Html</a> <a href="{% url 'show_file' f.id %}">Raw</a></td>
+        <td>{{ s.creator }}</td>
+        <td>{{ s.type }}</td>
+        <td><a href="{% url 'render_file' s.id f.id %}">Html</a> <a href="{% url 'show_file' s.id f.id %}">Raw</a></td>
         </tr>
+    {% endfor %}
+    {% endfor %}
+    {% for s, files in descriptor %}
+    {% for f in files %}
+        <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.file }}</td>
+        <td>{{ s.creator }}</td>
+        <td>{{ s.type }}</td>
+        <td><a href="{% url 'render_file' s.id f.id %}">Html</a> <a href="{% url 'show_file' s.id f.id %}">Raw</a></td>
+        </tr>
+    {% endfor %}
+    {% endfor %}
+    {% for s, files in oracle_exec %}
+    {% for f in files %}
+        <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.file }}</td>
+        <td>{{ s.creator }}</td>
+        <td>{{ s.type }}</td>
+        <td><a href="{% url 'render_file' s.id f.id %}">Html</a> <a href="{% url 'show_file' s.id f.id %}">Raw</a></td>
+        </tr>
+    {% endfor %}
+    {% endfor %}
+    {% for s, files in identity %}
+    {% for f in files %}
+        <tr>
+        <td>{{ f.id }}</td>
+        <td>{{ f.file }}</td>
+        <td>{{ s.creator }}</td>
+        <td>{{ s.type }}</td>
+        <td><a href="{% url 'render_file' s.id f.id %}">Html</a> <a href="{% url 'show_file' s.id f.id %}">Raw</a></td>
+        </tr>
+    {% endfor %}
     {% endfor %}
     </table>
     <p></p>
@@ -48,16 +83,16 @@
         <tr>
         <td>{{ f.id }}</td>
         <td>{%  if f.test %}
-            <a href="{% url 'render_file' f.test.id %}">View ({{ f.test.id }})</a>
+            <a href="{% url 'render_file' f.test.id 0 %}">View ({{ f.test.id }})</a>
         {% endif %}</td>
         <td>{%  if f.solution %}
-            <a href="{% url 'render_file' f.solution.id %}">View ({{ f.solution.id }})</a>
+            <a href="{% url 'render_file' f.solution.id 0 %}">View ({{ f.solution.id }})</a>
         {% endif %}</td>
         <td>{%  if f.results %}
-            <a href="{% url 'show_file' f.results.id %}">View ({{ f.results.id }})</a>
+            <a href="{% url 'show_file' f.results.id 0 %}">View ({{ f.results.id }})</a>
         {% endif %}</td>
         <td>{%  if f.feedback %}
-            <a href="{% url 'show_file' f.feedback.id %}">View ({{ f.feedback.id }})</a>
+            <a href="{% url 'show_file' f.feedback.id 0 %}">View ({{ f.feedback.id }})</a>
         {% endif %}</td>
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>

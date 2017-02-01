@@ -11,23 +11,24 @@ def string_id(item):
     return str(item.id) if item is not None else ''
 
 
-def get_test_data_for_tester(user, coursework):
-    """Get the test data for the tester @user, within a given @coursework"""
-    return first_model_item_or_none(m.TestData.objects.filter(
-        initiator=user, coursework=coursework))
+def get_test_match_for_developing(user, coursework):
+    """Get the test matches that @user created while in development of a solution for @coursework"""
+    initiated = m.Submission.objects.filter(coursework=coursework, initiator=user)
+    chosen = []
+    for tm in initiated:
+        if tm.solution.creator == user:
+            chosen.append(tm)
+    return chosen
 
 
-def get_test_data_for_developer(user, coursework):
-    """Get the test data for the developer @user, for given @coursework"""
-    sol = user_submitted_file(user, coursework, m.FileType.SOLUTION)
-    return first_model_item_or_none(m.TestData.objects.filter(
-        coursework=coursework, solution=sol))
-
-
-def get_feedback_for_solution(coursework, solution):
-    """Get the feedback for the developer, based on a @coursework for a @solution"""
-    return first_model_item_or_none(m.TestData.objects.filter(
-        coursework=coursework, solution=solution))
+def get_test_match_for_developer(user, coursework):
+    """Get the test matches for the developer @user, for given @coursework"""
+    visibles = m.Submission.objects.filter(coursework=coursework, visible_to_developer=True)
+    chosen = []
+    for tm in visibles:
+        if tm.solution.creator == user:
+            chosen.append(tm)
+    return chosen
 
 
 def read_file_by_line(file):
@@ -40,12 +41,6 @@ def read_file_by_line(file):
             return content
 
 
-def user_submitted_file(user, coursework, file_type):
-    """return the @file_type @user submitted for @coursework"""
-    return first_model_item_or_none(m.File.objects.filter(
-        coursework=coursework, creator=user, type=file_type))
-
-
 def first_model_item_or_none(query):
     """Working on the assumption that a user will only submit an item
     once in a given state, take the output of the @query, and give
@@ -55,16 +50,38 @@ def first_model_item_or_none(query):
     return None
 
 
-def get_test_data_with_associated_file(file):
-    """Given a certain @file within the scope of a @coursework,
+def get_test_match_with_associated_submission(submission):
+    """Given a certain @submission within the scope of a,
     get the test data file that contains it. This assumes
     that a file will only be used once"""
-    if file.type == m.FileType.SOLUTION:
-        return first_model_item_or_none(m.TestData.objects.filter(solution=file))
-    if file.type == m.FileType.TEST_CASE:
-        return first_model_item_or_none(m.TestData.objects.filter(test=file))
-    if file.type == m.FileType.TEST_RESULT:
-        return first_model_item_or_none(m.TestData.objects.filter(results=file))
-    if file.type == m.FileType.FEEDBACK:
-        return first_model_item_or_none(m.TestData.objects.filter(feedback=file))
+    if submission.type == m.SubmissionType.SOLUTION:
+        return first_model_item_or_none(m.TestMatch.objects.filter(solution=submission))
+    if submission.type == m.SubmissionType.TEST_CASE:
+        return first_model_item_or_none(m.TestMatch.objects.filter(test=submission))
+    if submission.type == m.SubmissionType.TEST_RESULT:
+        return first_model_item_or_none(m.TestMatch.objects.filter(results=submission))
+    if submission.type == m.SubmissionType.FEEDBACK:
+        return first_model_item_or_none(m.TestMatch.objects.filter(feedback=submission))
+    # todo this doesn't work with teacher feedback
     raise Exception("You shouldn't have reached here")
+
+
+def get_files(submission):
+    """For a given @submission instance, get the
+    names of the files back as an array"""
+    files = m.File.objects.filter(submission=submission)
+    list_files = []
+    for file in files:
+        list_files.append(file.name.split('/')[::-1][0])
+    return list_files
+
+
+def get_file(submission_id, filename):
+    """For a specified @submission_id, and @filename, get
+    the file object associated with that"""
+    sub = m.Submission.objects.get(id=submission_id)
+    files = m.File.objects.filter(submission=sub)
+    for file in files:
+        if file.name.split('/')[::-1][0] == filename:
+            return file
+    raise Exception("File not found")

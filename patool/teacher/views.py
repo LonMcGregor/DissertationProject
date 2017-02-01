@@ -2,6 +2,7 @@ from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
 import teacher.permission as p
 import student.models as m
+import student.helper as h
 import teacher.forms as f
 from django.db import transaction
 import student.runner as r
@@ -146,7 +147,7 @@ def create_coursework(request, kwargs):
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
-        return create_coursework_update(request.POST, requested_course_code)
+        return create_coursework_update(request.user, request.POST, requested_course_code)
     return create_coursework_render(request, requested_course_code)
 
 
@@ -155,6 +156,9 @@ def create_coursework_render(request, code):
     detail = {
         "courseworks": {"name": "New Coursework"},
         "cw_form": f.CourseworkForm(),
+        "descriptor": [],
+        "oracle_exec": [],
+        "identity": [],
         "solutions": [],
         "tests": [],
         "crumbs": [("Homepage", "/teacher"), ("Course", "/teacher/course/%s" % code)]
@@ -163,19 +167,39 @@ def create_coursework_render(request, code):
 
 
 @transaction.atomic
-def create_coursework_update(new_details, course_code):
-    """Given the @new_details for a coursework, and
+def create_coursework_update(user, new_details, course_code):
+    """@user - Given the @new_details for a coursework, and
     the @course_code we want to add it to, update the db"""
     updated_form = f.CourseworkForm(new_details)
     if not updated_form.is_valid():
-        raise Exception("validity problem")
+        #raise Exception("validity problem")
+        pass
     new_name = updated_form.cleaned_data['name']
-    new_descriptor = updated_form.cleaned_data['descriptor']
     new_state = updated_form.cleaned_data['state']
     course = m.Course.objects.get(code=course_code)
-    coursework = m.Coursework(name=new_name, descriptor=new_descriptor, course=course,
-                              state=new_state)
+    coursework = m.Coursework(id=m.new_random_slug(m.Coursework), name=new_name,
+                              course=course, state=new_state, file_pipe="runner.py",
+                              test_pipe="runner.py")
     coursework.save()
+
+    descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
+                              creator=user, type=m.SubmissionType.CW_DESCRIPTOR, private=False)
+    descriptor.save()
+    for each in updated_form.cleaned_data['descriptor']:
+        m.File(file=each, submission=descriptor).save()
+
+    oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
+                               creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE, private=False)
+    oracle_exec.save()
+    for each in updated_form.cleaned_data['oracle_exec']:
+        m.File(file=each, submission=oracle_exec).save()
+
+    identity = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
+                            creator=user, type=m.SubmissionType.IDENTITY_TEST, private=False)
+    identity.save()
+    for each in updated_form.cleaned_data['identity']:
+        m.File(file=each, submission=identity).save()
+
     return redirect('edit_cw', c=coursework.id)
 
 
@@ -208,8 +232,9 @@ def edit_coursework_render(request, coursework):
     page for a given @coursework, including the
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
-    files = m.File.objects.filter(coursework=coursework)
-    results = m.TestData.objects.filter(coursework=coursework)
+    files = [(s, h.get_files(s)) for s in m.Submission.objects.get(
+                       type=m.SubmissionType.SOLUTION, coursework=coursework)]
+    results = m.TestMatch.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
                "descriptor": coursework.descriptor,
                "state": coursework.state}
@@ -217,8 +242,14 @@ def edit_coursework_render(request, coursework):
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
-        "files": files,
+        "submissions": files,
         "results": results,
+        "descriptor": [(s, h.get_files(s)) for s in m.Submission.objects.get(
+                       type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)],
+        "oracle_exec": [(s, h.get_files(s)) for s in m.Submission.objects.get(
+                       type=m.SubmissionType.ORACLE_EXECUTABLE, coursework=coursework)],
+        "identity":  [(s, h.get_files(s)) for s in m.Submission.objects.get(
+                       type=m.SubmissionType.IDENTITY_TEST, coursework=coursework)],
         "crumbs": [("Homepage", "/teacher"),
                    ("Course", "/teacher/course/%s" % coursework.course.code)]
     }
@@ -230,7 +261,7 @@ def edit_coursework_render(request, coursework):
 def force_start_test_run(request, kwargs):
     """Given a particular test data id @[t], force it to run"""
     requested_test = kwargs['t']
-    test_instance = m.TestData.objects.get(id=requested_test)
+    test_instance = m.TestMatch.objects.get(id=requested_test)
     if not test_instance.waiting_to_run:
         return HttpResponseForbidden("Test has already been run")
     if not p.is_enrolled_on_course(request.user, test_instance.coursework.course):

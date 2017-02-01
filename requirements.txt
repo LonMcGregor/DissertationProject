@@ -5,6 +5,7 @@ channels==1.0.0
 constantly==15.1.0
 daphne==1.0.0
 Django==1.10.5
+django-multiupload==0.5.2
 incremental==16.10.1
 msgpack-python==0.4.8
 pkg-resources==0.0.0

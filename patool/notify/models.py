@@ -11,4 +11,5 @@ class Message(m.Model):
     template = m.ForeignKey(MessageTemplate)
     rel = m.CharField(max_length=256)
     user = m.ForeignKey(User)
-    hasBeenRead = m.BooleanField()
+    has_been_read = m.BooleanField()
+    has_been_deleted = m.BooleanField()
