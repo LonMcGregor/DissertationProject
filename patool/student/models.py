@@ -10,7 +10,7 @@ def upload_directory_path(instance, filename):
     This will be appended to the settings BASE_DIR and MEDIA_ROOT"""
     return '%s/%s/%s/%s/originals/%s' % (instance.submission.coursework.id,
                                          instance.submission.creator.id,
-                                         instance.submission.type.id,
+                                         instance.submission.type,
                                          instance.submission.id,
                                          filename)
 

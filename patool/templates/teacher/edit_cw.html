@@ -2,9 +2,18 @@
 {% block title %}View Course{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
-<form method="POST" action="">
+    <form method="POST" action="" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ cw_form }}
+    <label for="id_name">Coursework Name:</label><input id="id_name" maxlength="128" name="name" type="text" required="">
+<label for="id_state">Coursework State:</label><select id="id_state" name="state" required="">
+<option value="i">Invisible to Students</option>
+<option value="c">Closed for Submissions</option>
+<option value="u">Accepting Uploads</option>
+<option value="f">Accepting Feedback</option>
+</select>
+<label for="id_descriptor">Files for Coursework descriptor:</label><input id="id_descriptor" multiple="multiple" name="descriptor" type="file" required="">
+<label for="id_oracle_exec">Files for Oracle implementation:</label><input id="id_oracle_exec" multiple="multiple" name="oracle_exec" type="file" required="">
+<label for="id_identity">Files for Identity test:</label><input id="id_identity" multiple="multiple" name="identity" type="file" required="">
     <input type="submit" value="Save">
 </form>
 <p></p>

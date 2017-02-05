@@ -72,7 +72,7 @@ def get_files(submission):
     files = m.File.objects.filter(submission=submission)
     list_files = []
     for file in files:
-        list_files.append(file.name.split('/')[::-1][0])
+        list_files.append(file.file.name.split('/')[::-1][0])
     return list_files
 
 
@@ -82,6 +82,6 @@ def get_file(submission_id, filename):
     sub = m.Submission.objects.get(id=submission_id)
     files = m.File.objects.filter(submission=sub)
     for file in files:
-        if file.name.split('/')[::-1][0] == filename:
+        if file.file.name.split('/')[::-1][0] == filename:
             return file
     raise Exception("File not found")

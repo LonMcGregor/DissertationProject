@@ -147,7 +147,7 @@ def create_coursework(request, kwargs):
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
-        return create_coursework_update(request.user, request.POST, requested_course_code)
+        return create_coursework_update(request.user, request, requested_course_code)
     return create_coursework_render(request, requested_course_code)
 
 
@@ -167,15 +167,11 @@ def create_coursework_render(request, code):
 
 
 @transaction.atomic
-def create_coursework_update(user, new_details, course_code):
-    """@user - Given the @new_details for a coursework, and
+def create_coursework_update(user, request, course_code):
+    """@user - Given the @request for a coursework, and
     the @course_code we want to add it to, update the db"""
-    updated_form = f.CourseworkForm(new_details)
-    if not updated_form.is_valid():
-        #raise Exception("validity problem")
-        pass
-    new_name = updated_form.cleaned_data['name']
-    new_state = updated_form.cleaned_data['state']
+    new_name = request.POST['name']
+    new_state = request.POST['state']
     course = m.Course.objects.get(code=course_code)
     coursework = m.Coursework(id=m.new_random_slug(m.Coursework), name=new_name,
                               course=course, state=new_state, file_pipe="runner.py",
@@ -185,19 +181,19 @@ def create_coursework_update(user, new_details, course_code):
     descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                               creator=user, type=m.SubmissionType.CW_DESCRIPTOR, private=False)
     descriptor.save()
-    for each in updated_form.cleaned_data['descriptor']:
+    for each in request.FILES.getlist('descriptor'):
         m.File(file=each, submission=descriptor).save()
 
     oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                                creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE, private=False)
     oracle_exec.save()
-    for each in updated_form.cleaned_data['oracle_exec']:
+    for each in request.FILES.getlist('oracle_exec'):
         m.File(file=each, submission=oracle_exec).save()
 
     identity = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                             creator=user, type=m.SubmissionType.IDENTITY_TEST, private=False)
     identity.save()
-    for each in updated_form.cleaned_data['identity']:
+    for each in request.FILES.getlist('identity'):
         m.File(file=each, submission=identity).save()
 
     return redirect('edit_cw', c=coursework.id)
@@ -232,11 +228,10 @@ def edit_coursework_render(request, coursework):
     page for a given @coursework, including the
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
-    files = [(s, h.get_files(s)) for s in m.Submission.objects.get(
+    files = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.SOLUTION, coursework=coursework)]
     results = m.TestMatch.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
-               "descriptor": coursework.descriptor,
                "state": coursework.state}
     cw_form = f.CourseworkForm(initial)
     detail = {
@@ -244,11 +239,11 @@ def edit_coursework_render(request, coursework):
         "cw_form": cw_form,
         "submissions": files,
         "results": results,
-        "descriptor": [(s, h.get_files(s)) for s in m.Submission.objects.get(
+        "descriptor": [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)],
-        "oracle_exec": [(s, h.get_files(s)) for s in m.Submission.objects.get(
+        "oracle_exec": [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.ORACLE_EXECUTABLE, coursework=coursework)],
-        "identity":  [(s, h.get_files(s)) for s in m.Submission.objects.get(
+        "identity":  [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.IDENTITY_TEST, coursework=coursework)],
         "crumbs": [("Homepage", "/teacher"),
                    ("Course", "/teacher/course/%s" % coursework.course.code)]
