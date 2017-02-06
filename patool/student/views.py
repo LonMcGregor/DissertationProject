@@ -10,6 +10,8 @@ from pygments import highlight as pyghi
 from pygments.lexers import python as pyglex
 from pygments.formatters import html as pygform
 import student.helper as h
+import mimetypes
+from django.http.response import FileResponse
 
 
 @login_required()
@@ -57,17 +59,19 @@ def upload_solution_post(request, cw_instance):
     instances. Returns either an Http error code
     or False, if no error has occurred."""
     user = request.user
-    upload = f.FileUploadForm(request.POST, request.FILES)
-    if not upload.is_valid():
-        return HttpResponseForbidden("The files you uploaded are not valid")
-    if not p.user_can_upload_of_type(user, cw_instance, upload.cleaned_data['file_type']):
+    #upload = f.FileUploadForm(request.POST, request.FILES)
+    #if not upload.is_valid():
+    #    return HttpResponseForbidden("The files you uploaded are not valid")
+    data = request.POST
+    if not p.user_can_upload_of_type(user, cw_instance, data['file_type']):
         return HttpResponseForbidden("You can't upload submissions of this type")
-    file_type = upload.cleaned_data['file_type']
+    file_type = data['file_type']
+    is_private = 'keep_private' in data
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
                               creator=user, type=file_type,
-                              private=upload.cleaned_data['keep_private'])
+                              private=is_private)
     submission.save()
-    for each in upload.cleaned_data['chosen_files']:
+    for each in request.FILES.getlist('chosen_files'):
         m.File(file=each, submission=submission).save()
     return False
 
@@ -110,7 +114,7 @@ def single_coursework(request, coursework):
     if not p.can_view_coursework(request.user, cw):
         return HttpResponseForbidden("You are not allowed to access this coursework")
 
-    descriptors = [(s, h.get_files(s)) for s in m.Submission.objects.get(
+    descriptors = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
         type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)]
     solutions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
         coursework=coursework, creator=request.user, type=m.SubmissionType.SOLUTION)]
@@ -118,10 +122,11 @@ def single_coursework(request, coursework):
         coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE)]
 
     initiated = h.get_test_match_for_developing(request.user, coursework)
-    marking = m.Submission.objects.filter(coursework=coursework, marker=request.user)
+    marking = m.TestMatch.objects.filter(coursework=coursework, marker=request.user)
     developed = h.get_test_match_for_developer(request.user, coursework)
 
     details = {
+        "cw": cw,
         "descriptors": descriptors,
         "solutions": solutions,
         "tests": tests,
@@ -139,7 +144,7 @@ def retrieve_coursework(request):
     """For a given @request, return a list of coursework available to the user"""
     logged_in_user = request.user
     enrolled_courses = m.EnrolledUser.objects.filter(login=logged_in_user).values('course')
-    courses_for_user = m.Course.objects.filter(id__in=enrolled_courses)
+    courses_for_user = m.Course.objects.filter(code__in=enrolled_courses)
     all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
     visible_courseworks = []
     for item in all_courseworks_for_user:
@@ -199,9 +204,8 @@ def show_file(request, sub_id, filename):
     print out the contents of this file as a text document"""
     file = h.get_file(sub_id, filename)
     if not p.can_view_file(request.user, file):
-        return HttpResponseForbidden()
-    content = h.read_file_by_line(file.file)
-    return HttpResponse(content_type="text/plain", charset="utf-8", content=content)
+        return HttpResponseForbidden("You are not allowed to see this file")
+    return FileResponse(file.file)
 
 
 @login_required()
@@ -210,6 +214,8 @@ def render_file(request, sub_id, filename):
     read the contents. Then pretty print the contents
     of the file as an HTML page using pygments"""
     file = h.get_file(sub_id, filename)
+    # todo validate input is a text file / python script / etc. before processing. dont want to
+    # todo    start trying to pretty render pdf files or executables
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden()
     content = h.read_file_by_line(file.file)

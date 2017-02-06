@@ -5,7 +5,12 @@
     {% if allow_upload %}
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ ff }}
+    <label for="id_file_type">File Type:</label><select id="id_file_type" name="file_type" required="">
+<option value="s">Solution to Coursework</option>
+<option value="c">Test Case for Solution</option>
+</select>
+<label for="id_chosen_files">Selected files:</label><input id="id_chosen_files" multiple="multiple" name="chosen_files" type="file" required="">
+<label for="id_keep_private">Keep this submission private?</label><input id="id_keep_private" name="keep_private" type="checkbox">
     <input type="submit">
 </form>
     {% endif %}

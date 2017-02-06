@@ -155,7 +155,7 @@ def create_coursework_render(request, code):
     """Generate an empty form for creating a coursework for course @code"""
     detail = {
         "courseworks": {"name": "New Coursework"},
-        "cw_form": f.CourseworkForm(),
+        "cw_form": False,
         "descriptor": [],
         "oracle_exec": [],
         "identity": [],
@@ -218,7 +218,6 @@ def edit_coursework_update(new_details, old_coursework):
     if not updated_form.is_valid():
         raise Exception("validity problem")
     old_coursework.name = updated_form.cleaned_data['name']
-    old_coursework.descriptor = updated_form.cleaned_data['descriptor']
     old_coursework.state = updated_form.cleaned_data['state']
     old_coursework.save()
 
@@ -228,7 +227,7 @@ def edit_coursework_render(request, coursework):
     page for a given @coursework, including the
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
-    files = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
+    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.SOLUTION, coursework=coursework)]
     results = m.TestMatch.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
@@ -237,7 +236,7 @@ def edit_coursework_render(request, coursework):
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
-        "submissions": files,
+        "submissions": submissions,
         "results": results,
         "descriptor": [(s, h.get_files(s)) for s in m.Submission.objects.filter(
                        type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)],

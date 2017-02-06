@@ -94,11 +94,15 @@ def can_view_file(user, file):
         return False
     if is_teacher(user):
         return True
+    if file.submission.type == m.SubmissionType.CW_DESCRIPTOR:
+        return True
     if user == file.submission.creator:
         return True
     if file.submission.private:
         return False
     test_containing_file = h.get_test_match_with_associated_submission(file.submission)
+    if test_containing_file is None:
+        return False
     if test_containing_file.marker == user:
         return True
     if test_containing_file.visible_to_developer:

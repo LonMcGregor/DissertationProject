@@ -61,7 +61,7 @@ socketMan = {
     },
 
     close: function() {
-        notify('Notifications Socket Closed');
+        /*notify('Notifications Socket Closed');*/
     }
 };
 

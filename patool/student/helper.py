@@ -13,7 +13,7 @@ def string_id(item):
 
 def get_test_match_for_developing(user, coursework):
     """Get the test matches that @user created while in development of a solution for @coursework"""
-    initiated = m.Submission.objects.filter(coursework=coursework, initiator=user)
+    initiated = m.TestMatch.objects.filter(coursework=coursework, initiator=user)
     chosen = []
     for tm in initiated:
         if tm.solution.creator == user:
@@ -23,7 +23,7 @@ def get_test_match_for_developing(user, coursework):
 
 def get_test_match_for_developer(user, coursework):
     """Get the test matches for the developer @user, for given @coursework"""
-    visibles = m.Submission.objects.filter(coursework=coursework, visible_to_developer=True)
+    visibles = m.TestMatch.objects.filter(coursework=coursework, visible_to_developer=True)
     chosen = []
     for tm in visibles:
         if tm.solution.creator == user:
