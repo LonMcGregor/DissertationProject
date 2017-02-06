@@ -8,6 +8,7 @@ from django.db import transaction
 import student.runner as r
 from django.http import HttpResponseForbidden, HttpResponse
 import threading
+from django.contrib.auth.models import User
 
 
 @login_required()
@@ -211,6 +212,7 @@ def edit_coursework(request, kwargs=None):
     return edit_coursework_render(request, coursework)
 
 
+@transaction.atomic()
 def edit_coursework_update(new_details, old_coursework):
     """Given the @new_details, update the database for
     the details o @old_coursework"""
@@ -227,23 +229,19 @@ def edit_coursework_render(request, coursework):
     page for a given @coursework, including the
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
-    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-                       type=m.SubmissionType.SOLUTION, coursework=coursework)]
+    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(coursework=coursework)]
     results = m.TestMatch.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
                "state": coursework.state}
+    tm_initial = {"coursework": coursework.id, "visible_to_developer": True}
     cw_form = f.CourseworkForm(initial)
+    tm_form = f.TestMatchForm(tm_initial)
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
+        "tm_form": tm_form,
         "submissions": submissions,
         "results": results,
-        "descriptor": [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-                       type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)],
-        "oracle_exec": [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-                       type=m.SubmissionType.ORACLE_EXECUTABLE, coursework=coursework)],
-        "identity":  [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-                       type=m.SubmissionType.IDENTITY_TEST, coursework=coursework)],
         "crumbs": [("Homepage", "/teacher"),
                    ("Course", "/teacher/course/%s" % coursework.course.code)]
     }
@@ -268,3 +266,28 @@ def force_start_test_run(request, kwargs):
 def force_start_test_run_threaded(requested_test):
     """Force a @requested_test instance to run within another thread"""
     r.run_test(requested_test)
+
+
+@login_required()
+@p.is_teacher
+@transaction.atomic()
+def create_test_match(request):
+    if not request.POST:
+        return HttpResponseForbidden("You're supposed to POST a form here")
+    tm_form = f.TestMatchForm(request.POST)
+    if not tm_form.is_valid():
+        return HttpResponseForbidden("Invalid form data")
+    solution = m.Submission.objects.get(id=tm_form.cleaned_data['solution_sub'])
+    test_case = m.Submission.objects.get(id=tm_form.cleaned_data['test_sub'])
+    if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
+        return HttpResponseForbidden("Need 1 solution and 1 test")
+    cw = m.Coursework.objects.get(id=tm_form.cleaned_data['coursework'])
+    marker = User.objects.get(username=tm_form.cleaned_data['to_be_marked_by'])
+    if m.EnrolledUser.objects.filter(course=cw.course, login=marker).count() != 1:
+        return HttpResponseForbidden("You're not allowed to edit this course")
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
+                         coursework=cw, initiator=request.user, waiting_to_run=True,
+                         visible_to_developer=tm_form.cleaned_data['visible_to_developer'],
+                         marker=marker)
+    new_tm.save()
+    return HttpResponse("Test has been created")

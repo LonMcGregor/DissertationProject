@@ -78,13 +78,15 @@ def user_feedback_mode(user, test_match_instance):
     if is_teacher(user):
         return UserFeedbackModes.READ
     if is_owner_of_solution(user, test_match_instance) or user == test_match_instance.initiator:
-        return UserFeedbackModes.READ if test_match_instance.waiting_to_run else \
-            UserFeedbackModes.WAIT
+        return UserFeedbackModes.WAIT if test_match_instance.waiting_to_run else \
+            UserFeedbackModes.READ
     if test_match_instance.marker != user:
         return UserFeedbackModes.DENY
     if test_match_instance.waiting_to_run:
         return UserFeedbackModes.WAIT
-    return UserFeedbackModes.WRITE if test_match_instance.feedback is None else \
+    return UserFeedbackModes.WRITE if test_match_instance.feedback is None and \
+                                      test_match_instance.coursework.state == \
+                                      m.CourseworkState.FEEDBACK else \
         UserFeedbackModes.READ
 
 

@@ -39,40 +39,7 @@
         <td>{{ s.id }}</td>
         <td>{{ f }}</td>
         <td>{{ s.creator }}</td>
-        <td>{{ s.type }}</td>
-        <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
-        </tr>
-    {% endfor %}
-    {% endfor %}
-    {% for s, files in descriptor %}
-    {% for f in files %}
-        <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ f }}</td>
-        <td>{{ s.creator }}</td>
-        <td>{{ s.type }}</td>
-        <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
-        </tr>
-    {% endfor %}
-    {% endfor %}
-    {% for s, files in oracle_exec %}
-    {% for f in files %}
-        <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ f }}</td>
-        <td>{{ s.creator }}</td>
-        <td>{{ s.type }}</td>
-        <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
-        </tr>
-    {% endfor %}
-    {% endfor %}
-    {% for s, files in identity %}
-    {% for f in files %}
-        <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ f }}</td>
-        <td>{{ s.creator }}</td>
-        <td>{{ s.type }}</td>
+        <td>{% if s.private %}({% endif %}{{ s.type }}{% if s.private %}){% endif %}</td>
         <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
         </tr>
     {% endfor %}
@@ -80,6 +47,14 @@
     </table>
     <p></p>
 <h1>Coursework Results</h1>
+    <h3>Make a new Test Match</h3>
+    <form action="{% url 'make_tm' %}" method="POST">
+        {% csrf_token %}
+        {{ tm_form }}
+        <input type="submit" value="Create test match"/>
+    </form>
+    <p></p>
+    <h3>Results</h3>
     <table>
     <thead>
     <tr>
@@ -97,16 +72,16 @@
         <tr>
         <td>{{ f.id }}</td>
         <td>{%  if f.test %}
-            <a href="{% url 'render_file' f.test.id 0 %}">View ({{ f.test.id }})</a>
+            {{ f.test.id }})
         {% endif %}</td>
         <td>{%  if f.solution %}
-            <a href="{% url 'render_file' f.solution.id 0 %}">View ({{ f.solution.id }})</a>
+           {{ f.solution.id }}
         {% endif %}</td>
-        <td>{%  if f.results %}
-            <a href="{% url 'show_file' f.results.id 0 %}">View ({{ f.results.id }})</a>
+        <td>{%  if f.result %}
+            {{ f.result.id }}
         {% endif %}</td>
         <td>{%  if f.feedback %}
-            <a href="{% url 'show_file' f.feedback.id 0 %}">View ({{ f.feedback.id }})</a>
+            {{ f.feedback.id }}
         {% endif %}</td>
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>

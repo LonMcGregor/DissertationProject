@@ -168,13 +168,14 @@ def feedback(request, test_match):
             return HttpResponseForbidden("You are not allowed to submit feedback")
         feedback_upload(request, test_match_instance)
         return HttpResponse("Your feedback has been recorded")
+    feedback_files = h.get_files(test_match_instance.feedback)
     details = {
         "test_match": test_match_instance,
         "can_submit": perm == p.UserFeedbackModes.WRITE,
         "test_files": h.get_files(test_match_instance.test)[0],
         "result_files": h.get_files(test_match_instance.result)[0],
         "solution_files": h.get_files(test_match_instance.solution)[0],
-        "feedback_files": h.get_files(test_match_instance.feedback)[0],
+        "feedback_files": feedback_files[0] if len(feedback_files) > 0 else None,
         # todo for now, assume only 1 files
         "crumbs": [("Homepage", "/student"),
                    ("Coursework", "/student/cw/%s" % test_match_instance.coursework.id)]
@@ -183,19 +184,19 @@ def feedback(request, test_match):
 
 
 @transaction.atomic()
-def feedback_upload(request, test_data_instance):
+def feedback_upload(request, test_match_instance):
     """Once the user has uploaded their feedback, write it
     to a file and update the database"""
     feedback_text = request.POST["feedback"]
     feedback_sub = m.Submission(id=m.new_random_slug(m.Submission),
-                                coursework=test_data_instance.coursework, creator=request.user,
+                                coursework=test_match_instance.coursework, creator=request.user,
                                 type=m.SubmissionType.FEEDBACK, private=False)
     feedback_sub.save()
     feedback_file = m.File(submission=feedback_sub)
     feedback_file.file.save('feedback.txt', ContentFile(feedback_text))
     feedback_file.save()
-    test_data_instance.feedback = feedback_file
-    test_data_instance.save()
+    test_match_instance.feedback = feedback_sub
+    test_match_instance.save()
 
 
 @login_required()

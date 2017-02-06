@@ -8,7 +8,7 @@ urlpatterns = [
     url('logout', auth_views.logout, name='logout'),
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)/solution', views.upload_solution, name='solution'),
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)/test', views.upload_solution, name='test'),
-    url('cw/feedback/(?P<test_data>[0-9a-zA-Z\-_]*)', views.feedback, name='feedback'),
+    url('cw/feedback/(?P<test_match>[0-9a-zA-Z\-_]*)', views.feedback, name='feedback'),
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)', views.detail_coursework, name='cw'),
     url('file/(?P<sub_id>[0-9a-zA-Z\-_]*)/(?P<filename>[0-9a-zA-Z\-_.]*)/raw',
         views.show_file, name='show_file'),

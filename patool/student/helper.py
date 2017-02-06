@@ -59,7 +59,7 @@ def get_test_match_with_associated_submission(submission):
     if submission.type == m.SubmissionType.TEST_CASE:
         return first_model_item_or_none(m.TestMatch.objects.filter(test=submission))
     if submission.type == m.SubmissionType.TEST_RESULT:
-        return first_model_item_or_none(m.TestMatch.objects.filter(results=submission))
+        return first_model_item_or_none(m.TestMatch.objects.filter(result=submission))
     if submission.type == m.SubmissionType.FEEDBACK:
         return first_model_item_or_none(m.TestMatch.objects.filter(feedback=submission))
     # todo this doesn't work with teacher feedback
