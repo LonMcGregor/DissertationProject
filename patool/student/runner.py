@@ -6,6 +6,7 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 import shutil
 import os
+import threading
 
 
 @transaction.atomic
@@ -78,3 +79,9 @@ def run_queued_tests():
             return
         for test in tests:
             run_test(test)
+
+
+def run_test_on_thread(test_instance):
+    """Start a new thread and run the @test_instance"""
+    running = threading.Thread(target=run_test, args=(test_instance,))
+    running.start()

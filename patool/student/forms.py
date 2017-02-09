@@ -12,3 +12,10 @@ class FileUploadForm(f.Form):
     #                                   max_file_size=settings.MAX_FILESIZE_FOR_UPLOADS,
     #                                   label="Selected files")
     keep_private = f.BooleanField(label="Keep this submission private?")
+
+
+class TestMatchForm(f.Form):
+    solution = f.SlugField(max_length=4, required=False,
+                           label="Solution ID to be run (leave blank to use oracle)")
+    test = f.SlugField(max_length=4, required=False,
+                       label="Test ID to be run (leave blank to use identity test)# ")

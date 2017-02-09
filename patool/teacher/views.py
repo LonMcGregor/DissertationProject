@@ -258,14 +258,8 @@ def force_start_test_run(request, kwargs):
         return HttpResponseForbidden("Test has already been run")
     if not p.is_enrolled_on_course(request.user, test_instance.coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
-    running = threading.Thread(target=force_start_test_run_threaded, args=(test_instance,))
-    running.start()
+    r.run_test_on_thread(test_instance)
     return HttpResponse("Test Run %s Force Started" % kwargs['t'])
-
-
-def force_start_test_run_threaded(requested_test):
-    """Force a @requested_test instance to run within another thread"""
-    r.run_test(requested_test)
 
 
 @login_required()
