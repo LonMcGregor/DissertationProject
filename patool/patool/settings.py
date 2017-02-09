@@ -40,7 +40,7 @@ INSTALLED_APPS = [
     'student',
     'notify',
     'teacher',
-    'channels'
+    # 'channels'
 ]
 
 MIDDLEWARE = [
@@ -73,19 +73,19 @@ TEMPLATES = [
 
 WSGI_APPLICATION = 'patool.wsgi.application'
 
-CHANNEL_LAYERS = {
-    "default": {
-        "BACKEND": "asgi_redis.RedisChannelLayer",
-        "CONFIG": {
-            "hosts": [("localhost", 6379)],
-        },
-        "ROUTING": "patool.routing.channel_routing",
-    },
-}
+# CHANNEL_LAYERS = {
+#     "default": {
+#         "BACKEND": "asgi_redis.RedisChannelLayer",
+#         "CONFIG": {
+#             "hosts": [("localhost", 6379)],
+#         },
+#         "ROUTING": "patool.routing.channel_routing",
+#     },
+# }
 
 # Database
 # https://docs.djangoproject.com/en/1.10/ref/settings/#databases
-
+#
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',

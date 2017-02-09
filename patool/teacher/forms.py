@@ -1,6 +1,6 @@
 import django.forms as f
 import student.models as m
-import multiupload.fields as mff
+# import multiupload.fields as mff
 from django.conf import settings
 
 
