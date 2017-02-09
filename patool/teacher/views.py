@@ -9,7 +9,7 @@ import student.helper as h
 import student.models as m
 import teacher.forms as f
 import teacher.permission as p
-
+from runner import matcher
 
 @login_required()
 @p.is_teacher
@@ -233,13 +233,15 @@ def edit_coursework_render(request, coursework):
     results = m.TestMatch.objects.filter(coursework=coursework)
     initial = {"name": coursework.name,
                "state": coursework.state}
-    tm_initial = {"coursework": coursework.id, "visible_to_developer": True}
+    tm_initial = {"coursework": coursework.id}
     cw_form = f.CourseworkForm(initial)
     tm_form = f.TestMatchForm(tm_initial)
+    atm_form = f.AutoTestMatchForm(tm_initial)
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
         "tm_form": tm_form,
+        "atm_form": atm_form,
         "submissions": submissions,
         "results": results,
         "crumbs": [("Homepage", "/teacher"),
@@ -264,24 +266,48 @@ def force_start_test_run(request, kwargs):
 
 @login_required()
 @p.is_teacher
-@transaction.atomic()
 def create_test_match(request):
+    """Create a new test match, according to what is specified in the POST request"""
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
+    if "algorithm" in request.POST:
+        return auto_test_match_update(request)
+    else:
+        return manual_test_match_update(request)
+
+
+def manual_test_match_update(request):
+    """Create a new test match with data specified in @request"""
     tm_form = f.TestMatchForm(request.POST)
     if not tm_form.is_valid():
-        return HttpResponseForbidden("Invalid form data")
-    solution = m.Submission.objects.get(id=tm_form.cleaned_data['solution_sub'])
-    test_case = m.Submission.objects.get(id=tm_form.cleaned_data['test_sub'])
-    if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
-        return HttpResponseForbidden("Need 1 solution and 1 test")
-    cw = m.Coursework.objects.get(id=tm_form.cleaned_data['coursework'])
-    marker = User.objects.get(username=tm_form.cleaned_data['to_be_marked_by'])
-    if m.EnrolledUser.objects.filter(course=cw.course, login=marker).count() != 1:
-        return HttpResponseForbidden("You're not allowed to edit this course")
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
-                         coursework=cw, initiator=request.user, waiting_to_run=True,
-                         visible_to_developer=tm_form.cleaned_data['visible_to_developer'],
-                         marker=marker)
-    new_tm.save()
+        return HttpResponse("Invalid form data")
+    try:
+        matcher.create_single_test_match(
+            tm_form.cleaned_data['solution_sub'],
+            tm_form.cleaned_data['test_sub'],
+            tm_form.cleaned_data['coursework'],
+            tm_form.cleaned_data['to_be_marked_by'],
+            tm_form.cleaned_data['visible_to_developer'],
+            request.user
+        )
+    except Exception as e:
+        return HttpResponse(str(e))
     return HttpResponse("Test has been created")
+
+
+def auto_test_match_update(request):
+    """Given an @request, extract the form data and call an automatic
+    test match creation algorithm."""
+    atm = f.AutoTestMatchForm(request.POST)
+    if not atm.is_valid():
+        return HttpResponseForbidden("Invalid form data")
+    try:
+        matcher.first_available(
+            atm.cleaned_data['coursework'],
+            request.user,
+            atm.cleaned_data['assign_markers'],
+            atm.cleaned_data['visible_to_developer']
+        )
+    except Exception as e:
+        return HttpResponse(str(e))
+    return HttpResponse("Tests have been created")

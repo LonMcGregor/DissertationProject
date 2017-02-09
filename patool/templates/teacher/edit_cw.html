@@ -53,6 +53,12 @@
         {{ tm_form }}
         <input type="submit" value="Create test match"/>
     </form>
+    <h3>Auto create test matches for users</h3>
+    <form action="{% url 'make_tm' %}" method="POST">
+        {% csrf_token %}
+        {{ atm_form }}
+        <input type="submit" value="Create test matches"/>
+    </form>
     <p></p>
     <h3>Results</h3>
     <table>
