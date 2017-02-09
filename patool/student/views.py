@@ -1,17 +1,18 @@
-from django.core.files.base import ContentFile
-from django.http import Http404, HttpResponseForbidden, HttpResponse
-from django.shortcuts import render
 from django.contrib.auth.decorators import login_required
+from django.core.files.base import ContentFile
+from django.db import transaction
+from django.http import Http404, HttpResponseForbidden, HttpResponse
+from django.http.response import FileResponse
+from django.shortcuts import render
+from pygments import highlight as pyghi
+from pygments.formatters import html as pygform
+from pygments.lexers import python as pyglex
+
+import runner.runner as r
+import student.forms as f
+import student.helper as h
 import student.models as m
 import student.permission as p
-import student.forms as f
-from django.db import transaction
-from pygments import highlight as pyghi
-from pygments.lexers import python as pyglex
-from pygments.formatters import html as pygform
-import student.helper as h
-import student.runner as r
-from django.http.response import FileResponse
 
 
 @login_required()
@@ -44,7 +45,6 @@ def upload_solution(request, cw=None):
         msg = "Upload of files was completed",
         allow_upload = False
     detail = {
-        "ff": f.FileUploadForm(),
         "allow_upload": allow_upload,
         "msg": msg,
         "crumbs": [("Homepage", "/student"), ("Coursework", "/student/cw/%s" % cw)]
@@ -59,9 +59,6 @@ def upload_solution_post(request, cw_instance):
     instances. Returns either an Http error code
     or False, if no error has occurred."""
     user = request.user
-    #upload = f.FileUploadForm(request.POST, request.FILES)
-    #if not upload.is_valid():
-    #    return HttpResponseForbidden("The files you uploaded are not valid")
     data = request.POST
     if not p.user_can_upload_of_type(user, cw_instance, data['file_type']):
         return HttpResponseForbidden("You can't upload submissions of this type")
@@ -170,7 +167,7 @@ def create_test_match(request, cw):
                          coursework=coursework, initiator=request.user, waiting_to_run=True,
                          visible_to_developer=True)
     new_tm.save()
-    r.run_test_on_thread(new_tm)
+    r.run_test_on_thread(new_tm, r.execute_python3_unit)
     return HttpResponse("Test has been created")
 
 

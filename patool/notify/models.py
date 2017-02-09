@@ -1,5 +1,5 @@
-from django.db import models as m
 from django.contrib.auth.models import User
+from django.db import models as m
 
 
 class MessageTemplate(m.Model):

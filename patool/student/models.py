@@ -1,7 +1,8 @@
 import random
-from django.db import models as m
-from django.contrib.auth.models import User
 import string
+
+from django.contrib.auth.models import User
+from django.db import models as m
 
 
 def upload_directory_path(instance, filename):

@@ -1,5 +1,6 @@
-from django.http import HttpResponseForbidden
 from django.contrib.auth.models import Group
+from django.http import HttpResponseForbidden
+
 import student.models as m
 
 

@@ -1,8 +1,9 @@
-from django.shortcuts import render
-from django.db import transaction
-from django.http import HttpResponse, HttpResponseForbidden
 from django.conf import settings
 from django.contrib.auth.models import User, Group
+from django.db import transaction
+from django.http import HttpResponse, HttpResponseForbidden
+from django.shortcuts import render
+
 from student import models as m
 
 

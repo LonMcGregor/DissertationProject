@@ -1,6 +1,7 @@
-from channels.sessions import channel_session
-import time
 import os
+import time
+
+from channels.sessions import channel_session
 from django.db import transaction
 
 counter = 0

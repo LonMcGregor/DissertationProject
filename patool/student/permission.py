@@ -2,10 +2,12 @@
 whether or not a particular action should be carried out.
 Methods in here should only ever READ, never WRITE"""
 
-import student.models as m
 from enum import Enum
+
 from django.contrib.auth.models import Group
+
 import student.helper as h
+import student.models as m
 
 
 def can_view_coursework(user, coursework):

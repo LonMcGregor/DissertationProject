@@ -1,5 +1,6 @@
-from notify import consumers
 from channels import route
+
+from notify import consumers
 
 channel_routing = [
     route('websocket.connect', consumers.ws_connect, path=r"^/messages"),

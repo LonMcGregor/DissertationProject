@@ -1,29 +1,35 @@
-from django.conf import settings
-import student.models as m
-import sys
+import os
+import shutil
 import subprocess
+import sys
+import threading
+
+from django.conf import settings
 from django.core.files.base import ContentFile
 from django.db import transaction
-import shutil
-import os
-import threading
+
+import student.models as m
+
+"""This module implements the execution mechanism with
+respect to python3 unit testing."""
 
 
 @transaction.atomic
-def run_test(test_match_instance):
+def run_test(test_match_instance, exec_method):
     """Go through the @test_data_instance and run the
     test case against the solution. Store the data setting
     the results to be created by the initiator (which will
-     likely be the test creator). Then update the database"""
+     likely be the test creator). Then update the database.
+     Utilize the given @exec_method"""
     if not test_match_instance.waiting_to_run:
         return
-    result, output = execute(test_match_instance.solution, test_match_instance.test)
+    result, output = exec_method(test_match_instance.solution, test_match_instance.test)
     result_sub = m.Submission(id=m.new_random_slug(m.Submission),
-                               coursework=test_match_instance.coursework,
-                               creator=test_match_instance.initiator,
-                               type=m.SubmissionType.TEST_RESULT,
-                               private=test_match_instance.solution.private or
-                                       test_match_instance.test.private)
+                              coursework=test_match_instance.coursework,
+                              creator=test_match_instance.initiator,
+                              type=m.SubmissionType.TEST_RESULT,
+                              private=test_match_instance.solution.private or
+                                      test_match_instance.test.private)
     result_sub.save()
     result_file = m.File(submission=result_sub)
     result_file.file.save('results.txt', ContentFile(output))
@@ -34,7 +40,7 @@ def run_test(test_match_instance):
     test_match_instance.save()
 
 
-def execute(solution, test):
+def execute_python3_unit(solution, test):
     """Given specific argument as to how to run the test,
     move all of the files into the correct directories and
     execute the unit test. Note that care needs to be taken
@@ -81,7 +87,8 @@ def run_queued_tests():
             run_test(test)
 
 
-def run_test_on_thread(test_instance):
-    """Start a new thread and run the @test_instance"""
-    running = threading.Thread(target=run_test, args=(test_instance,))
+def run_test_on_thread(test_instance, exec_method):
+    """Start a new thread and run the @test_instance,
+    and use the specified @exec_method"""
+    running = threading.Thread(target=run_test, args=(test_instance,exec_method))
     running.start()

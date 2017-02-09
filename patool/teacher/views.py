@@ -1,14 +1,14 @@
-from django.shortcuts import render, redirect
 from django.contrib.auth.decorators import login_required
-import teacher.permission as p
-import student.models as m
-import student.helper as h
-import teacher.forms as f
-from django.db import transaction
-import student.runner as r
-from django.http import HttpResponseForbidden, HttpResponse
-import threading
 from django.contrib.auth.models import User
+from django.db import transaction
+from django.http import HttpResponseForbidden, HttpResponse
+from django.shortcuts import render, redirect
+
+import runner.runner as r
+import student.helper as h
+import student.models as m
+import teacher.forms as f
+import teacher.permission as p
 
 
 @login_required()
@@ -258,7 +258,7 @@ def force_start_test_run(request, kwargs):
         return HttpResponseForbidden("Test has already been run")
     if not p.is_enrolled_on_course(request.user, test_instance.coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
-    r.run_test_on_thread(test_instance)
+    r.run_test_on_thread(test_instance, r.execute_python3_unit)
     return HttpResponse("Test Run %s Force Started" % kwargs['t'])
 
 
