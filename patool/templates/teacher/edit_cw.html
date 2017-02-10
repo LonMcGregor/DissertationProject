@@ -39,7 +39,7 @@
         <td>{{ s.id }}</td>
         <td>{{ f }}</td>
         <td>{{ s.creator }}</td>
-        <td>{% if s.private %}({% endif %}{{ s.type }}{% if s.private %}){% endif %}</td>
+        <td>{% if s.private %}({% endif %}{{ s.type }}{% if s.private %}){% endif %}{% if s.final %}F{% endif %}</td>
         <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
         </tr>
     {% endfor %}

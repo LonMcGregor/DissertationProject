@@ -13,6 +13,7 @@ urlpatterns = [
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)', views.detail_coursework, name='cw'),
     url('file/(?P<sub_id>[0-9a-zA-Z\-_]*)/(?P<filename>[0-9a-zA-Z\-_.]*)/raw',
         views.show_file, name='show_file'),
+    url('setfinal/(?P<sub_id>[0-9a-zA-Z\-_]*)', views.set_final, name='set_final_sub'),
     url('file/(?P<sub_id>[0-9a-zA-Z\-_]*)/(?P<filename>[0-9a-zA-Z\-_.]*)/pretty',
         views.render_file, name='render_file'),
     url(r'^$', views.index, name='student_index'),

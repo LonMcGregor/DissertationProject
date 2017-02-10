@@ -244,3 +244,32 @@ def render_file(request, sub_id, filename):
         "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))
     }
     return render(request, 'student/pretty_file.html', detail)
+
+
+@login_required()
+def set_final(request, sub_id):
+    """Given the ID of a submission, @sub_id, set this as being
+    the final submission for the coursework specified, if we
+    are still within the submission deadline"""
+    submission = m.Submission.objects.get(id=sub_id)
+    if submission.coursework.state != m.CourseworkState.UPLOAD:
+        return HttpResponseForbidden("You cannot eedit this coursework - deadline has passed")
+    if submission.creator != request.user:
+        return HttpResponseForbidden("You can only set your own submissions as final")
+    set_final_update(submission)
+    return HttpResponse("Final submission updated")
+
+
+@transaction.atomic()
+def set_final_update(submission):
+    """Update the database, setting the current submission as
+    final and removing final from any other submissions"""
+    other_subs = m.Submission.objects.filter(coursework=submission.coursework,
+                                             type=submission.type, creator=submission.creator,
+                                             private=False, final=True)
+    for old_final in other_subs:
+        old_final.final = False
+        old_final.save()
+    submission.final=True
+    submission.save()
+

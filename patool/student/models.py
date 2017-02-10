@@ -96,6 +96,7 @@ class Submission(m.Model):
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
     private = m.BooleanField()
+    final = m.BooleanField(default=False)
 
 
 class File(m.Model):
@@ -109,7 +110,6 @@ class TestMatch(m.Model):
     solution = m.ForeignKey(Submission, m.CASCADE, related_name="tm_sol_sub")
     result = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_res_sub")
     feedback = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_fdbk_sub")
-    teacher_feedback = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_tfdbk_sub")
     error_level = m.IntegerField(null=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE, related_name="tm_cw")
     initiator = m.ForeignKey(User, m.CASCADE, related_name="tm_init")

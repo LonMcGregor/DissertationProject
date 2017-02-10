@@ -14,11 +14,10 @@ def first_available(coursework, initiator, marker, visible):
     cw = m.Coursework.objects.get(id=coursework)
     unassigned_solutions = list(m.Submission.objects.filter(coursework=cw,
                                                             type=m.SubmissionType.SOLUTION,
-                                                            private=False))
-    # todo get the submission marked as final
+                                                            private=False, final=True))
     unassigned_tests = list(m.Submission.objects.filter(coursework=cw,
                                                         type=m.SubmissionType.TEST_CASE,
-                                                        private=False))
+                                                        private=False, final=True))
     unassigned_users = list(m.EnrolledUser.objects.filter(course=cw.course))
     for sol in unassigned_solutions:
         chosen_test = None

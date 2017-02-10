@@ -33,7 +33,7 @@
     {% endif %}
     <ul>
     {% for sub, files in solutions %}
-        <li>Submission ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}<button>(Set as final)</button>{% endif %}{% endif %}</li>
+        <li>Submission ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}{% if sub.final %}(Final){% else %}<a href="{% url 'set_final_sub' sub.id %}">(Set as final)</a>{% endif %}{% else %}{% if sub.final %}(Final){% endif %}{% endif %}{% endif %}</li>
         <li><ul>
         {% for f in files%}
             <li><a href="{% url 'render_file' sub.id f %}">{{ f }}</a></li>
@@ -49,7 +49,7 @@
     {% endif %}
     <ul>
     {% for sub, files in tests %}
-        <li>Test Case ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}<button>(Set as final)</button>{% endif %}{% endif %}</li>
+        <li>Test Case ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}{% if sub.final %}(Final){% else %}<a href="{% url 'set_final_sub' sub.id %}">(Set as final)</a>{% endif %}{% else %}{% if sub.final %}(Final){% endif %}{% endif %}{% endif %}</li>
         <li><ul>
         {% for f in files%}
             <li><a href="{% url 'render_file' sub.id f %}">{{ f }}</a></li>
