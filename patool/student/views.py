@@ -192,10 +192,10 @@ def feedback(request, test_match):
     details = {
         "test_match": test_match_instance,
         "can_submit": perm == p.UserFeedbackModes.WRITE,
-        "test_files": h.get_files(test_match_instance.test)[0],
-        "result_files": h.get_files(test_match_instance.result)[0],
-        "solution_files": h.get_files(test_match_instance.solution)[0],
-        "feedback_files": feedback_files[0] if len(feedback_files) > 0 else None,
+        "test_files": h.get_files(test_match_instance.test),
+        "result_files": h.get_files(test_match_instance.result),
+        "solution_files": h.get_files(test_match_instance.solution),
+        "feedback_files": feedback_files if len(feedback_files) > 0 else None,
         # todo for now, assume only 1 files
         "crumbs": [("Homepage", "/student"),
                    ("Coursework", "/student/cw/%s" % test_match_instance.coursework.id)]
