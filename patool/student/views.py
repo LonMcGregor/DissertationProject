@@ -8,6 +8,7 @@ from pygments import highlight as pyghi
 from pygments.formatters import html as pygform
 from pygments.lexers import python as pyglex
 
+from runner import matcher
 import runner.runner as r
 import student.forms as f
 import student.helper as h
@@ -139,35 +140,23 @@ def single_coursework(request, coursework):
 
 
 @login_required()
-@transaction.atomic()
 def create_test_match(request, cw):
+    """Recieve a POST request to create a student test match"""
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
     tm_form = f.TestMatchForm(request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
-    if 'solution' not in tm_form.cleaned_data and 'test' not in tm_form.cleaned_data:
-        return HttpResponseForbidden("Either test, solution or both need to be one of your uploads")
-    if 'solution' in tm_form.cleaned_data:
-        solution = m.Submission.objects.get(id=tm_form.cleaned_data['solution'])
-        if solution.creator != request.user:
-            return HttpResponseForbidden("At this stage you can only test your own uploads")
-    else:
-        solution = "oracle"
-    if 'test' in tm_form.cleaned_data:
-        test_case = m.Submission.objects.get(id=tm_form.cleaned_data['test'])
-        if solution.creator != request.user:
-            return HttpResponseForbidden("At this stage you can only test your own uploads")
-    else:
-        test_case = "identity"
-    if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
-        return HttpResponseForbidden("Need 1 solution and 1 test")
-    coursework = m.Coursework.objects.get(id=cw)
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
-                         coursework=coursework, initiator=request.user, waiting_to_run=True,
-                         visible_to_developer=True)
-    new_tm.save()
-    r.run_test_on_thread(new_tm, r.execute_python3_unit)
+    try:
+        new_tm = matcher.student_create_single_test_match(
+            tm_form.cleaned_data['solution'],
+            tm_form.cleaned_data['test'],
+            cw,
+            request.user
+        )
+        r.run_test_on_thread(new_tm, r.execute_python3_unit)
+    except Exception as e:
+        return HttpResponseForbidden(str(e))
     return HttpResponse("Test has been created")
 
 

@@ -59,4 +59,32 @@ def create_single_test_match(solution, test, cw, marker, visible, initiator):
                          marker=marker)
     new_tm.save()
 
+
+@transaction.atomic()
+def student_create_single_test_match(solution_id, test_id, cw_id, user):
+    """Receive data to create a student-specific test match. Pass in IDs for
+    @solution_id, @test_id, @cw_id and an @user instance. Return the newly created test"""
+    coursework = m.Coursework.objects.get(id=cw_id)
+    if 'solution' == '' and 'test' == '':
+        raise Exception("Either test, solution or both need to be one of your uploads")
+    if solution_id != '':
+        solution = m.Submission.objects.get(id=solution_id, type=m.SubmissionType.SOLUTION)
+        if solution.creator != user:
+            raise Exception("At this stage you can only test your own uploads")
+    else:
+        solution = m.Submission.objects.get(coursework=coursework,
+                                            type=m.SubmissionType.ORACLE_EXECUTABLE)
+    if test_id is not '':
+        test_case = m.Submission.objects.get(id=test_id, type=m.SubmissionType.TEST_CASE)
+        if solution.creator != user:
+            raise Exception("At this stage you can only test your own uploads")
+    else:
+        test_case = m.Submission.objects.get(coursework=coursework,
+                                             type=m.SubmissionType.IDENTITY_TEST)
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
+                         coursework=coursework, initiator=user, waiting_to_run=True,
+                         visible_to_developer=True)
+    new_tm.save()
+    return new_tm
+
 AVAILABLE_MATCHES = (('fa', first_available),)
