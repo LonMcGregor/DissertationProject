@@ -66,13 +66,14 @@ def execute_python3_unit(solution, test):
             shutil.copy(full_path, tmp_dir)
     with open(init_dir, 'w+') as f:
         f.write('')
-    args = " ".join([script, '-m', 'unittest', '-v'])
+    args = " ".join([script, '-m', 'unittest', 'discover', '-p', '"*.py"'])
     proc = subprocess.Popen(args, cwd=tmp_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
                             shell=True)
     outb, errb = proc.communicate()
     outs = "" if outb is None else outb.decode('utf-8')
     errs = "" if errb is None else errb.decode('utf-8')
     output = outs + errs
+    output = output.replace(tmp_dir, '[[testing_directory]]')
     return proc.returncode, output
 
 
