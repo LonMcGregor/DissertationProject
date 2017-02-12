@@ -73,9 +73,9 @@ def student_create_single_test_match(solution_id, test_id, cw_id, user):
     else:
         solution = m.Submission.objects.get(coursework=coursework,
                                             type=m.SubmissionType.ORACLE_EXECUTABLE)
-    if test_id is not '':
+    if test_id != '':
         test_case = m.Submission.objects.get(id=test_id, type=m.SubmissionType.TEST_CASE)
-        if solution.creator != user:
+        if test_case.creator != user:
             raise Exception("At this stage you can only test your own uploads")
     else:
         test_case = m.Submission.objects.get(coursework=coursework,

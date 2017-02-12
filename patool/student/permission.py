@@ -98,8 +98,10 @@ def can_view_file(user, file):
         return False
     if is_teacher(user):
         return True
-    if file.submission.type == m.SubmissionType.CW_DESCRIPTOR:
+    if file.submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.IDENTITY_TEST]:
         return True
+    if file.submission.type == m.SubmissionType.ORACLE_EXECUTABLE:
+        return False
     if user == file.submission.creator:
         return True
     if file.submission.private:

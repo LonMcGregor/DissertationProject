@@ -16,7 +16,7 @@ def get_test_match_for_developing(user, coursework):
     initiated = m.TestMatch.objects.filter(coursework=coursework, initiator=user)
     chosen = []
     for tm in initiated:
-        if tm.solution.creator == user:
+        if tm.solution.creator == user or tm.test.creator == user:
             chosen.append(tm)
     return chosen
 
@@ -54,15 +54,14 @@ def get_test_match_with_associated_submission(submission):
     """Given a certain @submission within the scope of a,
     get the test data file that contains it. This assumes
     that a file will only be used once"""
-    if submission.type == m.SubmissionType.SOLUTION:
+    if submission.type in [m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE]:
         return first_model_item_or_none(m.TestMatch.objects.filter(solution=submission))
-    if submission.type == m.SubmissionType.TEST_CASE:
+    if submission.type in [m.SubmissionType.TEST_CASE, m.SubmissionType.IDENTITY_TEST]:
         return first_model_item_or_none(m.TestMatch.objects.filter(test=submission))
     if submission.type == m.SubmissionType.TEST_RESULT:
         return first_model_item_or_none(m.TestMatch.objects.filter(result=submission))
     if submission.type == m.SubmissionType.FEEDBACK:
         return first_model_item_or_none(m.TestMatch.objects.filter(feedback=submission))
-    # todo this doesn't work with teacher feedback
     raise Exception("You shouldn't have reached here")
 
 
