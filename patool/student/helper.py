@@ -23,7 +23,8 @@ def get_test_match_for_developing(user, coursework):
 
 def get_test_match_for_developer(user, coursework):
     """Get the test matches for the developer @user, for given @coursework"""
-    visibles = m.TestMatch.objects.filter(coursework=coursework, visible_to_developer=True)
+    visibles = m.TestMatch.objects.filter(coursework=coursework,
+                                          visible_to_developer=True).exclude(initiator=user)
     chosen = []
     for tm in visibles:
         if tm.solution.creator == user:

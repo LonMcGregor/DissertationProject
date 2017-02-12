@@ -78,7 +78,7 @@ def user_feedback_mode(user, test_match_instance):
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
     if is_teacher(user):
-        return UserFeedbackModes.READ
+        return UserFeedbackModes.WRITE if test_match_instance.marker==user else UserFeedbackModes.READ
     if is_owner_of_solution(user, test_match_instance) or user == test_match_instance.initiator:
         return UserFeedbackModes.WAIT if test_match_instance.waiting_to_run else \
             UserFeedbackModes.READ
