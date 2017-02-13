@@ -311,3 +311,14 @@ def auto_test_match_update(request):
     except Exception as e:
         return HttpResponse(str(e))
     return HttpResponse("Tests have been created")
+
+
+@login_required()
+@p.is_teacher
+def run_all_test_in_cw(request, c):
+    """Run all of the queued tests for coursework with id @c"""
+    cw = m.Coursework.objects.get(id=c['c'])
+    if not p.is_enrolled_on_course(request.user, cw.course):
+        return HttpResponseForbidden("you're not enrolled on this course")
+    r.run_all_queued_on_thread(cw)
+    return HttpResponse("Starting to run queued tests")

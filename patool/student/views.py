@@ -4,6 +4,7 @@ from django.db import transaction
 from django.http import Http404, HttpResponseForbidden, HttpResponse
 from django.http.response import FileResponse
 from django.shortcuts import render
+from mimetypes import guess_type
 from pygments import highlight as pyghi
 from pygments.formatters import html as pygform
 from pygments.lexers import python as pyglex
@@ -220,30 +221,42 @@ def feedback_upload(request, test_match_instance):
 
 
 @login_required()
-def show_file(request, sub_id, filename):
-    """For a given @file_id, access the filesystem and
-    print out the contents of this file as a text document"""
+def download_file(request, sub_id, filename):
     file = h.get_file(sub_id, filename)
     if not p.can_view_file(request.user, file):
         return HttpResponseForbidden("You are not allowed to see this file")
-    return FileResponse(file.file)
+    if 'pretty' in request.GET:
+        return render_file(request, file, filename)
+    if 'show' in request.GET:
+        return show_file(file, filename)
+    return attachment_file(file, filename)
 
 
-@login_required()
-def render_file(request, sub_id, filename):
-    """For a given @file_id, access the filesystem and
-    read the contents. Then pretty print the contents
+def render_file(request, file, filename):
+    """For a given @file and @filename,  pretty print the contents
     of the file as an HTML page using pygments"""
-    file = h.get_file(sub_id, filename)
-    # todo validate input is a text file / python script / etc. before processing. dont want to
-    # todo    start trying to pretty render pdf files or executables
-    if not p.can_view_file(request.user, file):
-        return HttpResponseForbidden()
+    mime = guess_type(filename, True)
+    if mime[0].split('/')[0] != 'text':
+        return HttpResponseForbidden("can only pretty print text files")
     content = h.read_file_by_line(file.file)
     detail = {
         "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))
     }
     return render(request, 'student/pretty_file.html', detail)
+
+
+def show_file(file, filename):
+    """For a given @file/@filename, display this in-browser"""
+    response = FileResponse(file.file)
+    response['Content-Type'] = str(guess_type(filename, False)[0])
+    return response
+
+
+def attachment_file(file, filename):
+    """return a @file fieldfile and @filename as an http attachment"""
+    response = FileResponse(file.file)
+    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    return response
 
 
 @login_required()

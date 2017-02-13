@@ -1,28 +1,36 @@
+"""This is a complete implementation"""
+
 class Tree:
     def __init__(self, value):
         self.value = value
         self.left = None
         self.right = None
 
-    def add_child(self, value):
+    def insert(self, value):
         if value == self.value:
-            return
+            return False
         if value < self.value:
             if self.left is None:
                 self.left = Tree(value)
+                return True
             else:
-                self.left.add_child(value)
+                return self.left.insert(value)
         if value > self.value:
             if self.right is None:
                 self.right = Tree(value)
+                return True
             else:
-                self.right.add_child(value)
+                return self.right.insert(value)
 
-    def search(self, needle):
+    def find(self, needle):
+        return self.find_internal(needle, 0)
+    
+    def find_internal(self, needle, depth):
         if self.value == needle:
-            return True
+            return depth
         if needle < self.value and self.left is not None:
-            return self.left.search(needle)
+            return self.left.find_internal(needle, depth+1)
         if needle > self.value and self.right is not None:
-            return self.right.search(needle)
-        return False
+            return self.right.find_internal(needle, depth+1)
+        return -1
+        

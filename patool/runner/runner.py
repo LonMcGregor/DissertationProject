@@ -77,19 +77,24 @@ def execute_python3_unit(solution, test):
     return proc.returncode, output
 
 
-def run_queued_tests():
+def run_queued_tests(coursework):
     """go through all of the test data instances that are
-    tagged as waiting to run, and run them"""
+    tagged as waiting to run for @coursework, and run them"""
     while True:
-        tests = m.TestMatch.objects.filter(waiting_to_run=True)
+        tests = m.TestMatch.objects.filter(coursework=coursework, waiting_to_run=True)
         if tests.count() == 0:
             return
         for test in tests:
-            run_test(test)
+            run_test(test, execute_python3_unit)
+
+
+def run_all_queued_on_thread(coursework):
+    """Start a new thread to run queued tests on within @coursework"""
+    threading.Thread(target=run_queued_tests, args=(coursework,)).start()
 
 
 def run_test_on_thread(test_instance, exec_method):
     """Start a new thread and run the @test_instance,
     and use the specified @exec_method"""
-    running = threading.Thread(target=run_test, args=(test_instance,exec_method))
+    running = threading.Thread(target=run_test, args=(test_instance, exec_method))
     running.start()

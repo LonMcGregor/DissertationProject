@@ -6,7 +6,7 @@
     <ul>
     {% for sub, files in descriptors %}
         {% for file in files %}
-        <li><a href="{% url 'show_file' sub.id file %}">{{ file }}</a></li>
+        <li><a href="{% url 'download_file' sub.id file %}?show=1">{{ file }}</a></li>
         {% endfor %}
     {% endfor %}
     </ul>
@@ -36,7 +36,7 @@
         <li>Submission ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}{% if sub.final %}(Final){% else %}<a href="{% url 'set_final_sub' sub.id %}">(Set as final)</a>{% endif %}{% else %}{% if sub.final %}(Final){% endif %}{% endif %}{% endif %}</li>
         <li><ul>
         {% for f in files%}
-            <li><a href="{% url 'render_file' sub.id f %}">{{ f }}</a></li>
+            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
         {% endfor %}
         </ul></li>
     {% endfor %}
@@ -52,7 +52,7 @@
         <li>Test Case ID: {{ sub.id }} - {% if sub.private %}(Private){% else %}{% if subs_open %}{% if sub.final %}(Final){% else %}<a href="{% url 'set_final_sub' sub.id %}">(Set as final)</a>{% endif %}{% else %}{% if sub.final %}(Final){% endif %}{% endif %}{% endif %}</li>
         <li><ul>
         {% for f in files%}
-            <li><a href="{% url 'render_file' sub.id f %}">{{ f }}</a></li>
+            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
         {% endfor %}
         </ul></li>
     {% endfor %}

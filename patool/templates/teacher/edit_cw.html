@@ -40,7 +40,7 @@
         <td>{{ f }}</td>
         <td>{{ s.creator }}</td>
         <td>{% if s.private %}({% endif %}{{ s.type }}{% if s.private %}){% endif %}{% if s.final %}F{% endif %}</td>
-        <td><a href="{% url 'render_file' s.id f %}">Html</a> <a href="{% url 'show_file' s.id f %}">Raw</a></td>
+        <td><a href="{% url 'download_file' s.id f %}?pretty=1">Html</a> <a href="{% url 'download_file' s.id f %}?show=1">Raw</a></td>
         </tr>
     {% endfor %}
     {% endfor %}
@@ -71,12 +71,14 @@
         <th>Feedback</th>
         <th>Error Level</th>
         <th>Initiator</th>
+        <th>Marker</th>
+        <th>Developer</th>
         <th>Waiting to Run</th>
     </tr>
     </thead>
     {% for f in results %}
         <tr>
-        <td>{{ f.id }}</td>
+            <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
             {{ f.test.id }})
         {% endif %}</td>
@@ -91,12 +93,15 @@
         {% endif %}</td>
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>
-            {% if f.waiting_to_run %}
-                <td><a href="{% url 'force_test_run' f.id %}">Run Now</a></td>
-            {% else %}
-                <td>Has Run</td>
-            {% endif %}
+        <td>{% if f.marker %}{{ f.marker }}{% endif %}</td>
+        <td>{% if f.visible_to_developer %}({{ f.solution.creator }}){% else %}{{ f.solution.creator }}{% endif %}</td>
+        {% if f.waiting_to_run %}
+            <td><a href="{% url 'force_test_run' f.id %}">Run Now</a></td>
+        {% else %}
+            <td>Has Run</td>
+        {% endif %}
         </tr>
     {% endfor %}
     </table>
+    <a href="{% url 'run_all_test_in_cw' coursework.id %}">Run all queued tests</a>
 {% endblock %}
