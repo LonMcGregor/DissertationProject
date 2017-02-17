@@ -3,7 +3,7 @@
 {% block content %}
     {% if courseworks %}
         {% for id, state, course, title in courseworks %}
-            <p><a href="/student/cw/{{ id }}" class="coursework coursework_{{ state }}"
+            <p><a href="{% url 'cw' id  %}" class="coursework coursework_{{ state }}"
             >{{ course }}:
                 {{ title }}</a></p>
         {% endfor %}

@@ -6,6 +6,7 @@ from django.shortcuts import render
 
 from student import models as m
 
+import os
 
 def default_index(request):
     """Show a basic index page for the application"""
