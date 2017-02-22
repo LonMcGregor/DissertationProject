@@ -13,7 +13,7 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 import os
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+BASE_DIR = '/home/cs4/lm356/peer-testing'
 
 
 # Quick-start development settings - unsuitable for production
@@ -25,7 +25,7 @@ SECRET_KEY = '$cn(%o3r-mdc8ku_$0xnyo4bf+g!gxt4%0!i^hi%3)odr_4%!w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['www2.macs.hw.ac.uk', 'anubis.macs.hw.ac.uk', '137.195.15.99']
 
 
 # Application definition
@@ -59,7 +59,7 @@ TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
         'DIRS': [os.path.join(BASE_DIR, 'templates')],
-        'APP_DIRS': True,
+       'APP_DIRS': True,
         'OPTIONS': {
             'context_processors': [
                 'django.template.context_processors.debug',
@@ -130,17 +130,18 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/static/'
-STATIC_ROOT = 'var/static'
+STATIC_URL = '/peer-testing/static/'
+STATIC_URL_REDIRECT = 'static/'
+STATIC_ROOT = os.path.join(BASE_DIR, 'var/static')
 
-MEDIA_URL = '/'
-MEDIA_ROOT = 'var/uploads'
-MEDIA_TMP_TEST = 'var/tmp/test'
+MEDIA_URL = '/peer-testing/'
+MEDIA_ROOT = os.path.join(BASE_DIR, 'var/uploads')
+MEDIA_TMP_TEST = os.path.join(BASE_DIR, 'var/tmp/test')
 
 
 # Auth URLconf
-LOGIN_URL = '/student/login'
-LOGOUT_REDIRECT_URL = '/student/'
+LOGIN_URL = '/peer-testing/student/login'
+LOGOUT_REDIRECT_URL = '/peer-testing/student/'
 
 # at most 20 1mb files per upload
 MAX_FILES_PER_SUBMISSION = 20

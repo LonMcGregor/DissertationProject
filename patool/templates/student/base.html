@@ -14,7 +14,7 @@
             <div id="nav_title">
                 <h1>{% block headertitle %}Student Peer Assessment Site{% endblock %}</h1>
                 <div id="breadcrumbs">
-{% block crumbs %}{% for title, url in crumbs %}<span> &gt; <a href="{{ url }}">{{ title }}</a></span>{% endfor %}{% endblock %}</div>
+{% block crumbs %}{% for title, url in crumbs %}<span> &gt; <a href="/peer-testing{{ url }}">{{ title }}</a></span>{% endfor %}{% endblock %}</div>
             </div>
             <button id="note_count" onclick="toggle_notes_status()">Notifications (0)</button>
             <div id="note_messages_container" class="collapsed">

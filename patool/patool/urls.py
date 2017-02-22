@@ -12,5 +12,5 @@ urlpatterns = [
     url(r'^prepdb', views.populate_database, name='prepdb'),
     url(r'^$', views.default_index, name='site_root'),
 ] + static(
-        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+        settings.STATIC_URL_REDIRECT, document_root=settings.STATIC_ROOT
     )
