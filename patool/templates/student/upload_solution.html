@@ -3,6 +3,7 @@
 {% block content %}
 <h1>{{ msg }}</h1>
     {% if allow_upload %}
+        <p>Please make sure to select the correct file type</p>
 <form action="" method="post" enctype="multipart/form-data">
     {% csrf_token %}
     <label for="id_file_type">File Type:</label><select id="id_file_type" name="file_type" required="">

@@ -80,7 +80,7 @@
         <tr>
             <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
-            {{ f.test.id }})
+            {{ f.test.id }}
         {% endif %}</td>
         <td>{%  if f.solution %}
            {{ f.solution.id }}
@@ -94,7 +94,7 @@
         <td>{{ f.error_level }}</td>
         <td>{{ f.initiator }}</td>
         <td>{% if f.marker %}{{ f.marker }}{% endif %}</td>
-        <td>{% if f.visible_to_developer %}({{ f.solution.creator }}){% else %}{{ f.solution.creator }}{% endif %}</td>
+        <td>{% if f.visible_to_developer %}{{ f.solution.creator }}{% else %}({{ f.solution.creator }}){% endif %}</td>
         {% if f.waiting_to_run %}
             <td><a href="{% url 'force_test_run' f.id %}">Run Now</a></td>
         {% else %}
@@ -103,5 +103,6 @@
         </tr>
     {% endfor %}
     </table>
+    <p>Key: (developer) indicates that this is not visible to developer</p>
     <a href="{% url 'run_all_test_in_cw' coursework.id %}">Run all queued tests</a>
 {% endblock %}

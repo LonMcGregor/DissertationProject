@@ -34,7 +34,7 @@ def upload_solution(request, cw=None):
     cw_instance = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(request.user, cw_instance):
         return HttpResponseForbidden("You are not allowed to see this coursework")
-    if cw_instance.state != m.CourseworkState.UPLOAD:
+    if cw_instance.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
         return HttpResponseForbidden("This coursework is not currently accepting uploads")
     state = p.state_of_user_in_coursework(request.user, cw_instance)
     msg, allow_upload, error = upload_solution_render(state)
@@ -81,11 +81,10 @@ def upload_solution_render(state):
     an upload should be allowed at this stage.
     Return the message, allowed, and any errors"""
     if state == p.UserCourseworkState.UPLOADS:
-        msg = "Please upload a solution for this coursework"
+        msg = "Please upload a solution and test case for this coursework"
         allow_upload = True
     elif state == p.UserCourseworkState.FEEDBACK:
-        msg = "You may now use the feedback view to submit feedback. Please visit the coursework " \
-              "detail page for more information."
+        msg = "You may now use the feedback view to submit feedback, and upoad tests to use."
         allow_upload = True
     elif state == p.UserCourseworkState.COMPLETE:
         msg = "The deadline for submissions for this coursework has passed"
@@ -124,9 +123,26 @@ def single_coursework(request, coursework):
     marking = m.TestMatch.objects.filter(coursework=coursework, marker=request.user)
     developed = h.get_test_match_for_developer(request.user, coursework)
 
+    my_public_tests = ((test.id, test.id) for test in m.Submission.objects.filter(
+        coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE,
+        private=False))
+    my_testable_solutions = []
+    for tm in marking:
+        tup = (tm.solution.id, tm.solution.id)
+        if tup not in my_testable_solutions:
+            my_testable_solutions.append(tup)
+    easy_match_form = f.EasyMatchForm(my_public_tests, my_testable_solutions)
+
+    all_my_tests = [(test[0].id, test[0].id) for test in tests]
+    all_my_tests.append(('I', 'Identity Test'))
+    all_my_solutions = [(sol[0].id, sol[0].id) for sol in solutions]
+    all_my_solutions.append(('O', 'Oracle Solution'))
+
+    tm_form = f.EasyMatchForm(all_my_tests, all_my_solutions)
+
     details = {
         "cw": cw,
-        "tm_form": f.TestMatchForm(),
+        "tm_form": tm_form,
         "descriptors": descriptors,
         "solutions": solutions,
         "tests": tests,
@@ -135,24 +151,69 @@ def single_coursework(request, coursework):
         "developed": developed,
         "subs_open": cw.state == m.CourseworkState.UPLOAD,
         "feedback_open": cw.state == m.CourseworkState.FEEDBACK,
-        "crumbs": [("Homepage", "/student")]
+        "crumbs": [("Homepage", "/student")],
+        "easy_match_form": easy_match_form
     }
     return render(request, 'student/detail_coursework.html', details)
 
 
 @login_required()
 def create_test_match(request, cw):
-    """Recieve a POST request to create a student test match"""
+    """Receive a POST request to create a student test match for what they are marking"""
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
-    tm_form = f.TestMatchForm(request.POST)
+    coursework = m.Coursework.objects.get(id=cw)
+    if coursework.state not in [m.CourseworkState.FEEDBACK]:
+        return HttpResponseForbidden("This coursework isn't accepting new test matches")
+    my_public_tests = ((test.id, test.id) for test in m.Submission.objects.filter(
+        coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE,
+        private=False))
+    marking = m.TestMatch.objects.filter(coursework=coursework, marker=request.user)
+    my_testable_solutions = []
+    for tm in marking:
+        tup = (tm.solution.id, tm.solution.id)
+        if tup not in my_testable_solutions:
+            my_testable_solutions.append(tup)
+    tm_form = f.EasyMatchForm(my_public_tests, my_testable_solutions, request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     try:
         new_tm = matcher.student_create_single_test_match(
             tm_form.cleaned_data['solution'],
             tm_form.cleaned_data['test'],
-            cw,
+            coursework,
+            request.user
+        )
+        r.run_test_on_thread(new_tm, r.execute_python3_unit)
+    except Exception as e:
+        return HttpResponseForbidden(str(e))
+    return HttpResponse("Test has been created")
+
+
+@login_required()
+def create_personal_test_match(request, cw):
+    """Receive a POST request to create a student test match for self"""
+    if not request.POST:
+        return HttpResponseForbidden("You're supposed to POST a form here")
+    coursework = m.Coursework.objects.get(id=cw)
+    if coursework.state not in [m.CourseworkState.UPLOAD]:
+        return HttpResponseForbidden("This coursework isn't accepting new test matches")
+    solutions = m.Submission.objects.filter(
+        coursework=coursework, creator=request.user, type=m.SubmissionType.SOLUTION)
+    tests = m.Submission.objects.filter(
+        coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE)
+    all_my_tests = [(test.id, test.id) for test in tests]
+    all_my_tests.append(('I', 'Identity Test'))
+    all_my_solutions = [(sol.id, sol.id) for sol in solutions]
+    all_my_solutions.append(('O', 'Oracle Solution'))
+    tm_form = f.EasyMatchForm(all_my_tests, all_my_solutions, request.POST)
+    if not tm_form.is_valid():
+        return HttpResponseForbidden("Invalid form data")
+    try:
+        new_tm = matcher.student_create_single_test_match(
+            tm_form.cleaned_data['solution'],
+            tm_form.cleaned_data['test'],
+            coursework,
             request.user
         )
         r.run_test_on_thread(new_tm, r.execute_python3_unit)
@@ -236,8 +297,8 @@ def render_file(request, file, filename):
     """For a given @file and @filename,  pretty print the contents
     of the file as an HTML page using pygments"""
     mime = guess_type(filename, True)
-    if mime[0].split('/')[0] != 'text':
-        return HttpResponseForbidden("can only pretty print text files")
+    if mime[0] is None or mime[0].split('/')[0] != 'text':
+        return show_file(file, filename)
     content = h.read_file_by_line(file.file)
     detail = {
         "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))

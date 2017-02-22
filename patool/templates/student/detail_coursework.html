@@ -14,12 +14,13 @@
     <h2>Your Tasks:</h2>
     <ul>
     {% if subs_open %}
-        Upload your solutions and test cases. Remember to set one as the one you want to submit.
-        During this first part of the coursework you should run your own tests to make sure that
-        they work correctly.
+        <li>Upload your solutions and test cases.</li>
+        <li>Remember to set one as the one you want to submit.</li>
+        <li>During this first part of the coursework you should run your own tests to make sure that they work correctly.</li>li>
     {% endif %}
     {% if feedback_open %}
-        <li>Give feedback on test matches where you are a marker</li>
+        <li>Give feedback on the solution(s) you are marking</li>
+        <li>Upload new tests to try on the solution(s) you are marking</li>
     {% endif %}
     {% if not subs_open and not feedback_open %}
         This coursework has closed
@@ -44,7 +45,7 @@
 
     <p></p>
     <h2>My Uploaded Test Cases</h2>
-    {% if subs_open %}
+    {% if subs_open or feedback_open %}
     <a href="{% url 'test' cw.id %}">Submit test case</a><p></p>
     {% endif %}
     <ul>
@@ -61,7 +62,7 @@
     <p></p>
     {% if subs_open %}
     <h2>Run your own test cases</h2>
-        <form action="{% url 'make_tm_student' cw.id %}" method="POST">
+        <form action="{% url 'make_ptm_student' cw.id %}" method="POST">
         {% csrf_token %}
         {{ tm_form }}
         <input type="submit" value="Create Test Match" />
@@ -72,15 +73,22 @@
     {% endif %}
     <ul>
     {% for tm in initiated %}
-        <li><a  href="{% url 'feedback' tm.id %}">Feedback</a></li>
+        <li><a  href="{% url 'feedback' tm.id %}">Results for Sol: {{ tm.solution.id }}, Test: {{ tm.test.id }}</a></li>
     {% endfor %}
     </ul>
 
     <p></p>
     <h2>Give peer feedback</h2>
+    {% if feedback_open %}
+    <form action="{%  url 'make_tm_student' cw.id %}" method="POST">
+        {% csrf_token %}
+        {{ easy_match_form }}
+        <input type="submit" value="Create Test Match" />
+    </form>
+    {% endif %}
     <ul>
     {% for tm in marking %}
-        <li><a  href="{% url 'feedback' tm.id %}">Feedback</a></li>
+        <li><a  href="{% url 'feedback' tm.id %}">{% if tm.feedback == None %} Give {% else %} View {% endif %} feedback for Sol: {{ tm.solution.id }}, Test: {{ tm.test.id }}</a></li>
     {% endfor %}
     </ul>
 
@@ -88,7 +96,9 @@
     <h2>Feedback for my solution</h2>
     <ul>
     {% for tm in developed %}
-        <li><a  href="{% url 'feedback' tm.id %}">Feedback</a></li>
+        {% if tm.feedback != None %}
+            <li><a  href="{% url 'feedback' tm.id %}">Feedback for my solution</a></li>
+        {% endif %}
     {% endfor %}
     </ul>
 {% endblock %}

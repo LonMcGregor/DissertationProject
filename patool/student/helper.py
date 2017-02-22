@@ -16,7 +16,9 @@ def get_test_match_for_developing(user, coursework):
     initiated = m.TestMatch.objects.filter(coursework=coursework, initiator=user)
     chosen = []
     for tm in initiated:
-        if tm.solution.creator == user or tm.test.creator == user:
+        if (tm.solution.creator == user or tm.solution.type == m.SubmissionType.ORACLE_EXECUTABLE) and tm.test.creator == user:
+            chosen.append(tm)
+        elif (tm.test.creator == user or tm.test.type == m.SubmissionType.IDENTITY_TEST) and tm.solution.creator == user:
             chosen.append(tm)
     return chosen
 

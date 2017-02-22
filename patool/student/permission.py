@@ -48,6 +48,8 @@ def user_can_upload_of_type(user, coursework, up_type):
     state = state_of_user_in_coursework(user, coursework)
     if state == UserCourseworkState.UPLOADS:
         return up_type in [m.SubmissionType.SOLUTION, m.SubmissionType.TEST_CASE]
+    if state == UserCourseworkState.FEEDBACK:
+        return up_type in [m.SubmissionType.TEST_CASE]
     return False
 
 
@@ -79,7 +81,8 @@ def user_feedback_mode(user, test_match_instance):
         return UserFeedbackModes.DENY
     if is_teacher(user):
         return UserFeedbackModes.WRITE if test_match_instance.marker==user else UserFeedbackModes.READ
-    if is_owner_of_solution(user, test_match_instance) or user == test_match_instance.initiator:
+    if is_owner_of_solution(user, test_match_instance) or (test_match_instance.test.creator==user
+            and test_match_instance.solution.type==m.SubmissionType.ORACLE_EXECUTABLE):
         return UserFeedbackModes.WAIT if test_match_instance.waiting_to_run else \
             UserFeedbackModes.READ
     if test_match_instance.marker != user:
@@ -94,19 +97,24 @@ def user_feedback_mode(user, test_match_instance):
 
 def can_view_file(user, file):
     """Determine if a @user should be allowed to view a given @file"""
-    if not can_view_coursework(user, file.submission.coursework):
+    return can_view_submission(user, file.submission)
+
+
+def can_view_submission(user, submission):
+    """Determine is a @user is allowed to see a given submission"""
+    if not can_view_coursework(user, submission.coursework):
         return False
     if is_teacher(user):
         return True
-    if file.submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.IDENTITY_TEST]:
+    if submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.IDENTITY_TEST]:
         return True
-    if file.submission.type == m.SubmissionType.ORACLE_EXECUTABLE:
+    if submission.type == m.SubmissionType.ORACLE_EXECUTABLE:
         return False
-    if user == file.submission.creator:
+    if user == submission.creator:
         return True
-    if file.submission.private:
+    if submission.private:
         return False
-    test_containing_file = h.get_test_match_with_associated_submission(file.submission)
+    test_containing_file = h.get_test_match_with_associated_submission(submission)
     if test_containing_file is None:
         return False
     if test_containing_file.marker == user:
