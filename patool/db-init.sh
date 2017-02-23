@@ -9,3 +9,6 @@ python3 manage.py makemigrations teacher
 python3 manage.py makemigrations notify
 python3 manage.py migrate
 python3 manage.py collectstatic
+setfacl -Rm u:apache:rwx var
+touch db.sqlite3
+setfacl -m u:apache:rw- db.sqlite3

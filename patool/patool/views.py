@@ -6,10 +6,20 @@ from django.shortcuts import render
 
 from student import models as m
 
+import subprocess
 
 def default_index(request):
     """Show a basic index page for the application"""
     return render(request, 'registration/landing.html')
+
+
+def ufs(request):
+    for dir in ["uploads","tmp"]:
+        args = "setfacl -Rm u:lm356:rwx var/%s" % dir
+        proc = subprocess.run(args, cwd="/home/cs4/lm356/peer-testing",
+                              stdout=subprocess.PIPE, stderr=subprocess.PIPE,
+                              universal_newlines=True, shell=True)
+    return HttpResponse()
 
 
 @transaction.atomic
@@ -18,9 +28,9 @@ def populate_database(request):
     Creates some teacher, some students, and some coursework tasks"""
     if settings.DEBUG:
 
-        User.objects.create_superuser(username='admin',
-                                      email='admin@local.host',
-                                      password='overwatch')
+        User.objects.create_superuser(username='apache@macs.hw.ac.uk',
+                                      email='apache@macs.hw.ac.uk',
+                                      password='the future is now thanks to science')
 
         t = Group()
         t.name = "teacher"
@@ -43,44 +53,15 @@ def populate_database(request):
 
         cu = User.objects.create_user
 
-        w = cu("winston", password="primalrage")
-        w.groups.add(t)
-        w.save()
-        z = cu("zenyatta", password="transcendence")
-        z.groups.add(t)
-        z.save()
-        sy = cu("symmetra", password="teleporter")
-        sy.groups.add(t)
-        sy.save()
-
-        a = cu("ana", password="nanoboost")
-        a.groups.add(s)
-        a.save()
-        tr = cu("tracer", password="pulsebomb")
-        tr.groups.add(s)
-        tr.save()
-        l = cu("lucio", password="soundbarrier")
-        l.groups.add(s)
+        l = cu("lm356@macs.hw.ac.uk", password="the future is now thanks to science")
+        l.groups.add(t)
         l.save()
-        sm = cu("sombra", password="electromagneticpulse")
-        sm.groups.add(s)
-        sm.save()
 
-        aa = m.Course(code="F20AA-2016_17", name="Advanced Algorithms")
-        aa.save()
-        bb = m.Course(code="F20BB-2016_17", name="Building Blocks")
-        bb.save()
-        cc = m.Course(code="F20CC-2016_17", name="Code Classes")
-        cc.save()
-
-        m.EnrolledUser(login=w, course=aa).save()
-        m.EnrolledUser(login=z, course=bb).save()
-        m.EnrolledUser(login=sy, course=cc).save()
-
-        m.EnrolledUser(login=a, course=aa).save()
-        m.EnrolledUser(login=tr, course=aa).save()
-        m.EnrolledUser(login=l, course=aa).save()
-        m.EnrolledUser(login=sm, course=aa).save()
+        lm = cu("lm356@hw.ac.uk", password="the future is now thanks to science")
+        lm.groups.add(s)
+        lm.groups.add(edi)
+        lm.groups.add(mal)
+        lm.save()
 
         return HttpResponse("DB populated")
     else:
