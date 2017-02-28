@@ -106,7 +106,7 @@ An evaluation of my prototype has revealed that \todo{...}
 \vfill
 
 \section*{Acknowledgements}
-Thanks to Manuel Maarek for helping me to organise this project. Additionally, thanks are given to the members of the QAA project headed by Manuel and those who took part in the evaluation study for their input.
+Thanks to Manuel Maarek for helping me to organise this project. Additionally, thanks are given to the members of the QAA project headed by Manuel and those who took part in the evaluation study for their input. Also, thanks are given to the MACS IT team for altering the Anubis server to host my website.
 
 \newpage
 
@@ -129,6 +129,8 @@ Thanks to Manuel Maarek for helping me to organise this project. Additionally, t
 % cross reference each of these to their sections further within the report
 
 
+% BG CHAPTER
+% BEGIN
 \chapter{Background}
 \section{Peer Assessment}
 \subsection{What is it?}
@@ -327,6 +329,7 @@ Given the many different aspects covered above, I have identified the following 
  \item Feedback could be collected from the testers through free comment in various places of the application, or by checking against a marking criteria.
 \end{itemize}
 
+% END
 
 
 
@@ -335,7 +338,11 @@ Given the many different aspects covered above, I have identified the following 
 
 % phase 1 [login, ]
 % adaptations for phase 2 [multi-file, improved test matching plugins, prep for pipeline]
-
+\chapter{Objectives}
+\section{Aims \& Objectives}
+\section{Requirements Analysis}
+\section{Risks.......}
+\todo{stuff from the thingy  first report}
 
 
 % Work from semester 1 from research report
@@ -347,9 +354,24 @@ Given the many different aspects covered above, I have identified the following 
 % Post-Evaluation Improvements
 
 \chapter{Initial Prototype}
+Following the completion of the background researched, the next step of the project was to develop an initial prototype, to test that the concept could actually be built and tested. This would require identifying and choosing suitable technologies, designing an interface and designing and implementing a system.
 \section{Choosing Tools}
+There are many ways that the website could be built. To identify some option \todo{add some narrative...}
+\begin{itemize}
+\item Languages:
+\item PHP
+\item Python
+\item Java Servlets
+\item Frameworks:
+\item CakePHP (PHP)
+\item Django (Python)
+\item Flask (Python)
+\end{itemize}
+Of these, \todo{something something something} so I chose to develop the website using Django. Models? cms? auth management? clean language? unclean language? lightweight? better support? uni compatibility a factor?
 \section{Initial Interface Design}
+With the focus of this initial prototype being with regards to ensuring the functionality of such a site to be feasible \todo{bad sentence}. barebones ui. 
 \section{Initial System Design}
+Do we want UML diagrams here? At each `iteration of development stage? wherefore?
 \section{Initial Prototype Development}
 
 \chapter{Discussions with Stakeholders}
@@ -358,9 +380,21 @@ Given the many different aspects covered above, I have identified the following 
 \section{Modifications to interface design}
 \section{Further development}
 \section{Live Hosting}
+In order to prepare for a live test of the system, I identified some possible options that could be used to host the Django application:
+\begin{enumerate}
+\item Running the website from a private server
+\item Running the website in local debug mode from one of the university machines
+\item Running the website on the university Apache web server
+\end{enumerate}
+For the intended purpose of the website, that it would be used in an educational environment, the most obvious option would be 3. This way, we could ensure that all of the student-uploaded data is kept inside the university ecosystem.\par
+While discussing this setup with the University MACS administrators, it was found that in order to run the application on the Apache server either some packages would need to be upgraded or rebuilt, or the Django application would need to be modified to use an older version of Django and python. The latter was not possible, to while the MACS IT team investigated ways to upgrade the server, I worked with my Project Supervisor to host it in a private location.\par
+When the Django application was hosted as a daemon process within Apache under WSGI (Web Server Gateway Interface), the requests on a given URL path are routed to the Django application rather than the usual routing to static HTML / PHP scripts. This meant that some modification was needed for the Django application's configuration as errors in serving the website highlighted places where  hard-coded URLs had broken, where relative paths were incorrectly used and where the Apache Linux user did not have the correct permissions to operate on the application. These required relatively simple fixes.\par
+The MACS IT team was able to upgrade the required packages such that Apache could operate. Using the changes made for running on the private server as a base, setting up the Django application to run on the university server was easily possible.
+
 
 \chapter{Evaluation Study}
 \section{Methodology}
+In order to conduct the evaluation study \todo{make sure you're not repeating or contradicting the earlier objectives section} I aimed to test the live system with participants pretending to be students completing coursework. Ideally we would have two groups - one performing peer-testing for coursework 'A' using the website, and coursework 'B' without the website.\todo{need to explain why?}
 \section{Results}
 \section{Have main objectives been met}
 
