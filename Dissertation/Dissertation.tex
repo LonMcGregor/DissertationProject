@@ -116,6 +116,7 @@ Andrew \textsc{Ireland}\\
 \doublespacing
 % END
 
+% BEGIN
 \section*{Declaration}
 I, L\'eon McGregor confirm that this work submitted for assessment is my own and is expressed in my own words. Any uses made within it of the works of other authors in any form (e.g., ideas, equations, figures, text, tables, programs) are properly acknowledged at any point of their use. A list of the references employed is included.\par
 Signed: L\'eon McGregor\par
@@ -522,24 +523,25 @@ Do we want UML diagrams here? At each `iteration of development stage? wherefore
 \draw [line] (m) -- (db);
 \draw [line] (db) -- (fs);
 \draw [line] (v) -- (ht);
-
 \end{tikzpicture}
 \caption{Diagram showing the main components of the system at this iteration}
 \label{fig:i1sd}
 \end{figure}
-The initial system uses an MVC style architecture.
-
+The initial system uses an MVC style architecture, as is recommended by Django.
 \subsection{Models}
 The models are defined as Django model classes and then Django automatically implements them in a database. One advantage of creating the models this way is that different database technologies can be switched out. for the prototyping stage, a basic sqlite database was used, that acts as a lightweight database stored in a single file, making it easier to manage during development. This could be switched out to use a dedicated MySQL database when implementation is complete. This method also makes it easier to access data from the database in a object oriented manner, which reduces the reliance on SQL commands for extracting information, and also allows for Django abstractions to offer some performance improvements. One such improvement is by storing queries in a QuerySet object, which can be passed around in code, the database query is executed on-demand which means \todo{finish this thought, make a nicer sentence structure}.\par
 Something something files on a filesystem \todo{am i repeating myself?}
 \todo{Remember to explain why each choice was made that way.}
 \subsection{Controllers}
-
+When a user makes a request to 
 
 \subsection{Views}
 In a Django application, the views are instantiated by the controller classes. These take the form of HTML templates, with information filled in at runtime. These support inheritance, which is useful, as it allows for a single template to be created that acts as a base for all part of the website... \todo{et.c. etc.}.\par
 Django also offers some standard HTTP responses that can be sent instead of the HTML templates, making it easy to support standard web request-response dialogue, such as informing a user they do not have sufficient permissions through a HTTP 403 Response View.
 
+\section{Notifications}
+As part of this initial prototype (but not included in later iterations), was a test of WebSocket-based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
+The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
 % END
 
 % 2nd iteration
@@ -584,8 +586,26 @@ The MACS IT team was able to upgrade the required packages such that Apache coul
 \chapter{Evaluation Study}
 \section{Methodology}
 In order to conduct the evaluation study \todo{make sure you're not repeating or contradicting the earlier objectives section} I aimed to test the live system with participants pretending to be students completing coursework. Ideally we would have two groups - one performing peer-testing for coursework 'A' using the website, and coursework 'B' without the website.\todo{need to explain why?}
+\section{Participation}
+During the study I had planned for a cohort of 16 people participating, however throughout the process a lower number, around half, actually took part.\par
+Participants filled out a consent form, as can be seen in appendix \todo{number?}.
+\todo{metnion reward monies}
+\section{Observations}
+My observations - the website architecture is not very good. I definitely needs re-thinking in terms of how things work. For example, forcing people to submit stuff before a deadline doesn't seem optimal, but maybe thats what teachers want. what if students wwho finish early could peer test themselves while others finish later, withou having long dealys- that seems a good change that would be needed.\par
+Also, there is the issue that students may wish to peer-test the tests as well, which would require a re-working of the way things are managed in terms of test match creation.\par
+Regarding the solutions that were submitted, there seems to be a great deal of variety - this is good. It shows that the interface was clear enough to follow, but not overly restrictive regarding what people were able to use. The different implementations will hopefully allow those doing the peer-testing to learn by see alternative ways of completing the task\par
+The website did not handle very well the different indentation related issues from python, as well as some issues with ... \todo{go  on...}
+\section{Participant Feedback}
+\subsection{External Questions}
+I invited particpants to contact me directly if there were any queries or problems that occurred during the study.\par
+One issue discussed was that once a feedback comment has been submitted for a test match, it cannot be modified. This caused issues for one participant as they had accidentally clicked the submit button. It may be worth modifying this such that feedback can be changed after it has been submitted, although a history of responses would need to be kept.
+\subsection{Feedback Survey}
+At the end of the study, I asked students to fill out a feedback survey (included as an appendix \todo{which?})
+This is a summary of the responses \todo{include bulk of all responses? what about bulk responses of code, etc.?}
+\subsection{Discussion}
+In the discussion, the following points happened...
 \section{Results}
-\section{Have main objectives been met}
+Have main objectives been met?
 ...
 % END
 
@@ -678,7 +698,7 @@ I confirm that the project involves only standard IT equipment and exposes parti
 \addcontentsline{toc}{section}{D: Evaluation Extended Discussion Questions}
  % BEGIN
 \section*{D: Evaluation Extended Discussion Questions}
-These questions were discussed in a debriefing session after the evaluation study had completed.\par
+These questions were discussed in a debriefing session after the evaluation study had completed. \todo{make sure these are up to date - if any new ones were added or not used...}\par
 \begin{itemize}
 \item Describe what you think peer assessment is?
 \item Describe what you think the website is meant to do?
