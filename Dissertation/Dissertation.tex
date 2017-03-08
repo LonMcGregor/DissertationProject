@@ -11,12 +11,15 @@
 \usepackage{longtable}
 \usepackage{xcolor}
 \usepackage{listings}
+\usepackage{hyperref}
 \usepackage{wrapfig}
 \usepackage{setspace}
 \usepackage{datetime}
+\usepackage{enumitem}
 \usepackage{url}
 \usepackage{tikz}
 \usetikzlibrary{shapes}
+\usepackage{tikz-uml}
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
 \usepackage{pdflscape}
@@ -242,7 +245,7 @@ This experiment followed the results students achieved over a sequence of 4 task
 \end{enumerate}
 The experiment looked to see if the peer marking was at all helpful in improving the marks of students between the two tests. The results found that the peer marking was very useful for students who had initially performed poorly. Student comments on the experience would suggest that they found the peer assessment process both enjoyable and informative. There is also evidence from this feedback indicating the importance of maintaining anonymity, as some students felt it would be difficult to the marking non-anonymously.\par
 From this, I can gather that the model of peer assessment used, through the web interface, was indeed successful. Based on the evidence from this study, the use of a similar system could well be helpful to students who would otherwise not have performed well. This study also revealed that students learnt a lot from the ``repetitive nature of the marking''. This could indicate that testers in such a system as mine might benefit from testing multiple solutions.\par
-Given that the user interface and flow of information through the application provided by CAP (figure \todo{\ref{fig:cap}}) is in many ways similar to my conceptual website, I would have liked to obtain a copy of it to evaluate further. Unfortunately, Davies has not made the source for the website available for download.\par
+Given that the user interface and flow of information through the application provided by CAP (figure \todo{ref{fig:cap}}) is in many ways similar to my conceptual website, I would have liked to obtain a copy of it to evaluate further. Unfortunately, Davies has not made the source for the website available for download.\par
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{fig/CAP.png}
@@ -472,6 +475,156 @@ I also detail which of the requirements I was able to complete in this first ite
 \subsection{Additional Notes on Requirements}
 Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
 
+\section{Use Cases}
+To better describe and visualise the requirements for the application as a whole, the use cases described in figure \todo{which} (and the included extended descriptions) are given.
+\begin{figure}[ht]
+\centering
+\begin{tikzpicture} 
+\begin{umlsystem}[x=0, y=0]{Peer-testing website} 
+\umlusecase[y=-2, x=-2]{Authenticate}
+\umlusecase[y=-3.5, x=-2]{View Coursework}
+\umlusecase[y=-2, x=2, width=2cm]{Create \& Edit Coursework}
+\umlusecase[y=-7, x=2, width=2cm]{View, Create \& Edit Course}
+\umlusecase[y=-9, x=2, width=2cm]{Create \& Run Test Match}
+\umlusecase[y=-5, x=-2]{View Test Match}
+\umlusecase[y=-9, x=-2, width=2cm]{Create Test Match Feedback}
+\umlusecase[y=-7, x=-2, width=2cm]{Upload submission for coursework}
+\end{umlsystem} 
+\umlactor[x=-7, y=-6]{student}
+\umlactor[x=7, y=-6]{teacher}
+\umlassoc{student}{usecase-1}
+\umlassoc{student}{usecase-2}
+\umlassoc{student}{usecase-6}
+\umlassoc{student}{usecase-7}
+\umlassoc{student}{usecase-8}
+\umlassoc{teacher}{usecase-1}
+\umlassoc{teacher}{usecase-2}
+\umlassoc{teacher}{usecase-3}
+\umlassoc{teacher}{usecase-4}
+\umlassoc{teacher}{usecase-5}
+\umlassoc{teacher}{usecase-6}
+\end{tikzpicture}
+\caption{Diagram showing the main use cases implemented at this iteration of development. Both Student and teacher are sub-actors of User}
+\label{fig:i1uc}
+\end{figure}
+
+\singlespacing
+\subsection*{UC - Authenticate}
+\textit{A user wants to log in to the website using their credentials - a username and password}\\
+\textbf{Primary Actor}: User\\
+\textbf{Preconditions}: A user is not already logged in, The user is registered on the website, user is at login web page\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Website requests credentials
+\item User submits credentials through a form
+\item Website checks that these match expected values
+\item \textbf{If not:} Go to step 1
+\end{enumerate}
+\textbf{Postconditions}: User is logged in, user is at main index page
+
+\subsection*{UC - Create \& Edit Coursework}
+\textit{A teacher wants to create a coursework, or update the values of an existing one}\\
+\textbf{Primary Actor}: Teacher\\
+\textbf{Preconditions}: A teacher is logged in\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Website requests information for coursework
+\item Teacher submits details through a form
+\item Website updates coursework with these details
+\item \textbf{If coursework does not exist:} Coursework is created with these details
+\end{enumerate}
+\textbf{Postconditions}: Coursework exists with new values, any old values are overwritten
+
+\subsection*{UC - View Coursework}
+\textit{A user wishes to see the full details for a coursework, and any files associated with it}\\
+\textbf{Primary Actor}: User\\
+\textbf{Preconditions}: User is logged in, user is enrolled on the course for a coursework\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item User selects a coursework item
+\item Website selects the appropriate view for their permission level
+\item Website collects information about coursework
+\item Website collects files related to coursework that user has permission to view
+\end{enumerate}
+\textbf{Postconditions}: Website displays coursework details to user
+
+\subsection*{UC - View Test Match}
+\textit{A user wishes to see the results of having run a test, and the files that were involved with it}\\
+\textbf{Primary Actor}: User\\
+\textbf{Preconditions}: User is logged in, user is enrolled on the course for the given test match, test match has been run\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Website checks that user has permission to view test match - i.e. they are a teacher, they created the test match, they are assigned to give feedback on it, etc.
+\item Website gathers list of files associated with the test match
+\item Website displays those files that user has permission to view
+\end{enumerate}
+\textbf{Postconditions}: The user is shown everything related to the test match that they have permission to see
+
+\subsection*{UC - View, Create \& Edit Course}
+\textit{A user wishes to see details of a course, possibly edit it, or create a new one}\\
+\textbf{Primary Actor}: Teacher\\
+\textbf{Preconditions}: Teacher is logged in\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Teacher chooses a course
+\item Website displays details of course in a form (name, code, enrolled students)
+\item \textbf{If creating}: Website displays a blank form
+\item Teacher may edit this form and submit it
+\item The contents of the form are validated
+\item The database is updated
+\end{enumerate}
+\textbf{Postconditions}: Course is updated, or a new one created, with these details; the teacher is shown the newly updated coursework
+
+\subsection*{UC - Upload submission for coursework}
+\textit{A student wants to submitsome sort of answer submission for a coursework - e.g. a solution source code or a test case}\\
+\textbf{Primary Actor}: Student\\
+\textbf{Preconditions}: Student is logged in, student is enrolled on course, coursework is accepting submissions\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Student picks file(s) for submission, and the type of the file (solution, test case)
+\item Student uploads this to website
+\item Website Processes this uploaded submission
+\end{enumerate}
+\textbf{Postconditions}: The submission is uploaded to the website
+
+\subsection*{UC - Create \& Run Test Match}
+\textit{A teacher wants to match a solution and a test case together and get the output of running them}\\
+\textbf{Primary Actor}: Teacher\\
+\textbf{Preconditions}: Teacher is logged in and enrolled on a course\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Teacher views file uploads for a coursework
+\item Teacher selects a solution and test case
+\item Teacher decides whether to keep it invisible from students, to make it visible to developer, to assign a marker\todo{conflicting wording - tester}
+\item Teacher submits these details
+\item Website processes this request, creates a test match
+\item The test match is queued to run
+\end{enumerate}
+\textbf{Postconditions}: Depending on the configuration of the website, the test match may be queued to run or run immediately. After it has run the results are stored in a file\\
+comment: \todo{this is changed later to allow students to also create test matches..., mention appropriate anonymisation of results - e.g. dirs and paths... have a special method in pipeline of running rsults in code?}
+
+\subsection*{UC - Create Test Match Feedback}
+\textit{A student has viewed a test match and wants to give feedback to the developer}\\
+\textbf{Primary Actor}: Student\\
+\textbf{Preconditions}: Student is logged in, enrolled on course, student has viewed test match\\
+\textbf{Main Flow}:
+\begin{enumerate}[noitemsep,nolistsep]
+\item Student submits feedback text
+\item Website stores this as a file
+\item Website attaches this file as one related to the test match
+\end{enumerate}
+\textbf{Postconditions}: Feedback is submitted, next time it is viewed, feedback will be shown as well as other files
+comment: \todo{note that the idea of giving feedback just on solutions may be faulty, may want to feedback test cases as well, in addition, mention somewhere about extended interaction / discussions for feedback rather than single  comment. note lack of feedback editing}
+
+\section{Sequence of Operations}
+In order to better grasp the sequence of operations that a class of users (student developers, testers, and teachers), I have developed the following sequence diagram. \todo{note that this was improved upon in the next iteration of development}\\
+\begin{figure}[ht]
+
+\caption{Sequence diagram showing how students, teacher and the website interact during a coursework exercise}
+\label{fig:i1sd}
+\end{figure}
+
+
 \section{Choosing Tools}
 There are many ways that the website could be built. To identify some options, I considered the available software on the university servers, and Identified languages and frameworks that could be used here:\par
 \textbf{Languages:} Java Server Pages, PHP, Python\par
@@ -491,7 +644,9 @@ For this initial prototype, I would aim to get the core functionality implemente
 Given that Django offers some prefab content for authentication, this was easily implemented.\par
 For file uploads, the main issue was of how to get them from the file and store them on the filesystem. The standard Django methodology for doing this would be to create a form class with the relevant file upload field. Then, within a view, display this form and extract the file for saving through a POST request. Django can then store an uploaded file by instantiating a Model in a database. This process could have perhaps been done using a standard HTTP PUT request, however I felt it would be more secure to use the standard Django method.\par
 The file could be written directly to the system, but using the database offers a nice abstraction that means lower level file system management operations are not required. This also simplifies development of finding files later (if not necessarily the actual efficiency of the operation), as you would not have to search through a filesystem, just rows in a database tables.\par
+
 \section{Initial Interface Design}
+\doublespacing
 Given that the focus of this initial prototype was more concerned with testing that functionality could work, I have decided to place less of a focus on the UI implementation, However I prepared some mock-ups describing the main sections that users logged into the site would see. These mock-ups are included in an appendix \todo{which one, and remember to add it, and keep stage 2 separate, maybe add more comments on each}.
 \subsection{(Students) The Coursework Overview}
 After selecting a coursework from a list, the students would be displayed a page that contained all of the necessary instructions to complete the coursework, including links to where they could download full descriptors, code samples, etc. This page also offers a link to a page for uploading solutions to the site. This page also displayed links to the feedback view where students would either give or receive feedback.\par
@@ -565,7 +720,8 @@ One of the requests suggested that it would be beneficial to allow multiple file
 As will be used within an evaluation study, more effort is placed into the design of the UI at this stage than the previous one. Most of the design stayed the same, but in some places it was improved:\par
 The \textit{feedback view} was changed to support multiple files being used per solution / test case. Instead of panels with files, there is a tab control that allows the user to switch between each of the files individually. A compromise that only allows one file to be viewed at once, but allows for multiple files to be seen without needing to change/reload the web page.\par
 Within the \textit{Coursework Overview}, to encourage students to familiarise themselves with how the system works\todo{a la joe wells suggestion}, they are offered the ability to create their own tests on the system, whereas previously any testing of their own would need to happen offline. This allows them to create a test match, and also lets them access the signature test and oracle. In a similar vein, to encourage additional testing, once students have been assigned someone elses work to test, they can upload additional tests to use when providing feedback.\par
-Given the ease with which HTML can be modified, and that much of what I needed was already present, I simply made the UI changes directly without preparing mock-ups. \todo{attach screenshots / appdx}
+Given the ease with which HTML can be modified, and that much of what I needed was already present, I simply made the UI changes directly without preparing mock-ups. \todo{attach screenshots / appdx}\par
+To increase the level of anonyhmity everything public facing was given \todo{random slugs - anon, security etc.}
 \section{Further development}
 As part of supporting multiple files per submission
 \section{Live Hosting}
@@ -594,7 +750,8 @@ Participants filled out a consent form, as can be seen in appendix \todo{number?
 My observations - the website architecture is not very good. I definitely needs re-thinking in terms of how things work. For example, forcing people to submit stuff before a deadline doesn't seem optimal, but maybe thats what teachers want. what if students wwho finish early could peer test themselves while others finish later, withou having long dealys- that seems a good change that would be needed.\par
 Also, there is the issue that students may wish to peer-test the tests as well, which would require a re-working of the way things are managed in terms of test match creation.\par
 Regarding the solutions that were submitted, there seems to be a great deal of variety - this is good. It shows that the interface was clear enough to follow, but not overly restrictive regarding what people were able to use. The different implementations will hopefully allow those doing the peer-testing to learn by see alternative ways of completing the task\par
-The website did not handle very well the different indentation related issues from python, as well as some issues with ... \todo{go  on...}
+The website did not handle very well the different indentation related issues from python, as well as some issues with ... \todo{go  on...}\par
+The teachers view was created with quite minimal functionality, with most focus given to the student view. This did cause some issues though, for example with regards to editing descriptor files for a givne coursework - this is simply not supported and would of course be an addition that would be needed for actual use by a teacher. \todo{add new requirements list?}
 \section{Participant Feedback}
 \subsection{External Questions}
 I invited particpants to contact me directly if there were any queries or problems that occurred during the study.\par
