@@ -4,14 +4,11 @@
 % BEGIN
 
 \usepackage[utf8]{inputenc}
-\usepackage[backend=bibtex]{biblatex}
-\bibliography{../Dissertation.bib}
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{longtable}
 \usepackage{xcolor}
 \usepackage{listings}
-\usepackage{hyperref}
 \usepackage{wrapfig}
 \usepackage{setspace}
 \usepackage{datetime}
@@ -22,9 +19,15 @@
 \usepackage{tikz-uml}
 \usepackage{pgf-umlsd}
 \usepackage{pgfgantt}
+\usepackage{pgfplots}
+\usepackage{pgfplotstable}
+\pgfplotsset{compat=1.8}
 \usepackage{pdflscape}
 \usepackage{pdfpages}
 \usepackage{showframe}
+\usepackage[backend=bibtex8]{biblatex}
+\bibliography{../Dissertation.bib}
+\usepackage{hyperref}
 \usepackage{geometry}
 \geometry{
  a4paper,
@@ -680,7 +683,7 @@ Do we want UML diagrams here? At each `iteration of development stage? wherefore
 \draw [line] (v) -- (ht);
 \end{tikzpicture}
 \caption{Diagram showing the main components of the system at this iteration}
-\label{fig:i1sd}
+\label{fig:i1sysd}
 \end{figure}
 The initial system uses an MVC style architecture, as is recommended by Django.
 \subsection{Models}
@@ -757,12 +760,175 @@ The teachers view was created with quite minimal functionality, with most focus 
 I invited particpants to contact me directly if there were any queries or problems that occurred during the study.\par
 One issue discussed was that once a feedback comment has been submitted for a test match, it cannot be modified. This caused issues for one participant as they had accidentally clicked the submit button. It may be worth modifying this such that feedback can be changed after it has been submitted, although a history of responses would need to be kept.
 \subsection{Feedback Survey}
-At the end of the study, I asked students to fill out a feedback survey (included as an appendix \todo{which?})
-This is a summary of the responses \todo{include bulk of all responses? what about bulk responses of code, etc.?}
+At the end of the study, I asked students to fill out a feedback survey (included as an appendix \todo{which?}). There were 5 total respondents, not all of whom answered every single question. Included is a summary of the responses \todo{include bulk of all responses? what about bulk responses of code, etc.?}
+\subsubsection{Simulated Coursework Exercises}
+This section asked participants how well they felt they did on each exercise by asking them to select choices from a set of statements. There was also some space for user input. In addition, they were asked how many test cases they produced, and how many tests failed. Due to issues with the website causing some tests to fail, I do not feel that much can be learnt from the latter point.\par
+The \textit{Quicksort} exercise was found, overall, to be easy, likely because many people had completed this exercise before, and that the instructions for the exercise were good. The participants found it enjoyable and easy to write tests for this exercise (both to test themselves and others), and they felt that unit testing was an appropriate method of testing. 3 participants produced 4 test cases, 1 produced 1 test case. Of the test cases produced, none failed.\par
+The \textit{Binary Tree} exercise was found to be challenging by some and easy by others. Some had completed such a task previously, and the instructions were found to be good. Most participants felt it was easy to write tests for themselves and others, and that unit testing was an appropriate method for this task. Two participants produced 4 test cases, 1 produced 2 and 1 produced 8. \todo{worth looking directly at the uploaded files?} Of these, the 8-case long, and one 4-case test failed completely.\par
+Overall, I would take these results to suggest that the exercises were well explained to participants, and that the chosen exercises were a good fit for the study as a whole, as they offered a wide range of test case creation \todo{again, reference the actual test files themselves?}.\par
+\subsubsection{Peer-Testing Website}
+The survey included questions relating to how students felt regarding the website itself. These questions included some Likert-scale based questions regarding how easy to use and quick the website was, as well as some multiple choice and extended answer questions to gauge people's interactions. In addition, there were some questions that aimed to see how they used different devices (desktops, mobiles, etc.).\par
+\todo{grafs?}
+On a scale on 1 (very difficult), to 5 (very easy), participants responded as follows to the questions ``Was it easy to...'':\\
+\pgfplotstableread{ % Read the data into a table macro
+Label VDiff Diff Meh Easy VEasy
+understand\space coursework\space details\space page 0.0 0.2 0.2 0.2 0.4 
+submit\space files 0.0 0.2 0.0 0.4 0.4 
+understand\space process\space for\space giving\space feedback 0.0 0.0 0.0 0.8 0.2 
+navigate\space feedback\space view 0.0 0.0 0.0 0.6 0.4 
+}\testdata
+
+\begin{tikzpicture}
+\begin{axis}[
+            xbar stacked,   % Stacked horizontal bars
+            xmin=0,         % Start x axis at 0
+            ytick=data,     % Use as many tick labels as y coordinates
+            yticklabels from table={\testdata}{Label}  % Get the labels from the Label column of the \datatable
+]
+\addplot [fill=red] table [x=VDiff, meta=Label,y expr=\coordindex] {\testdata};   % "First" column against the data index
+\addplot [fill=orange] table [x=Diff, meta=Label,y expr=\coordindex] {\testdata};
+\addplot [fill=yellow] table [x=Meh, meta=Label,y expr=\coordindex] {\testdata};
+\addplot [fill=lime] table [x=Easy, meta=Label,y expr=\coordindex] {\testdata};
+\addplot [fill=green] table [x=VEasy, meta=Label,y expr=\coordindex] {\testdata};
+\end{axis}
+\end{tikzpicture}
+\todo{FIX THIS LATER. WHO NEED VISUALISATIONS, RIGHT?}
+\par
+These results \todo{ref a graph?} indicate that the feedback view is easily understood, but that some work could be given into better explaining how the rest of the site works.\par
+When asked about the various functions used on the site, 1 person used all available testing functionality, Most \todo{is 'most' an acceptable summary, or should I be used actual values at this point} ran tests for their own solutions. However, not many people know what identity and oracle solutions are for and not many people used testing someone else's solution functionality. This could mean that these functions require more explanation or that their discoverability could be improved.\par
+Participants responded positively when asked about how responsive the website was. Granted, there were only a few participants, and it is unlikely they were using the website at the same time, but it is encouraging to know that there doesn't seem to be any immediate issues with slowness.\par
+Participants were given a chance to provide general feedback regarding the website.The main points that were brought up included:
+\begin{itemize}
+\item The layout of the website would require improvement. Currently there are parts of the website, such as the feedback view that don't make efficient use of available screen space, although the general idea behind the design of the feedback view is a good one.
+\item The design of the website UI is very minimal. It would benefit from more colours and styling.
+\item Currently, most uploads are identified by random IDs. These are quite hard to manage when selecting the to run tests, so they would need to be improved into something more usable (easily read and remembered)
+\item The site currently remembers login sessions - according to the respondent it does this better than the university VLE (Blackboard) - While this is noted as a positive, it indicates that the website is not in line with that of the university security policy.
+\end{itemize}
+The question of anonymty was important in this website, so some questions involved checking if the participants were able to guess who they were giving feedback to on the website. Only 1 responded with a maybe when asked if they knew who wrote the code they were testing. When asked if they knew the location of the person whose code they were testing, 3 did not know, 1 maybe knew and one felt that yes, they did know. Of course, there was no way to be sure about this.\par
+Regarding the performance of the website on different devices, while participants were not instructed in which device type to use, I felt it worthwhile to ask anyway. All of the participants responded saying the used a desktop/laptop device. This is also the same type of device they normally do development of code on. When asked about what would be a use case for the website and mobile devices, some respondents said that it would be beneficial to view feedback (not give feedback, though), on mobile devices.\par
+When asked about any other issues with the website not yet covered, one participant raised the issue that they were not able to see the code files of the person they were testing. Checking this revealed that the person they were testing had not marked their solution as public and final. I believe that this is a UX issue on the side of the website, as it may have not been immediately apparent what a \textit{final} or \textit{private} solution was.\par
+In terms of additional features, most participants would like to see the following in a future version:
+\begin{itemize}
+\item Notifications of new feedback via email
+\item Good anonymity
+\item Extended back-and-forth discussions (as opposed to one feedback alone)
+\end{itemize}
+Some participants also felt that categorizing tests by importance \todo{I forget exactly what this means, and the people who selected this feature had their own ideas} would be useful.
+\todo{some sort of summary of this section}
+\subsubsection{Peer-Testing}
+In order to gain an insight into peoples perceptions of peer-testing, participants were asked some questions about peer activites and how these might fit into the university courses.\par
+The first point participants were asked about was if they had participated in peer activites before. 1 person responded positively describing an activity involving essay peer marking and feedback.\par
+The participants were asked to rate some statements describing peer-testing on a scale of 1 (strongly disagree) to 5 (strongly agree). \todo{another CHART. hurray.}
+\begin{figure}
+\caption{eugh}
+\end{figure}
+Overall, \todo{describe the graph of Likert answers}.
+Participants were asked if they though that such peer-testing should be reciprocal (both participants tets each other), and if this should happen across campuses. Most responded neutrally regarding reciprocty, but more positively towards the idea of cross-campus interactions.\par
+\subsubsection{Demographics}
+\todo{we asked them about it, but we already know who took part, so I don't think this really adds very much. Also, theres the issue that not everyone who signed up took part, and not everyone who took part filled out the form.}
+
 \subsection{Discussion}
-In the discussion, the following points happened...
+In the discussion, the following points happened:\par
+Regarding the peer-testing website, some points were raised in that Feedback is good for getting a new view on code, and a 2-way review of code can show what parts of code are unclear (e.g. any issues with code readability).\par
+When asked about running tests on the website, there were issues \todo{note that ypou're kind of repeating a lot of stuff from the feeedback survey. am i organising these sections wrong, should all of the feedbakc be merged into categories?}
+Running tests on web?
+Website could be made more straight forward wrt the process to giving tests
+Selecting the test cases for running was awkward to learn how to work it
+
+Runnign cli vs website?
+Helpful in automating running the tests
+But not as quick as bashing something out on cli
+
+Using web vs sharing via email?
+Web vs email is fairly similar in current state
+Web is more direct, web could offer "check boxes" to see if certain crtieria were met
+Email is a bit more personal in terms on giving a face to code
+
+Anonymity?
+Anonymity is better as it reduces judgements
+
+Any class exercises better using peer assessment website?
+Need to be careful about plagiarism - when uploading and seeing others
+On vision, there was some issue with peer assessment that was done due to lack of anonymity
+Peer review works better for larger courseworks
+Could do a peer review on the end result rather than looking into the code, and feedback limits
+
+Any courses you do right?
+Software engineering - solutions will all be very different offering much place for discussion
+Data structures & algorithms
+There are specific assignments that fit well with this kind of assessment
+Programming based exercises with clear interfaces
+
+Improvements on site:
+More of a back and forth discussion during feedback
+[from earlier - criteria for matching coursework grading]
+[anon - maybe some level of background if not full knowledge of who they are would help tailor feedback]
+Better UX - better UI and colours
+
+Were the exercises suitable?
+Good questions
+Well defined behaviours - makes it easy to test
+Tree would need to match spec exactly, possibly enforce on website site
+
+Tabs or spaces?
+Always tabs - dubai
+Python's a mess
+Tabs converted to spaces - edinburgh
+Spaces are better for partability, but tabs are more usable
+EOLs are also an issue
+[note from me: need to fix this in input pipeline? Of uploads]
+
+Enjoy this?
+Yes.
+
+\todo{follows is manuels questions}
+
+Do you normally write tests?
+Not unit tests, but on the fly testing [informal]
+Didn't normally unit test - but writing them showed some shortcommings
+
+Was it good to have time to do your own tests?
+Its good to have a known good solution - this points out if your understanding is correct
+
+Pair programming vs peer testing - feedback options?
+Pair programming usually happens much faster - dubai
+Paired exercises  - when you break up solutions, you don’t always end up giving feedback, can possibly slow things down, you may not want to hurt feelings [anonymity may protect this, allowing for more criticism] - edi
+Just asking someone directly can help solve a problem much faster than looking up solutions by yourelf
+Can share "insider knnowledge" of shortcuts by discussing in person
+
+Was there enough information to do this?
+Initial thought was there too much work - better to have everything in one place
+Instructions were pretty clear
+An initial demo - maybe be helpful
+Initial start was a bit confusing - but once got started was quite difficult
+Could have made it clearer describing that there were separate parts - could solve by having a single document desccriptor or a video tutorial describing task
+With paper you can have it next to you to check - this is not possible with video
+
+Website output - was it clear what the website was doing behind the scenes
+With many files it could be messy - add distinction of what are tests, sources, results etc.
+Re-ran tests for indentation - got same sort of issue
+Some effort should be given on the part of the tester to make the code testable [if there are minor errors]
+Tested on own computer before running on website - different architectures give different results, e.g recursion limits
+[feature from dubai: An in-built editor for website would be useful, editing tests on the fly]
+[note from me: you're basically making a web-based IDE]
+
+Additional notes:
+Having mobile suport would be good fo giving feedback on the go
+There is a big difference in whether or not you do peer review before or after the submission deadline - to allow for improvement of code
+[mm: not necesaiyl need to change the code, but to explain how you would fix it based on the feedback]
+
+Student x-campus interactions:
+Once you realise you're acting x-campus, it becomes more "interesting"
+Scope for learning from acting x-campus
+Could help for when different lecutres share different experiences based on their lecturers
+
 \section{Results}
-Have main objectives been met?
+Have main objectives been met? The main evaluation objectives that this website aimed to achieve are:\par
+\textbf{Correct}: This evaluation would suggest that there are many faults in this protoype that would need to be ironed out. Some of these issues would stem from underlying X problems (such as people not beign able to see files, which is caused by people misunderstanding hwo files are marked as private or final). There also seems to be some issue with respect to making sure that test cass can run succesfully - This would need to be fixed as part of the pipeline system  \todo{mention that this wasn't fully implemented before testing, and as part of conducting the signature check on solutions, youc ould do some sort of check ont est cases to make sure they were parseable... perhaps?}. Other than this, the behaviour of the site seemed to be consistemt with what was expected. \todo{Do i ever want to mention the lack of unit testing? I could mention it and discuss how as this si a prototype the overhead associate dwith producing tests mgiht be very high. Besides, I think the solution I ended up with is kind of ugly, and re-writing it migth allow for some unit -testing kind of situations now I know ore about what the whole thing is supposed to be doing}\par
+\textbf{Usable}: There are many usability isses in the website. Partly stemming from the lack of nice appearance and layout, which might act psycologically to make people think its more complicated \todo{citaiton needed}. The UX of the site is also difficult. There are issues with onboarding, discoverability and general understanding of what each part of the site does (with the exception of the feedback view, which was found to be self-explanatory, once participants were able to find it). \todo{do we mention fixes for problem here or in the next chapter?}. In terms of the responsivenes of the website, it seemed to be performing well. The website seems to be lackign some common abilities one would expect from a website with social interaction, such as being able to edit comments in feedback, which is unexpected behaviour.\par
+\textbf{Speed}: I am beginning to suspect that including this a an evaluation objetive was an optimistic choice. Due to the issues that arose during the conducting of the experiment (with some participants opting to leave the study early), and email responses only being produced at the time of the website going into feedback mode (possibly a mis-communication of the time slices in the initial email I sent out \todo{appendix this?}); I do not feel I have enough evidence to comment on any improvements or deteriorations in turnaround time for getting feedback through either method.\par
+\textbf{Enhance}: Based on the feedback given regarding the need for 2-way discussions during feedback, I suspect that the email based feedback system outperforms the website. And due to the issues that ocurred with many tests not running fully, I feel that the feedback given on the site would obviously not be as detailed as one would expect.
+Secure
 ...
 % END
 
@@ -833,21 +999,21 @@ I confirm that the project involves only standard IT equipment and exposes parti
 \newpage
 \addcontentsline{toc}{section}{B: Evaluation Consent Form}
 % BEGIN
-\includepdf[pages={1}]{eva/consent.pdf}
-\includepdf[pages={2}]{eva/consent.pdf}
+\includepdf[pages={1}]{eva/consent2.pdf}
+\includepdf[pages={2}]{eva/consent2.pdf}
 
 
 \newpage
 \addcontentsline{toc}{section}{C: Evaluation Survey Form}
-\includepdf[pages={1}]{eva/survey.pdf}
-\includepdf[pages={2}]{eva/survey.pdf}
-\includepdf[pages={3}]{eva/survey.pdf}
-\includepdf[pages={4}]{eva/survey.pdf}
-\includepdf[pages={5}]{eva/survey.pdf}
-\includepdf[pages={6}]{eva/survey.pdf}
-\includepdf[pages={7}]{eva/survey.pdf}
-\includepdf[pages={8}]{eva/survey.pdf}
-\includepdf[pages={9}]{eva/survey.pdf}
+\includepdf[pages={1}]{eva/survey2.pdf}
+\includepdf[pages={2}]{eva/survey2.pdf}
+\includepdf[pages={3}]{eva/survey2.pdf}
+\includepdf[pages={4}]{eva/survey2.pdf}
+\includepdf[pages={5}]{eva/survey2.pdf}
+\includepdf[pages={6}]{eva/survey2.pdf}
+\includepdf[pages={7}]{eva/survey2.pdf}
+\includepdf[pages={8}]{eva/survey2.pdf}
+\includepdf[pages={9}]{eva/survey2.pdf}
 % END
 
 
@@ -855,29 +1021,26 @@ I confirm that the project involves only standard IT equipment and exposes parti
 \addcontentsline{toc}{section}{D: Evaluation Extended Discussion Questions}
  % BEGIN
 \section*{D: Evaluation Extended Discussion Questions}
-These questions were discussed in a debriefing session after the evaluation study had completed. \todo{make sure these are up to date - if any new ones were added or not used...}\par
+These questions were discussed in a debriefing session after the evaluation study had completed. Both Myself and Manuel Maarek had prepared some questions to ask during this evaluation study. The following were questions prepared by myself:\par
 \begin{itemize}
-\item Describe what you think peer assessment is?
-\item Describe what you think the website is meant to do?
-\vspace{1cm}
-\item Was it faster to use the website or not use it to complete peer assessment?
-\item Did either using the website allow you to give better feedback?
-\item Did either using the website allow you to receive better feedback?
-\item Did using the website give a more useful overall peer assessment experience?
-\vspace{1cm}
-\item If a coursework involved peer assessment, would you find that useful?
-\item Which courses would benefit most?
-\vspace{1cm}
-\item Do you think peer assessment exercises would benefit from using the website?
-\item Any specific kinds of peer assessment?
-\vspace{1cm}
-\item Do you feel that anonymity is important during peer assessment?
-\item If so, Do you think the anonymity provided by the website was adequate?
-\item Do you feel that peer assessment tasks are made more difficult by a lack of anonymity?
-\vspace{1cm}
-\item What features do you think a website like this ought to have?
-\vspace{1cm}
-\item Did you enjoy taking part in this evaluation?
+\item Is peer feedback useful forgetting a new view on code?
+\item How did you feel about running tests on the website?
+\item How was running tests on the website when compared to a command line interface?
+\item How do you feel about anonymity during peer activities?
+\item Can you think of any classes that benefit from such a peer assessment website?
+\item Can you think of any improvements that ought to be made to the website?
+\item Were the exercises you completed suitable for the website?
+\item In python, do you use tabs or spaces?
+\item Did you enjoy taking part?
+\end{itemize}
+The following questions were prepared by Manuel Maarek:
+\begin{itemize}
+\item Do you normally write tests for your code?
+\item Was it good to have time set aside for you to test code?
+\item How do you feel about the feedback options afforded through peer activities or pair programming?
+\item Was there enough information provided to complete the task
+\item Was it clear what the website was doing behind the scenes?
+\item What are your feelings on cross-campus interactions?
 \end{itemize}
 % END
 
