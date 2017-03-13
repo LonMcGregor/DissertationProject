@@ -2,6 +2,7 @@
 {% block title %}Choose a Coursework{% endblock %}
 {% block content %}
     {% if courseworks %}
+        <h1>Choose a coursework to view:</h1>
         {% for id, state, course, title in courseworks %}
             <p><a href="/student/cw/{{ id }}" class="coursework coursework_{{ state }}"
             >{{ course }}:
