@@ -25,5 +25,6 @@
 }
 
 #note_count {
-    float: right;
+    /*float: right*/
+    display: none;
 }
