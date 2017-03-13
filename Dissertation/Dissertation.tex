@@ -378,7 +378,7 @@ The following is a glossary of terms used in the remainder of this dissertation.
 \gloss{Submission}{A solution, test case, coursework descriptor, etc. Any item made up of one or more files that is uploaded to the system by a student or teacher.}
 \gloss{Test Case}{A students test case that is to be run against a solution}
 \gloss{Test Match}{A matching of a test case and a solution. It will eventually have results, and may also have attached feedback}
-\gloss{Website}{To use laymans terms when discussing a web platform or web application - For this dissertation this will refer to a Client-Server type system}
+\gloss{Website}{Shortened form referring to a web platform or web application}
 % END
 
 
@@ -855,7 +855,7 @@ Could do a peer review on the end result rather than looking into the code, and 
 
 Any courses you do right?
 Software engineering - solutions will all be very different offering much place for discussion
-Data structures & algorithms
+Data structures \& algorithms
 There are specific assignments that fit well with this kind of assessment
 Programming based exercises with clear interfaces
 
@@ -924,19 +924,37 @@ Could help for when different lecutres share different experiences based on thei
 
 \section{Results}
 Have main objectives been met? The main evaluation objectives that this website aimed to achieve are:\par
-\textbf{Correct}: This evaluation would suggest that there are many faults in this protoype that would need to be ironed out. Some of these issues would stem from underlying X problems (such as people not beign able to see files, which is caused by people misunderstanding hwo files are marked as private or final). There also seems to be some issue with respect to making sure that test cass can run succesfully - This would need to be fixed as part of the pipeline system  \todo{mention that this wasn't fully implemented before testing, and as part of conducting the signature check on solutions, youc ould do some sort of check ont est cases to make sure they were parseable... perhaps?}. Other than this, the behaviour of the site seemed to be consistemt with what was expected. \todo{Do i ever want to mention the lack of unit testing? I could mention it and discuss how as this si a prototype the overhead associate dwith producing tests mgiht be very high. Besides, I think the solution I ended up with is kind of ugly, and re-writing it migth allow for some unit -testing kind of situations now I know ore about what the whole thing is supposed to be doing}\par
-\textbf{Usable}: There are many usability isses in the website. Partly stemming from the lack of nice appearance and layout, which might act psycologically to make people think its more complicated \todo{citaiton needed}. The UX of the site is also difficult. There are issues with onboarding, discoverability and general understanding of what each part of the site does (with the exception of the feedback view, which was found to be self-explanatory, once participants were able to find it). \todo{do we mention fixes for problem here or in the next chapter?}. In terms of the responsivenes of the website, it seemed to be performing well. The website seems to be lackign some common abilities one would expect from a website with social interaction, such as being able to edit comments in feedback, which is unexpected behaviour.\par
-\textbf{Speed}: I am beginning to suspect that including this a an evaluation objetive was an optimistic choice. Due to the issues that arose during the conducting of the experiment (with some participants opting to leave the study early), and email responses only being produced at the time of the website going into feedback mode (possibly a mis-communication of the time slices in the initial email I sent out \todo{appendix this?}); I do not feel I have enough evidence to comment on any improvements or deteriorations in turnaround time for getting feedback through either method.\par
-\textbf{Enhance}: Based on the feedback given regarding the need for 2-way discussions during feedback, I suspect that the email based feedback system outperforms the website. And due to the issues that ocurred with many tests not running fully, I feel that the feedback given on the site would obviously not be as detailed as one would expect.
-Secure
+\subsection*{Correctness}
+\textit{Was the website behaving correctly? Were there any bugs?}\par
+This evaluation would suggest that there are many faults in this prototype that would need to be ironed out. Some of these issues would stem from underlying \todo{X} problems (such as people not begin able to see files, which is caused by people misunderstanding how files are marked as private or final). There also seems to be some issue with respect to making sure that test case can run successfully - This would need to be fixed as part of the pipeline system  \todo{mention that this wasn't fully implemented before testing, and as part of conducting the signature check on solutions, youc ould do some sort of check on test cases to make sure they were parseable... perhaps?}.\par
+Other than this, the behaviour of the site seemed to be consistent with what was expected. \todo{Do i ever want to mention the lack of unit testing? I could mention it and discuss how as this is a prototype the overhead associated with producing tests might be very high. Besides, I think the solution I ended up with is kind of ugly, and re-writing it might allow for some unit -testing kind of situations now I know ore about what the whole thing is supposed to be doing}\par
+\subsection*{Usability}
+\textit{How usable was the website, from the perspective of the end users?}\par
+There are many usability issues in the website. Partly stemming from the lack of nice appearance and layout, which might act psychologically to make people think its more complicated \todo{citaiton needed}. The UX of the site is also difficult. There are issues with onboarding, discoverability and general understanding of what each part of the site does (with the exception of the feedback view, which was found to be self-explanatory, once participants were able to find it). \todo{do we mention fixes for problem here or in the next chapter?}.\par
+In terms of the responsiveness of the website, it seemed to be performing well. The website seems to be lacking some common abilities one would expect from a website with social interaction, such as being able to edit comments in feedback, which is unexpected behaviour.\par
+\subsection*{Speed}
+\textit{Did the website allow for a faster turnaround of feedback than other methods?}\par
+I am beginning to suspect that including this a an evaluation objective was an optimistic choice. Due to the issues that arose during the conducting of the experiment (with some participants opting to leave the study early), and email responses only being produced at the time of the website going into feedback mode (possibly a mis-communication of the time slices in the initial email I sent out \todo{appendix this?}); I do not feel I have enough evidence to comment on any improvements or deterioration in turnaround time for getting feedback through either method.\par
+\subsection*{Enhance}
+\textit{Did the website improve the level of feedback given?}\par
+Based on the feedback given regarding the need for 2-way discussions during feedback, I suspect that the email based feedback system outperforms the website. And due to the issues that occurred with many tests not running fully, I feel that the feedback given on the site would obviously not be as detailed as one would expect.
+\subsection*{Security}
+\textit{Did the website act in a secure manner. Were there any security flaws?}\par
+At this stage, the only security in place lies within making sure users are authenticated. This would only allow university students to gain access to the system and upload / readfiles. However, due to a lack of time before the evaluation took place, I was unable to complete some of the other security features previously discussed.\par
+One issue I noticed lies with the way I handle the error output from having run the test cases. Firstly, the error output does not properly hide the file paths, which reveals information about the internals of the application (such as directories), and the output is not bounded by length. One student created a test case that failed due to a recursion limit. As a result, a very large stack trace was produced, and subsequently stored in a text file. This could pose a problem if there were many large files being created, as the website wold run out of storage. Similarly, there is no restriction on the maximum filesize the user can upload.\par
+There is also little restriction in this iteration of the website when considering what kind of scripts the user may run. Currently any python script can have access to any file uploaded, and potentially a user could upload any sort of script + a python script and have the python script call that other script. Scripts are also currently run on the same level as the website application itself, rather than as a user, which could lead to scripts being run in too permissive a fashion.
 ...
 % END
 
 % POST EVAL
 % BEGIN
 \chapter{Post-Evaluation Study Improvements}
-\section{Any Modifications}
-...
+\section{Planned Modifications}
+Improve the appearance of the website.\par
+Add more pipelining - possibly checks for filesize, process of results.txt to remove sensitive info Manuel made a suggestion at an earlier stage about using the filesystem directly instead of models - perhaps if i'm going to implement pipelines properly then I could simply forego the models for FILE. Because if I have the information from the submission model, that's enough to build up the file system\par
+help / [?] buttons to describe how things work a bit better.\par
+Remove private submissions - why do we need those? it'll just cause confusion.\par
+make submissions accessible more easily - ossibly timestamp everything and make that the front facing ID instead of the slug. But use the slug on the internal id and in URLs.
 % END
 
 
