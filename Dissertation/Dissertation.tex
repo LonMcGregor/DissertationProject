@@ -149,6 +149,7 @@ Thanks to Manuel Maarek for helping me to organise this project. Additionally, t
 
 
 % INTRODUCTION
+%BEGIN
 \chapter{Introduction}
 \todo{make sure all notes from first report are resolved}
 % descibe organisation of dissertation
@@ -190,7 +191,7 @@ This is a description of the ideal usage of the website, and identifies some \te
  \item A teacher can see all data that has been submitted to the website 
 \end{enumerate}
 Considering this process in terms of a more traditional peer assessment, the testers and developers would be assessors and assessees respectively.
-
+%END
 
 
 % BG CHAPTER
@@ -802,10 +803,13 @@ My observations - the website architecture is not very good. I definitely needs 
 Also, there is the issue that students may wish to peer-test the tests as well, which would require a re-working of the way things are managed in terms of test match creation.\par
 Regarding the solutions that were submitted, there seems to be a great deal of variety - this is good. It shows that the interface was clear enough to follow, but not overly restrictive regarding what people were able to use. The different implementations will hopefully allow those doing the peer-testing to learn by see alternative ways of completing the task\par
 The teachers view was created with quite minimal functionality, with most focus given to the student view. This did cause some issues though, for example with regards to editing descriptor files for a givwn coursework - this is simply not supported and would of course be an addition that would be needed for actual use by a teacher. \todo{add new requirements list?}
+%END
 
 \section*{Results}
 The following sections will break down the feedback I have received from participants into the major sections that I wished to evaluate, as set out in section \todo{\S 1.whatever}.
 
+%correct
+% begin
 \section{Correctness}
 \textit{Was the website behaving correctly? Were there any bugs?}\par
 \subsection{Failing Tests}
@@ -833,6 +837,7 @@ Additionally, one respondent raised the issue that they were unable \todo{make s
 \subsection{Summary}
 This evaluation would suggest that there are many faults in this prototype that would need to be ironed out. Some of these issues would stem from underlying permission management problems (such as people not begin able to see files, which is caused by the website miscommunicating how files should be marked as private or final). There also seems to be some issue with respect to making sure that test case can run successfully - This would need to be fixed as part of the pipeline system  \todo{mention that this wasn't fully implemented before testing, and as part of conducting the signature check on solutions, you could do some sort of check on test cases to make sure they were parseable... perhaps?}.\par
 Other than these issues, the behaviour of the site seemed to be consistent with what was expected. There are some places with minor cosmetic issues (such as forms that prompt saying incorrect input before anything has been entered, or mis-aligned html elements), but these did not adversely affect the functionality of the website.\todo{Do i ever want to mention the lack of unit testing? I could mention it and discuss how as this is a prototype the overhead associated with producing tests might be very high. Besides, I think the solution I ended up with is kind of ugly, and re-writing it might allow for some unit -testing kind of situations now I know ore about what the whole thing is supposed to be doing}\par
+%end
 
 \section{Usability}
 \textit{How usable was the website, from the perspective of the end users?}\par
@@ -844,6 +849,22 @@ Participants were given a chance to provide general feedback regarding the websi
 \item Currently, most uploads are identified by random IDs. These are quite hard to manage when selecting the to run tests, so they would need to be improved into something more usable (easily read and remembered)
 \item The site currently remembers login sessions - according to the respondent it does this better than the university VLE (Blackboard) - While this is noted as a positive, it indicates that the website is not in line with that of the university security policy.
 \end{itemize}
+
+To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \todo{num}) and to select all the statements that the respondent felt applicable (fig \todo{num}).
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
+\caption{Likert scale questions regarding the ease of use of the website}
+\end{figure}
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{eva-result/stmt-tests.png}
+\caption{Question asked users to select all statements that applied to them}
+\end{figure}
+The Likert scales seem to suggest that most users found the site easy enough to use, and that it responded in a pretty quick manner when interacted with. There did seem to be some issues in the coursework detail page, and its associated file upload page. The feedback view did not appear to have any major issues. Following these questions, respondents were invited to give a more extended description of any issues they had with the site. Some of the responses included:
+\begin{itemize}
+\item 
+\end{itemize}
+
+
 \subsection{Permission Issues}
 This iteration of the site allowed an uploaded submission to be marked as private \todo{I mentioned this earlier, right?}. In retrospect I do not think this is a particularly useful feature, as regardless of private values, only the solution marked as final will be shared, and anything else is hidden. The inclusion of this setting likely caused some confusion, which resulted in some files not being usable when a tester goes to give feedback. Going forward, it may be better to simplify the process of marking files as Final and give a better explanation as to what that means.
 \subsection{Modifying Feedback}
@@ -881,7 +902,28 @@ During the discussion session, when the participants were asked about their opin
 
 Some features that participants felt were important in improving the feedback offered through the website were to ensure a good level of anonymity, and to put in place the infrastructure to encourage extended back and forth discussions. Currently, the website only allowed one piece of feedback to be sent from the tester back to the developer, but it is true that in the email testing group, there was one instance of a back-and-forth that occurred, which allowed for more in depth discussion (and hopefully therefore learning) to occur. One person described a situation where a 2-way communication would allow for getting an insight into code readability as it would allow for explanation and discussion of unclear code.\par
 
-Having had some experience with the site, I asked the participants in the discussion if they felt there were any courses or coursework exercises they felt would be improved by using the peer-testing feedback offered by the website. 
+
+\subsection{Peer Activities}
+In order to find out students perceptions of peer activities, I asked if any had completed some before. Only 2 respondents to the survey had prior experience in peer activities. The peer activities were ``Essay peer-marking, giving feedback'' and ``Checking correctness and logic of code of other students in high school''. These responses would seem to suggest that peer activities are not currently utilised very much in programming courses at university.\par
+The participants were asked to rate their opinions on whether or not they agreed with certain website and peer-testing related statements. In figure \todo{which} the results can be seen:\\
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{eva-result/likert-peer-test.png}
+\caption{Responses for Likert questions with regards to peer-testing and the website}
+\end{figure}\par
+It is reassuring to see that the results affirm the previous research into this area \todo{ref}, suggesting that students believe they learn more by giving feedback as opposed to receiving it. There seems to be a somewhat mixed response to the idea that peer-testing can be better than a teacher's response, so an addition the site may benefit would be from allowing teacher interaction as well as peers. For the most part, it seems that students respond positively that the peer-testing helps with completing the exercises, and that this should be encourage in the university. Interestingly, the response to using such a peer-testing website more in university was less positive. This may be an indicator that the participants did not find the website all that useful.\par
+
+Having had some experience with the site, I asked the participants in the discussion if they felt there were any courses or activities within courses they felt would be improved by using the peer-testing feedback offered by the website. They suggested that the website would be useful for
+\begin{itemize}
+\item Larger Courseworks, which are likely to have very different solutions thus offering more places for discussion
+\item Data Structures and algorithms, where there are specific assignments that fit well with the website (although they did not name any specifically)
+\item Any programming exercise where the interface and specification is clearly set out
+\end{itemize}
+One concern was raised however in that offering such peer-testing might be detrimental to completing some exercises as it opens up a surface for plagiarism. \todo{need to discuss somewhere the advantages and disadvantages of having ``upload'' and ``feedback'' modes}.
+
+\subsection{Anonymity}
+The question of anonymty was important in this website, so some survey questions involved checking if the participants were able to guess who they were giving feedback to on the website. Only 1 responded with a maybe, and 1 yes when asked if they knew who wrote the code they were testing. When asked if they knew the location of the person whose code they were testing, 3 said they knew, 1 maybe knew the location. Of course, there was no way to be sure about this \todo{in retrospect, maybe I should have made this an open-answer field and asked them to tell me}. The low number of positive guesses as to who others were suggests that the site does offer anonymity.\par
+
+A participant mentioned that peer discussions done previous on the university VLE discussion boards would have been improved had the discussion been completed anonymously. The site currently offers anonymous feedback but doesn't yet allow for a multi-way discussion, but this comment suggests that it would fit in well. The point was raised that anonymity is better as it ``reduces judgements'' on people, and thus more of a focus is on the result of the exercise itself.
 
 \todo{ensure consistency of the wording - people who took part should be referred to as participants, not students}
 
