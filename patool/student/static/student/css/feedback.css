@@ -6,6 +6,7 @@ Styles relating to the panelled feedback page
     display: flex;
     flex-direction: column;
     width: 100%;
+    height: calc(100vh - 110px);
 }
 
 #file_view_container{
@@ -19,14 +20,16 @@ Styles relating to the panelled feedback page
 #file_tabs{
     display: flex;
     flex-direction: column;
-    width: 200px;
+    min-width: 180px;
+    max-width: 180px;
     min-height: 100%;
     background: #cccccc;
 }
 
 #file_tabs span {
     margin: 4px 0;
-    max-width: 200px;
+    max-width: 180px;
+    overflow: hidden;
 }
 
 #file_tabs span.active {
@@ -84,4 +87,19 @@ iframe{
 
 #feedback_input iframe {
     height: calc(100% - 20px);
+}
+
+span.test::before {
+    content: '[test]'
+}
+span.result::before {
+    content: '[result]'
+}
+span.solution::before {
+    content: '[solution]'
+}
+span.test::before, span.result::before, span.solution::before {
+    color: #333;
+    font-size: small;
+    padding-right: 5px;
 }
