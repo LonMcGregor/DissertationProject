@@ -223,6 +223,7 @@ def edit_coursework_update(new_details, old_coursework):
     old_coursework.state = updated_form.cleaned_data['state']
     old_coursework.save()
 
+import os, time
 
 def edit_coursework_render(request, coursework):
     """Get all of the necessary details to display a
@@ -230,7 +231,9 @@ def edit_coursework_render(request, coursework):
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
     submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(coursework=coursework)]
-    results = m.TestMatch.objects.filter(coursework=coursework)
+    results = [(result, time.ctime(os.path.getmtime(h.get_files(result.result)[0])), time.ctime(
+        os.path.getmtime(h.get_files(result.feedback)[0]))) for result in
+               m.TestMatch.objects.filter(coursework=coursework)]
     initial = {"name": coursework.name,
                "state": coursework.state}
     tm_initial = {"coursework": coursework.id}

@@ -74,9 +74,11 @@
         <th>Marker</th>
         <th>Developer</th>
         <th>Waiting to Run</th>
+        <th>Date Results Available</th>
+        <th>Date Feedback Given</th>
     </tr>
     </thead>
-    {% for f in results %}
+    {% for f, r, fb in results %}
         <tr>
             <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
@@ -100,6 +102,12 @@
         {% else %}
             <td>Has Run</td>
         {% endif %}
+        <td>
+{{ r }}
+        </td>
+        <td>
+{{ fb }}
+        </td>
         </tr>
     {% endfor %}
     </table>
