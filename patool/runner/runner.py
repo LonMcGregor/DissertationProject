@@ -5,10 +5,10 @@ import sys
 import threading
 
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.db import transaction
 
 import student.models as m
+import runner.pipelines as pipes
 
 """This module implements the execution mechanism with
 respect to python3 unit testing."""
@@ -24,17 +24,8 @@ def run_test(test_match_instance, exec_method):
     if not test_match_instance.waiting_to_run:
         return
     result, output = exec_method(test_match_instance.solution, test_match_instance.test)
-    result_sub = m.Submission(id=m.new_random_slug(m.Submission),
-                              coursework=test_match_instance.coursework,
-                              creator=test_match_instance.initiator,
-                              type=m.SubmissionType.TEST_RESULT,
-                              private=test_match_instance.solution.private or
-                                      test_match_instance.test.private)
-    result_sub.save()
-    result_file = m.File(submission=result_sub)
-    result_file.file.save('results.txt', ContentFile(output))
-    result_file.save()
-    test_match_instance.result = result_sub
+    result_file = pipes.python_results(output, test_match_instance)
+    test_match_instance.result = result_file.submission
     test_match_instance.error_level = result
     test_match_instance.waiting_to_run = False
     test_match_instance.save()
@@ -73,7 +64,6 @@ def execute_python3_unit(solution, test):
     outs = "" if outb is None else outb.decode('utf-8')
     errs = "" if errb is None else errb.decode('utf-8')
     output = outs + errs
-    output = output.replace(tmp_dir, '[[testing_directory]]')
     return proc.returncode, output
 
 
