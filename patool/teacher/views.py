@@ -231,8 +231,9 @@ def edit_coursework_render(request, coursework):
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
     submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(coursework=coursework)]
-    results = [(result, time.ctime(os.path.getmtime(h.get_files(result.result)[0])), time.ctime(
-        os.path.getmtime(h.get_files(result.feedback)[0]))) for result in
+    path = "/home/cs4/lm356/DissertationProject/patool/var/uploads/"
+    results = [(result, time.ctime(os.path.getmtime(path+h.get_file(result.result.id, h.get_files(result.result)[0]).file.name)) if result.result is not None else "", time.ctime(
+        os.path.getmtime(path+h.get_file(result.feedback.id, h.get_files(result.feedback)[0]).file.name)) if result.feedback is not None else "") for result in
                m.TestMatch.objects.filter(coursework=coursework)]
     initial = {"name": coursework.name,
                "state": coursework.state}
