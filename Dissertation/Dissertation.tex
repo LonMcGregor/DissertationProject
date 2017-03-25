@@ -281,7 +281,7 @@ This experiment followed the results students achieved over a sequence of 4 task
 \end{enumerate}
 The experiment looked to see if the peer marking was at all helpful in improving the marks of students between the two tests. The results found that the peer marking was very useful for students who had initially performed poorly. Student comments on the experience would suggest that they found the peer assessment process both enjoyable and informative. There is also evidence from this feedback indicating the importance of maintaining anonymity, as some students felt it would be difficult to the marking non-anonymously.\par
 From this, I can gather that the model of peer assessment used, through the web interface, was indeed successful. Based on the evidence from this study, the use of a similar system could well be helpful to students who would otherwise not have performed well. This study also revealed that students learnt a lot from the ``repetitive nature of the marking''. This could indicate that testers in such a system as mine might benefit from testing multiple solutions.\par
-Given that the user interface and flow of information through the application provided by CAP (figure \todo{ref{fig:cap}}) is in many ways similar to my conceptual website, I would have liked to obtain a copy of it to evaluate further. Unfortunately, Davies has not made the source for the website available for download.\par
+Given that the user interface and flow of information through the application provided by CAP (figure \ref{fig:cap}) is in many ways similar to my conceptual website, I would have liked to obtain a copy of it to evaluate further. Unfortunately, Davies has not made the source for the website available for download.\par
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{fig/CAP.png}
@@ -761,6 +761,12 @@ Given the ease with which HTML can be modified, and that much of what I needed w
 To increase the level of anonyhmity everything public facing was given \todo{random slugs - anon, security etc.}
 \section{Further development}
 As part of supporting multiple files per submission
+\begin{itemize}
+\item Setting one submission as final
+\item Setting submissions as private
+\item ...
+\end{itemize}
+
 \section{Live Hosting}
 In order to prepare for a live test of the system, I identified some possible options that could be used to host the Django application:
 \begin{enumerate}
@@ -797,7 +803,7 @@ As part of the final survey participants filled out, they were asked their opini
 The \textit{Quicksort} exercise was found, overall, to be easy, likely because many people had completed this exercise before, and that the instructions for the exercise were good. The participants found it enjoyable and easy to write tests for this exercise (both to test themselves and others), and they felt that unit testing was an appropriate method of testing.\par
 The \textit{Binary Tree} exercise was found to be challenging by some and easy by others. Some had completed such a task previously, and the instructions were found to be good. Most participants felt it was easy to write tests for themselves and others, and that unit testing was an appropriate method for this task.\par
 Overall, I would take these results to suggest that the exercises were well explained to participants, and that the chosen exercises were a good fit for the study as a whole, as they offered a wide range of possible solutions and therefore test case creation. For example, within the binary tree I saw several different patterns of object oriented solutions, and in the quicksort there were a wide variety of ways that arrays were split up for recursion.\par
-Questions asked in the discussion session seem to agree with these responses. The students said that they enjoyed taking part, and that the well defined expected behaviours of the tasks made it easy to test. Beyond this, some interesting points were raised regarding the way the tasks were distributed: While there was enough information provided in the various documents for the study, it may have been easier to understand if they had been placed in a single PDF, and that some sort of live/video demonstration would have helped explain the task better. \todo{summarize how the site could be improved with this advice?}
+Questions asked in the discussion session seem to agree with these responses. The students said that they enjoyed taking part, and that the well defined expected behaviours of the tasks made it easy to test. Beyond this, some interesting points were raised regarding the way the tasks were distributed: While there was enough information provided in the various documents for the study, it may have been easier to understand if they had been placed in a single PDF, and that some sort of live/video demonstration would have helped explain the task better.\par
 Regarding the solutions that were submitted, there seems to be a great deal of variety - this is good. It shows that the interface was clear enough to follow, but not overly restrictive regarding what people were able to use. The different implementations will hopefully allow those doing the peer-testing to learn by see alternative ways of completing the task\par
 
 \section*{Results}
@@ -828,35 +834,36 @@ Additionally, one respondent raised the issue that they were unable to see the f
 \section{Usability}
 \textit{How usable was the website, from the perspective of the end users?}\par
 \subsection{General Feedback Given}
-\todo{I don't think this is laid out correctly at all}
-Participants were given a chance to provide general feedback regarding the website.The main points that were brought up through the survey included:
+To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \ref{fig:likert-use}).\par
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
+\caption{Likert scale questions regarding the ease of use of the website}
+\label{fig:likert-use}
+\end{figure}
+The Likert scales seem to suggest that most users found the site easy enough to use, and that it responded in a pretty quick manner when interacted with. There did seem to be some issues in the coursework detail page, and its associated file upload page. The feedback view did not appear to have any major issues.\par
+Following the Likert scale questions, Participants were given a chance to provide general feedback regarding the website. The main points that were brought up through the survey included:
 \begin{itemize}
 \item The layout of the website would require improvement. Currently there are parts of the website, such as the feedback view that don't make efficient use of available screen space, although the general idea behind the design of the feedback view is a good one.
 \item The design of the website UI is very minimal. It would benefit from more colours and styling.
 \item Currently, most uploads are identified by random IDs. These are quite hard to manage when selecting the to run tests, so they would need to be improved into something more usable (easily read and remembered)
 \item The site currently remembers login sessions - according to the respondent it does this better than the university VLE (Blackboard) - While this is noted as a positive, it indicates that the website is not in line with that of the university security policy.
 \end{itemize}
-To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \todo{num}) and to select all the statements that the respondent felt applicable (fig \todo{num}).
-\begin{figure}[ht]
-\includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
-\caption{Likert scale questions regarding the ease of use of the website}
-\end{figure}
+\subsection{Running Tests}
+In the feedback survey, participants were asked to select certain statements that they felt applied to them. The results can be seen in figure \ref{fig:stmt-test}.\par
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{eva-result/stmt-tests.png}
 \caption{Question asked users to select all statements that applied to them}
+\label{fig:stmt-test}
 \end{figure}
-The Likert scales seem to suggest that most users found the site easy enough to use, and that it responded in a pretty quick manner when interacted with. There did seem to be some issues in the coursework detail page, and its associated file upload page. The feedback view did not appear to have any major issues.\par
-\subsection{Running Tests}
 When asked about the testing functions used on the site, 8 / 10 respondents tested their own solution and 6/10 said they felt they had tested someone elses solution. As part of the feedback process all of them would have had to test the other persons solution, but this was done automatically, so it may not have been entirely clear what was happening. Similarly, comparatively few people used the identity\footnote{At this point, the test I was using to check the interfaces matched up was called the identity test. I decided to change it to something more meaningful - the Signature test, and this is the nomenclature used throughout the rest of this document.} test and oracle tests. This suggests that these also need better explanation. In the discussion session, one participant said they liked having a good working solution they could test against, so it would be worth emphasising the existence of these options more.\par
 Further to this, when asked for a detailed explanation of any other problems with the site, One respondent said that the flow of the website when running tests was somewhat disrupted - When running tests you are shown a message saying the test is being run, but there is no indication of what to do next. Once tests are complete or files uploaded, you are left with many nonsensical IDs and these are hard to read and work with.
 \subsection{Permission Issues}
 \label{sec:permiss}
-This iteration of the site allowed an uploaded submission to be marked as private \todo{I mentioned this earlier, right?}. In retrospect I do not think this is a particularly useful feature, as regardless of private values, only the solution marked as final will be shared, and anything else is hidden. The inclusion of this setting likely caused some confusion, which resulted in some files not being usable when a tester goes to give feedback. Going forward, it may be better to simplify the process of marking files as Final and give a better explanation as to what that means.
+This iteration of the site allowed an uploaded submission to be marked as private. In retrospect I do not think this is a particularly useful feature, as regardless of private values, only the solution marked as final will be shared, and anything else is hidden. The inclusion of this setting likely caused some confusion, which resulted in some files not being usable when a tester goes to give feedback.
 \subsection{Feedback}
 One issue that cropped up in both the survey, and I was contacted directly by a participant over, was that once a feedback comment has been submitted for a test match, it cannot be modified. This caused issues for one participant as they had accidentally clicked the submit button. It may be worth modifying this such that feedback can be changed after it has been submitted, although a history of responses would need to be kept.\par
 \subsection{Site Appearance and Layout}
-There are many usability issues in the website. Partly stemming from the lack of nice appearance and layout, which might act psychologically to make people think its more complicated \todo{citaiton needed}. The UX of the site is also poor. There are issues with onboarding, discoverability and general understanding of what each part of the site does (with the exception of the feedback view, which was found to be self-explanatory, once participants were able to find it).\par
-In terms of the responsiveness of the website, it seemed to be performing well.\par
+There are many usability issues in the website. Partly stemming from the lack of nice appearance and layout, which might act psychologically to make people think its more complicated. The UX of the site is also poor. There are issues with explanation of features available and general understanding of what each part of the site does (with the exception of the feedback view, which was found to be self-explanatory, once participants were able to find it).\par
 The layout of the feedback view was good, with praise for the automatic syntax colouring of the code. However, it was suggested that the tab view could become harder to navigate if there were many files as there was little distinction between the different types of file (such as source code, test results, etc.).\par
 \subsection{Device Usage}
 Regarding the performance of the website on different devices, while participants were not instructed in which device type to use, I felt it worthwhile to ask anyway. All of the participants responded saying the used a desktop/laptop device. This is also the same type of device they normally do development of code on, although 1 respondent did say they also used a tablet computer, and 1 said they used a mobile device to program. When asked about what would be a use case for the website and mobile devices, 6 respondents said that they would use either tablet or mobile devices to interact with the feedback view. This same point was agreed upon in the discussion session.\par
@@ -889,9 +896,9 @@ A student from Edinburgh noted that in other Non-anonymous paired exercises, suc
 
 \section{Enhance}
 \textit{Did the website improve the level of feedback given?}\par
-Based on the feedback given regarding the need for 2-way discussions during feedback, I suspect that the email based feedback system outperforms the website. And due to the issues that occurred with many tests not running fully, I feel that the feedback given on the site would obviously not be as detailed as one would expect.\par
-During the discussion session, when the participants were asked about their opinions on cross-campus learning such as this, they felt that it was much more ``interesting''. Within the feedback,  there is greater scope for learning across campuses as you can give feedback based on different experiences you have had learning, and the different ways that lecturers will teach across campuses.\par
-Some features that participants felt were important in improving the feedback offered through the website were to ensure a good level of anonymity, and to put in place the infrastructure to encourage extended back and forth discussions. Currently, the website only allowed one piece of feedback to be sent from the tester back to the developer, but it is true that in the email testing group, there was one instance of a back-and-forth that occurred, which allowed for more in depth discussion (and hopefully therefore learning) to occur. One person described a situation where a 2-way communication would allow for getting an insight into code readability as it would allow for explanation and discussion of unclear code.\par
+It is important that if the website works properly, that the feedback and learning that happens as a result of using it is useful. Ideally it would outperform other means of peer-testing feedback and learning. Due to the issues that occurred with many tests not running fully, I feel that the feedback given on the site would obviously not be as detailed as one would expect.\par
+\subsection{Cross-Campus Learning}
+One of the benefits that using a website would offer is that it could make it easier for peer-testing activities to take place across campuses. During the discussion session, when the participants were asked about their opinions on cross-campus learning such as this, they felt that it was much more ``interesting''. Within the feedback,  there is greater scope for learning across campuses as you can give feedback based on different experiences you have had learning, and the different ways that lecturers will teach across campuses.
 \subsection{Unit-Testing}
 During the discussion, a point was raised about how people normally do testing. Some said that they did not always to formal testing, but informally tested their code as it was developed. One participant said that by forcing themselves to write the unit tests this time, something they did not normally do, it revealed shortcomings in their own code that they had missed. This would suggest that the way the site forces the students to write code is beneficial.
 \subsection{Peer Activities}
@@ -913,12 +920,11 @@ One concern was raised however in that offering such peer-testing might be detri
 Having looked at some of the email based feedback, it looked as though many of the students were also providing feedback on the test cases themselves, in addition to the solution. It may be worth changing the way the website works to allow this sort of feedback also, as that may provide for more avenues for learning about how to improve both solutions and tests.\par
 Also, discussion noted that when you are giving feedback to a person, it is much more direct and that you can share ``insider knowledge'' of shortcuts in programming through discussion and feedback.\par
 \subsection{Anonymity}
-The question of anonymity was important in this website, so some survey questions involved checking if the participants were able to guess who they were giving feedback to on the website. Only 1 responded with a maybe, and 1 yes when asked if they knew who wrote the code they were testing. When asked if they knew the location of the person whose code they were testing, 3 said they knew, 1 maybe knew the location. Of course, there was no way to be sure about this \footnote{In retrospect, it would have been useful to ask this an open-answer field so I could confirm responses}. The low number of positive guesses as to who others were suggests that the site does offer anonymity.\par
+The question of anonymity was important in this website, and in the discussion session this point was reinforced by many. Some survey questions involved checking if the participants were able to guess who they were giving feedback to on the website. Only 1 responded with a maybe, and 1 yes when asked if they knew who wrote the code they were testing. When asked if they knew the location of the person whose code they were testing, 3 said they knew, 1 maybe knew the location. Of course, there was no way to be sure about this \footnote{In retrospect, it would have been useful to ask this an open-answer field so I could confirm responses}. The low number of positive guesses as to who others were suggests that the site does offer anonymity.\par
 A participant mentioned that peer discussions done previous on the university VLE discussion boards would have been improved had the discussion been completed anonymously. The site currently offers anonymous feedback but doesn't yet allow for a multi-way discussion, but this comment suggests that it would fit in well. The point was raised that anonymity is better as it ``reduces judgements'' on people, and thus more of a focus is on the result of the exercise itself.
-\todo{ensure consistency of the wording - people who took part should be referred to as participants, not students}
 \subsection{Feedback}
 In the discussion session, someone brought up the Idea that a 2-way discussion would be beneficial to giving more feedback. If a forum-style discussion was implemented for feedback, this could allow for feedback comments to be modified after they were sent.\par
-One student suggested that it would be nice to see a criteria for giving feedback (such a concept was referenced in the CAP system, see \S \todo{?}). And another participant discussed the idea that because of anonymity it may be hard to tailor feedback to the other person, so having a small amount of background information, such as their course or their programming strengths would be useful in helping to provide more relevant feedback. To complement that, one student liked the idea of having an identity in the email-based feedback as it allowed them to ``put a face to the code'' they were testing.
+One student suggested that it would be nice to see a criteria for giving feedback (the concept of criteria-based marking was used in the cap system, see fig \ref{fig:cap}). And another participant discussed the idea that because of anonymity it may be hard to tailor feedback to the other person, so having a small amount of background information, such as their course or their programming strengths would be useful in helping to provide more relevant feedback. To complement that, one student liked the idea of having an identity in the email-based feedback as it allowed them to ``put a face to the code'' they were testing.
 
 \section{Security}
 \textit{Did the website act in a secure manner. Were there any security flaws?}\par
@@ -946,7 +952,10 @@ This evaluation study revealed many issues with the usability of the website. Th
 \subsection{Speed}
 The evidence I was able to collect did suggest that the website offers for a faster turnaround than a peer exercises that uses e-mail as a base. Further investigation of this, with larger numbers, might be required to say with certainty. Suggested features to improve turnaround time even more included E-mail notifications for any new feedback, and a built-in editor to allow for quick tweaking of code for testing.
 \subsection{Enhance}
+The website did seem to make some steps towards providing better feedback and learning. The way the website operates allows for cross-campus activity and forces students to make use of unit-testing. Both of these features help enhance the learning and feedback that occurs during the process. Students felt that peer activities would be welcome if they were used in university courses more, and that the website would work well with Large courseworks in courses such as Data Structures \& Algorithms where the courseworks have clearly laid out specifications. Praise was given for the anonymity offered by the website as this allowed for more open feedback.\par
+One change that was discussed would be to introduce a way of allowing for multi-way discussions for feedback, in place of the current single-comment-per-test. This would allow for better communication and discussion of results and allow for more learning and sharing of insights into the code.
 \subsection{Security}
+...
 
 %more stuff...
 Add more pipelining - possibly checks for filesize, process of results.txt to remove sensitive info Manuel made a suggestion at an earlier stage about using the filesystem directly instead of models - perhaps if i'm going to implement pipelines properly then I could simply forego the models for FILE. Because if I have the information from the submission model, that's enough to build up the file system\par
