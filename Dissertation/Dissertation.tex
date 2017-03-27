@@ -7,7 +7,7 @@
 \usepackage{graphicx}
 \usepackage{tabularx}
 \usepackage{longtable}
-\usepackage{xcolor}
+\usepackage[dvipsnames,table]{xcolor}
 \usepackage{listings}
 \usepackage{wrapfig}
 \usepackage{setspace}
@@ -44,6 +44,11 @@
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\eva}[2]{\textbf{EVA-#1} & #2\\}
 \newcommand{\gloss}[2]{\textbf{#1} - {#2}\\}
+% \newcommand{\ls5}{\cellcolor{green}5}
+% \newcommand{\ls4}{\cellcolor{limegreen}4}
+% \newcommand{\ls3}{\cellcolor{goldenrod}3}
+% \newcommand{\ls2}{\cellcolor{yelloworange}2}
+% \newcommand{\ls1}{\cellcolor{brickred}1}
 
 
 \newcounter{FunCount}
@@ -789,13 +794,13 @@ To try and get as fair a response as possible, each participant in each group wo
 Participants filled out a consent form, as can be seen in appendix B (p\pageref{app:consent}), then took part in the peer-testing exercises. Upon completing this, they were given a survey, appendix C (p\pageref{app:survey}) to complete and an invitation to a discussion session, appendix D (p\pageref{app:discussion}). Finally, participants were rewarded with a gift voucher.
 
 \section{Participation}
-During the study I had planned for a group of 16 people participating, however throughout the process a lower number, actually took part, with 2 participants withdrawing, and not all participants completing the peer-testing exercise. Overall, 12 used the website at some point and 10 people filled out the final survey.\par
+During the study I had planned for a group of 16 people participating, however throughout the process a lower number, actually took part, with 2 participants withdrawing, and not all participants completing the peer-testing exercise. Overall, 12 used the website at some point and 11 people filled out the final survey.\par
 As part of the final survey participants were requested to fill out, the following demographic data was found:
 \begin{itemize}
-\item The majority of participants were Computer Systems students, with 7 participants. Then, 2 Software Engineering students and 1 Computer Science student.\footnote{Before 4th year, both the Software Engineers and Computer Scientists follow the same course.}
-\item Most of those who took part were Year 2 students 6, and 3 from Year 3\footnote{1 Participant did not identify which year they were from}. 
-\item There was a decent mix of students from both campuses, with 5 participants from each campus in Edinburgh and Dubai.
-\item There were more male participants, with 7 identifying as male, and 3 identifying as female.
+\item The majority of participants were Computer Systems students, with 8 participants. Then, 2 Software Engineering students and 1 Computer Science student.\footnote{Before 4th year, both the Software Engineers and Computer Scientists follow the same course.}
+\item Most of those who took part were Year 2 students (7 in total), and 3 from Year 3\footnote{1 Participant did not identify which year they were from}. 
+\item There was a decent mix of students from both campuses, with 5 participants from the campus in Edinburgh and 6 in Dubai.
+\item There were more male participants, with 7 identifying as male, and 4 identifying as female.
 \end{itemize}
 I feel that the spread of students that ended up taking part does provide a useful range over the demographics within the university as a whole.
 \subsection{Response to the Exercises}
@@ -837,9 +842,20 @@ Additionally, one respondent raised the issue that they were unable to see the f
 To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \ref{fig:likert-use}).\par
 \begin{figure}[ht]
 \includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
+\scriptsize
+\begin{tabular}{r|lllllllllll}
+How easy was it to understand the page with the details of the coursework?  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2   & \cellcolor{YellowOrange} 2\\
+How easy was it to submit a solution \& test case for the coursework?    & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2   & \cellcolor{RedOrange} 1\\
+How easy was it to understand the process for giving feedback?  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
+How easy was it to navigate the view where you give feedback?   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
+How easy was it to navigate the view where you give feedback?   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
+How fast was the website responding as you used it? & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3\\
+\end{tabular}
+\normalsize
 \caption{Likert scale questions regarding the ease of use of the website}
 \label{fig:likert-use}
 \end{figure}
+
 The Likert scales seem to suggest that most users found the site easy enough to use, and that it responded in a pretty quick manner when interacted with. There did seem to be some issues in the coursework detail page, and its associated file upload page. The feedback view did not appear to have any major issues.\par
 Following the Likert scale questions, Participants were given a chance to provide general feedback regarding the website. The main points that were brought up through the survey included:
 \begin{itemize}
@@ -851,11 +867,22 @@ Following the Likert scale questions, Participants were given a chance to provid
 \subsection{Running Tests}
 In the feedback survey, participants were asked to select certain statements that they felt applied to them. The results can be seen in figure \ref{fig:stmt-test}.\par
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{eva-result/stmt-tests.png}
+\centering
+\small
+\begin{tikzpicture}
+\begin{axis}[
+xbar, xmin=0,
+width=6cm,
+symbolic y coords={I ran my own tests against my own solutions,I ran my own tests against someone elses solution,I know what the identity test is for,I ran the identity test against my own solution,I could not run tests,I know what the oracle solution is for,I ran my own tests against the oracle solution},
+ytick=data,
+]
+\addplot coordinates {(8,I ran my own tests against my own solutions) (7,I ran my own tests against someone elses solution) (2,I know what the identity test is for) (2,I ran the identity test against my own solution) (1,I could not run tests) (1,I know what the oracle solution is for) (1,I ran my own tests against the oracle solution)};
+\end{axis}
+\end{tikzpicture}
 \caption{Question asked users to select all statements that applied to them}
 \label{fig:stmt-test}
 \end{figure}
-When asked about the testing functions used on the site, 8 / 10 respondents tested their own solution and 6/10 said they felt they had tested someone elses solution. As part of the feedback process all of them would have had to test the other persons solution, but this was done automatically, so it may not have been entirely clear what was happening. Similarly, comparatively few people used the identity\footnote{At this point, the test I was using to check the interfaces matched up was called the identity test. I decided to change it to something more meaningful - the Signature test, and this is the nomenclature used throughout the rest of this document.} test and oracle tests. This suggests that these also need better explanation. In the discussion session, one participant said they liked having a good working solution they could test against, so it would be worth emphasising the existence of these options more.\par
+When asked about the testing functions used on the site, 8 / 11 respondents tested their own solution and 7/11 said they felt they had tested someone elses solution. As part of the feedback process all of them would have had to test the other persons solution, but this was done automatically, so it may not have been entirely clear what was happening. Similarly, comparatively few people used the identity\footnote{At this point, the test I was using to check the interfaces matched up was called the identity test. I decided to change it to something more meaningful - the Signature test, and this is the nomenclature used throughout the rest of this document.} test and oracle tests. This suggests that these also need better explanation. In the discussion session, one participant said they liked having a good working solution they could test against, so it would be worth emphasising the existence of these options more.\par
 Further to this, when asked for a detailed explanation of any other problems with the site, One respondent said that the flow of the website when running tests was somewhat disrupted - When running tests you are shown a message saying the test is being run, but there is no indication of what to do next. Once tests are complete or files uploaded, you are left with many nonsensical IDs and these are hard to read and work with.
 \subsection{Permission Issues}
 \label{sec:permiss}
@@ -909,6 +936,21 @@ The participants were asked to rate their opinions on whether or not they agreed
 \caption{Responses for Likert questions with regards to peer-testing and the website}
 \label{tab:peer-test}
 \end{figure}\par
+\tiny
+\begin{tabular}{r|cccccccccccc}
+Receiving feedback from peer-testing helps me learn & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3 \\
+Giving feedback during peer-testing helps me learn  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4\\
+Peer-testing is better for learning than having a teacher give feedback on my work  & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2\\
+Peer-testing helped me understand how code testing works    & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{RedOrange} 1\\
+Peer-testing helped me understand how code review works & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{RedOrange} 1\\
+Peer-testing helped me understand the coursework exercises  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{RedOrange} 1\\
+Peer-testing helped me think differently about the coursework exercises & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2    & \cellcolor{RedOrange} 1\\
+Peer-testing helped me think of new solutions to the coursework exercises   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2\\
+I think peer-testing exercises should be included as part of university courses & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4\\
+I think peer-testing exercises using a website like the one in this study should be included as part of university courses  & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2\\
+\end{tabular}
+\normalsize
+
 It is reassuring to see that the results affirm the previous research into this area \S\ref{sec:peer-test-why}, suggesting that students believe they learn more by giving feedback as opposed to receiving it. There seems to be a somewhat mixed response to the idea that peer-testing can be better than a teacher's response, so an addition the site may benefit would be from allowing teacher interaction as well as peers. For the most part, it seems that students respond positively that the peer-testing helps with completing the exercises, and that this should be encourage in the university. Interestingly, the response to using such a peer-testing website more in university was less positive. This may be an indicator that the participants did not find the website all that useful.\par
 Having had some experience with the site, I asked the participants in the discussion if they felt there were any courses or activities within courses they felt would be improved by using the peer-testing feedback offered by the website. They suggested that the website would be useful for
 \begin{itemize}
@@ -923,13 +965,14 @@ Also, discussion noted that when you are giving feedback to a person, it is much
 The question of anonymity was important in this website, and in the discussion session this point was reinforced by many. Some survey questions involved checking if the participants were able to guess who they were giving feedback to on the website. Only 1 responded with a maybe, and 1 yes when asked if they knew who wrote the code they were testing. When asked if they knew the location of the person whose code they were testing, 3 said they knew, 1 maybe knew the location. Of course, there was no way to be sure about this \footnote{In retrospect, it would have been useful to ask this an open-answer field so I could confirm responses}. The low number of positive guesses as to who others were suggests that the site does offer anonymity.\par
 A participant mentioned that peer discussions done previous on the university VLE discussion boards would have been improved had the discussion been completed anonymously. The site currently offers anonymous feedback but doesn't yet allow for a multi-way discussion, but this comment suggests that it would fit in well. The point was raised that anonymity is better as it ``reduces judgements'' on people, and thus more of a focus is on the result of the exercise itself.
 \subsection{Feedback}
-In the discussion session, someone brought up the Idea that a 2-way discussion would be beneficial to giving more feedback. If a forum-style discussion was implemented for feedback, this could allow for feedback comments to be modified after they were sent.\par
-One student suggested that it would be nice to see a criteria for giving feedback (the concept of criteria-based marking was used in the cap system, see fig \ref{fig:cap}). And another participant discussed the idea that because of anonymity it may be hard to tailor feedback to the other person, so having a small amount of background information, such as their course or their programming strengths would be useful in helping to provide more relevant feedback. To complement that, one student liked the idea of having an identity in the email-based feedback as it allowed them to ``put a face to the code'' they were testing.
+In the discussion session, someone brought up the Idea that a 2-way discussion would be beneficial to giving more feedback. If a forum-style discussion was implemented for feedback, this could allow for feedback comments to be modified after they were sent. Another feature that seemed to have some support from participants was the concept of using inline code comments for feedback.\par
+One student suggested that it would be nice to see a criteria for giving feedback (the concept of criteria-based marking was used in the cap system, see fig \ref{fig:cap}). And another participant discussed the idea that because of anonymity it may be hard to tailor feedback to the other person, so having a small amount of background information, such as their course or their programming strengths would be useful in helping to provide more relevant feedback. To complement that, one student liked the idea of having an identity in the email-based feedback as it allowed them to ``put a face to the code'' they were testing.\par
 
 \section{Security}
 \textit{Did the website act in a secure manner. Were there any security flaws?}\par
 The evaluation study participants were not asked to assess the security of the website. Instead, I offer my own evaluation based on the current state of development of the prototype website.\par
 At this stage, the only security in place lies within making sure users are authenticated. This would only allow university students to gain access to the system and upload / readfiles. However, due to a lack of time before the evaluation took place, I was unable to complete some of the other security features previously discussed.\par
+The user authentication works very well. Once a user account is created, the user is assigned a group -- either teacher or student, and this is checked along with the user credentials when accessing any views through python decorators. Using these ensures that only the correct type of user can access various parts of the system. It is possible in certain cases that the checking of permissions of which users can view which files is too restrictive.\par
 One issue I noticed lies with the way I handle the error output from having run the test cases. Firstly, the error output does not properly hide the file paths, which reveals information about the internals of the application (such as directories), and the output is not bounded by length. One student created a test case that failed due to a recursion limit. As a result, a very large stack trace was produced, and subsequently stored in a text file. This could pose a problem if there were many large files being created, as the website wold run out of storage. Similarly, there is no restriction on the maximum filesize the user can upload.\par
 There is also little restriction in this iteration of the website when considering what kind of scripts the user may run. Currently any python script can have access to any file uploaded, and potentially a user could upload any sort of script + a python script and have the python script call that other script. Scripts are also currently run on the same level as the website application itself, rather than as a user, which could lead to scripts being run in too permissive a fashion.
 
@@ -955,7 +998,7 @@ The evidence I was able to collect did suggest that the website offers for a fas
 The website did seem to make some steps towards providing better feedback and learning. The way the website operates allows for cross-campus activity and forces students to make use of unit-testing. Both of these features help enhance the learning and feedback that occurs during the process. Students felt that peer activities would be welcome if they were used in university courses more, and that the website would work well with Large courseworks in courses such as Data Structures \& Algorithms where the courseworks have clearly laid out specifications. Praise was given for the anonymity offered by the website as this allowed for more open feedback.\par
 One change that was discussed would be to introduce a way of allowing for multi-way discussions for feedback, in place of the current single-comment-per-test. This would allow for better communication and discussion of results and allow for more learning and sharing of insights into the code.
 \subsection{Security}
-...
+The security in terms of authentication on the website is very good, and I believe there are sufficient checks to make sure that only the right users are able to use the right parts of the website. However, once these users are logged in, they are given too much trust that they will not abuse the system. The output that they are given from the website having run tests should be stripped down, possibly as part of piping the output of the tests and making sure that any directories are removed
 
 %more stuff...
 Add more pipelining - possibly checks for filesize, process of results.txt to remove sensitive info Manuel made a suggestion at an earlier stage about using the filesystem directly instead of models - perhaps if i'm going to implement pipelines properly then I could simply forego the models for FILE. Because if I have the information from the submission model, that's enough to build up the file system\par
