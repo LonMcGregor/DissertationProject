@@ -136,9 +136,10 @@ Date: \today
 \newpage
 
 \section*{Abstract}
-Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to improve this process by facilitating peer testing and peer feedback.\par
+Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to improve this process by facilitating peer-testing and peer feedback.\par
+Peer-testing is an activity in which peers, students within a university class, will attempt to provide feedback on each others solutions to a programming exercise. This will be done by performing tests on each others code, and discussing the results of these tests.\par
 To achieve this, I have implemented a prototype of a website that would combine the delivery of coursework assignments within Computer Science Programming courses, the self-testing of solutions to said coursework, and subsequently the peer testing that can take place after submission of the coursework is complete.\par
-An evaluation of my prototype has revealed that \todo{...}
+An evaluation of my prototype has revealed that the prototype functions correctly, however there are several usability issues with regards to explaining how the process of peer-testing will work to the end user. The feedback that is enabled by the prototype peer-testing website, and comments made by evaluation test subjects suggests that such a site would be welcome in future iterations of university Computer Science courses.
 
 \newpage
 
@@ -366,6 +367,7 @@ The study found:
 From the evidence available, I can gather that there is a great importance in creating a peer assessment system which can function while maintaining anonymity. It might also be worthwhile integrating some form of training, as found in the study by Lan Li, as this might reduce stress during the peer assessment process, as it is not outwith the real of possibility that students might recognise the work of others even if it is anonymous.
 
 \subsection{Security \& Sandboxing}
+\label{subsec:security}
 If the website I aim to create is going to integrate built-in running of test cases I will need to make sure to use the right way of doing this. Because the website I aim to build will accept solutions from students that will need to be executed, it is important that these applications be restricted in terms of the permissions available to them. Restricting how they can interact with the executing computer will prevent malicious attacks or accidental errors in code from damaging the whole system.\par
 Some available security measures include AppArmor, SELinux, FBAC amongst others. A study by Schreuders \cite{schreuders_empowering_2011} investigated how easy it is to set up the relevant security measures. They found that the FBAC-LSM security model was the best in terms of the ease of setting up, and ensuring that programs worked correctly. The tool offered for FBAC-LSM security set up would be a good candidate for use in a peer assessment system for running programs.\par
 There is also the idea of running programs directly in a browser, using a JavaScript interpreter in a way such as PyPy.js \cite{pypy.js_web_2016}. In this manner, the local file system would be protected, as the file system used by the python interpreter is virtual in memory. However this would not be an ideal solution, as if there were security risks they would simply be placed upon the assessor instead. Additionally, this model of execution would make it more difficult to get and store results of tests and would need to be run synchronously in the website UI. Long operations also block the browser from functioning (having tried this myself, I can see that this would be an issue).\par
@@ -374,6 +376,7 @@ One issue with sandboxing security mechanisms is that such systems can only prot
 As an alternative to sandboxing, one common method is to re-map the root directory to prevent an application from accessing files on the system that it should not. This is known as a chroot jail \cite{ubuntu_basic_2016}. This could be a useful way of restricting the solution submitted so that it can only access relevant files.
 
 \subsection{Testing Submitted Solutions}
+\label{subsec:bgtest}
 When considering the testing of software, there are several ways that this can be done. To produce a website that enables peer assessment, an appropriate testing methodology will need to be selected. Based on suggested testing styles from Bill Laboon \cite{laboon_friendly_2016}, some testing methodologies were considered for inclusion:
 \begin{itemize}
  \item Linting - Performing basic checks for 'smells' of bad code design, such as identifying unused variables or methods. Not particularly useful from a perspective of checking code is correct, but is still useful in terms of producing good quality code.
@@ -436,38 +439,27 @@ Once a functioning prototype is created, perform a study to determine the effect
 \section{High Level Objectives}
 To further break down these aims, I wish for the project to meet the following objectives:
 \begin{itemize}
-\item Create a website
+\item Create a website that...
+\begin{itemize}
 \item Let developers submit solutions to website
 \item Let testers run test cases against solutions
 \item Let testers give feedback on the solutions
-\item Report this feedback / results of tests to developers
-\item Test the website to make sure it is free of bugs
-\item Test the website to make sure it is useful for peer assessment through peer-testing
+\item Report this feedback / results of tests to developer
 \end{itemize}
-%END
-
-
-% 1st iteration
-% BEGIN
-% Work testing various technologies
-% Initial bits of implementation
-% Refining a working single-file prototype
-\chapter{Initial Prototype}
-Following the completion of the background researched, the next step of the project was to develop an initial prototype, to test that the concept could actually be built and tested. This would require identifying and choosing suitable technologies, designing an interface and designing and implementing a system.
+\item Evaluate that this website performs well
+\end{itemize}
 
 \section{Prototype Objectives}
-\todo{may want to trim this as needed - want to be relevant to initial prototype only}
-\todo{the \S numberings will all be wrong}
-These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the next section on implementation (\S4.2).
+These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the next section on implementation (Chapter \ref{ch:proto1}).
 \objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to one (or more) other student for assessment.}
-\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S1.3.3, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
+\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S\ref{subsec:bgtest}, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
 \objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata) on each test.}
 \objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it.\par
 While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
 \objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. This could include at the results of tests or on the source code.\par
-An ideal implementation of this would provide a way for testers to give feedback to the solutions, within certain places of the peer assessment \todo{... what?}. Possible objectives that could interact with feedback include:
+An ideal implementation of this would provide a way for testers to give feedback to the developers. Possible objectives that could interact with feedback include:
 \begin{itemize}
  \item OBJ-Results: Once tests are run, the tester could attach comments to the (results of) test cases
  \item OBJ-Source: Annotating the source code of solutions (possibly on a line by line basis, or by leaving general comments for a submitted solution)
@@ -477,6 +469,15 @@ An ideal implementation of this would provide a way for testers to give feedback
 \objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
 \objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as Moodle.}
 \objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
+
+%END
+
+
+% 1st iteration
+% BEGIN
+\chapter{Prototype Development I}
+\label{ch:proto1}
+Following the completion of the background researched, the next step of the project was to develop an initial prototype, to test that the concept could actually be built and tested. This would require identifying and choosing suitable technologies, designing an interface and designing and implementing a system.
 
 \section{Initial Prototype Requirements}
 Based on the  prototype objectives previously outlined (\S4.1), I can establish the following system requirements:\par
@@ -517,8 +518,139 @@ I also detail which of the requirements I was able to complete in this first ite
 \subsection{Additional Notes on Requirements}
 Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
 
-\section{Use Cases}
-To better describe and visualise the requirements for the application as a whole, the use cases described in figure \todo{which} (and the included extended descriptions) are given.
+\section{Choosing Tools}
+There are many ways that the website could be built. To identify some options, I considered the available software on the university servers, and Identified languages and frameworks that could be used here:\par
+\textbf{Languages:} Java Server Pages, PHP, Python\par
+\textbf{Frameworks:} CakePHP, Django (Python), Flask (Python)\\
+I decided it would be beneficial to use a language I was familiar with, to allow me to prototype more rapidly, so I decided to choose between some sort of PHP or Python based option, having had previous experience with these.\par
+I considered if it would be better to use a framework or start scripting using raw files but decided it would be better to use a framework, as these often have abstractions that can offer standard security measures (for example, user form input validation), as well as other abstractions to help speed up creation of website applications (such as HTML templating\footnote{This is when you create a static HTML template, and at runtime fill it in with relevant values, enabling better re-use of HTML code}).\par
+Given that I would need to restrict the scope of the peer-testing website for this initial prototype I decided, with the suggestion from my supervisor, that it would make sense to use the same language in both the website and the coursework exercises that might be used within the live website, as having the same language features for developing both the website and the method for offering testing might be easier to develop. Such a design would need to be carefully chosen to be modular, as this might increase the temptation to form tightly coupled code.\par
+To this end, I have chosen to develop the application using a python web framework. For initial selection of some frameworks, I attempted to develop sites that allowed a user to authenticate themselves with a password. I found that this was much easier to do with Django, as it offered its own middleware for authentication, as well as many other features such as a clear model-view-controller style. Flask on the other hand was much more low level. I did not feel it would be worth spending a lot of time developing low-level web application technology myself, so decided to go with Django.\par
+
+\section{1st Iteration Development}
+For this initial prototype, I would aim to get the core functionality implemented:
+\begin{itemize}
+\item User Authentication
+\item File Uploads and Serving
+\item Managing Coursework
+\item Running Tests
+\end{itemize}
+Given that Django offers some prefab content for authentication, this was easily implemented.\par
+For file uploads, the main issue was of how to get them from the file and store them on the filesystem. The standard Django methodology for doing this would be to create a form class with the relevant file upload field. Then, within a view, display this form and extract the file for saving through a POST request. Django can then store an uploaded file by instantiating a Model in a database. This process could have perhaps been done using a standard HTTP PUT request, however I felt it would be more secure to use the standard Django method.\par
+The file could be written directly to the system, but using the database offers a nice abstraction that means lower level file system management operations are not required. This also simplifies development of finding files later (if not necessarily the actual efficiency of the operation), as you would not have to search through a filesystem, just rows in a database tables.\par
+
+\section{Notification Experiments}
+As part of this initial prototype (but not included in later iterations), was a test of WebSocket-based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
+The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
+% END
+
+% 2nd iteration
+% BEGIN
+% [multi-file, improved test matching plugins, prep for pipeline]
+\chapter{Second Iteration Development}
+Once the initial prototype was created, I attended a course of two meetings with members of university staff in Edinburgh and Dubai who were interested in potentially using this peer-testing website.\par
+\section{Discussions with Stakeholders}
+The purpose of these meetings was to further refine what might be required for a full implementation of the website. These were quite insightful, and I have developed the following \todo{notes? changes? requirements?} as a result, including some uncompleted requirements from the initial prototype (marked with a $\succ$), and those that I have completed in this iteration are marked with a $\bigtriangleup$:
+\subsection{2nd Iteration Requirements}
+\begin{longtable}{cclrc}
+\textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*}\\\hline
+\freq{Security}{Log students in}{High}{$\succ$}
+\end{longtable}
+
+\subsection{Changes from 1st Iteration Prototype}
+\todo{Brief notes, mind.}
+\subsubsection{Modifications to system design}
+One of the requests suggested that it would be beneficial to allow multiple files to be part of a single solution or test case - this would be a definite requirement if additional languages are supported beyond python - e.g. languages like C that require separate header files. I have modified the models accordingly. This is the current working layout:
+\todo{add a database er diagram thingy}
+\todo{somethign something pipeline, originals folder, process inputs, modularity, python and other languages}
+\subsubsection{Modifications to interface design}
+As will be used within an evaluation study, more effort is placed into the design of the UI at this stage than the previous one. Most of the design stayed the same, but in some places it was improved:\par
+The \textit{feedback view} was changed to support multiple files being used per solution / test case. Instead of panels with files, there is a tab control that allows the user to switch between each of the files individually. A compromise that only allows one file to be viewed at once, but allows for multiple files to be seen without needing to change/reload the web page.\par
+Within the \textit{Coursework Overview}, to encourage students to familiarise themselves with how the system works\todo{a la joe wells suggestion}, they are offered the ability to create their own tests on the system, whereas previously any testing of their own would need to happen offline. This allows them to create a test match, and also lets them access the signature test and oracle. In a similar vein, to encourage additional testing, once students have been assigned someone elses work to test, they can upload additional tests to use when providing feedback.\par
+Given the ease with which HTML can be modified, and that much of what I needed was already present, I simply made the UI changes directly without preparing mock-ups. \todo{attach screenshots / appdx}\par
+To increase the level of anonyhmity everything public facing was given \todo{random slugs - anon, security etc.}
+\section{2nd Iteration Development}
+As part of supporting multiple files per submission
+\begin{itemize}
+\item Setting one submission as final
+\item Setting submissions as private
+\item ...
+\end{itemize}
+\subsection{Managing Tests}
+Users need to be able to interact with the testing right from the start, etc.
+\subsection{Pipelines}
+I never really completed this because i'm an incompetent.
+
+\section{Live Hosting}
+In order to prepare for a live test of the system, I identified some possible options that could be used to host the Django application:
+\begin{enumerate}
+\item Running the website from a private server
+\item Running the website in local debug mode from one of the university machines
+\item Running the website on the university Apache web server
+\end{enumerate}
+For the intended purpose of the website, that it would be used in an educational environment, the most obvious option would be 3. This way, we could ensure that all of the student-uploaded data is kept inside the university ecosystem.\par
+While discussing this setup with the University MACS administrators, it was found that in order to run the application on the Apache server either some packages would need to be upgraded or rebuilt, or the Django application would need to be modified to use an older version of Django and python. The latter was not possible, to while the MACS IT team investigated ways to upgrade the server, I worked with my Project Supervisor to host it in a private location.\par
+When the Django application was hosted as a daemon process within Apache under WSGI (Web Server Gateway Interface), the requests on a given URL path are routed to the Django application rather than the usual routing to static HTML / PHP scripts. This meant that some modification was needed for the Django application's configuration as errors in serving the website highlighted places where  hard-coded URLs had broken, where relative paths were incorrectly used and where the Apache Linux user did not have the correct permissions to operate on the application. These required relatively simple fixes.\par
+The MACS IT team was able to upgrade the required packages such that Apache could operate. Using the changes made for running on the private server as a base, setting up the Django application to run on the university server was easily possible.
+% END
+
+\chapter{Prototype System Design}
+After the 2nd iteration of development, the website was in a state that it was ready to be evaluated by real people. This chapter will detail the system design, as it was in this state.
+\section{User Interface Design}
+...
+\subsection{Initial Storyboards}
+This section will show some of the initial storyboarding ideas for how to lay out the important views of the website.\\
+\scriptsize
+\makebox[\textwidth][c]{
+\begin{tabular}{cc}
+\includegraphics[page=3, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
+\includegraphics[page=4, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
+SB1 - This is a mock-up of the website login page &
+SB2 - This is a mock-up of the coursework listing page,\\ & detailing the various coursework tasks a user has access to.
+\end{tabular}
+}
+\makebox[\textwidth][c]{
+\begin{tabular}{cc}
+\includegraphics[page=5, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
+\includegraphics[page=6, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
+SB3 - This is a mock-up of the coursework descriptor page, &
+SB4 - This is a mock-up of the upload page,\\
+showing the various tasks that are to be completed & where a user will upload solutions and test cases
+\end{tabular}
+}
+\makebox[\textwidth][c]{
+\begin{tabular}{cc}
+\includegraphics[page=7, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
+\includegraphics[page=8, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
+SB5 - This is a mock-up of the feedback view, &
+SB6 - This is a mock-up of a page informing the user,\\
+showing the files and results for which feedback is requested & that tests are still waiting to be run, with notification showing when they are done
+\end{tabular}
+}
+\makebox[\textwidth][c]{
+\begin{tabular}{cc}
+\includegraphics[page=9, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
+\includegraphics[page=10, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
+SB7 - This is a mock-up of the teacher overview, &
+SB8 - This is an improved view of the coursework descriptor page,\\
+showing the all of the data and uploads for courseworks & showing the greater level of detail explaining the task
+\end{tabular}
+}
+\normalsize
+
+The mock-ups SB1 through SB7 were created during the 1st iteration of development. They were created to show a general sense of what would be required for the websites base functionality, and to guide the development of the views of the application. Mockup SB8 was created during the 2nd iteration of development, as I needed to improve upon the coursework descriptor page, and having a mock-up would help decide what detail could be included without overcrowding it.\par
+\todo{Do we really need such things as the login page? And do we want to have screenshots of the final implementation?}
+
+\section{System Architecture}
+The bloody system architecture. Alright. Lets just get this fucking done.
+\subsection{Initial Architecture Plan}
+...
+\subsection{2nd Iteration Architecture}
+...
+\subsubsection{MVC}
+...
+\subsection{Use Cases}
+To better describe and visualise the requirements for the application as a whole, the use cases described in figure \ref{fig:uc} (and the included extended descriptions) are given.
 \begin{figure}[ht]
 \centering
 \begin{tikzpicture} 
@@ -546,8 +678,8 @@ To better describe and visualise the requirements for the application as a whole
 \umlassoc{teacher}{usecase-5}
 \umlassoc{teacher}{usecase-6}
 \end{tikzpicture}
+\label{fig:uc}
 \caption{Diagram showing the main use cases implemented at this iteration of development. Both Student and teacher are sub-actors of User}
-\label{fig:i1uc}
 \end{figure}
 
 \singlespacing
@@ -627,7 +759,7 @@ To better describe and visualise the requirements for the application as a whole
 \item Student uploads this to website
 \item Website Processes this uploaded submission
 \end{enumerate}
-\textbf{Postconditions}: The submission is uploaded to the website
+\textbf{Postconditions}: The submission is uploaded to the site
 
 \subsection*{UC - Create \& Run Test Match}
 \textit{A teacher wants to match a solution and a test case together and get the output of running them}\\
@@ -657,133 +789,16 @@ comment: \todo{this is changed later to allow students to also create test match
 \end{enumerate}
 \textbf{Postconditions}: Feedback is submitted, next time it is viewed, feedback will be shown as well as other files
 comment: \todo{note that the idea of giving feedback just on solutions may be faulty, may want to feedback test cases as well, in addition, mention somewhere about extended interaction / discussions for feedback rather than single  comment. note lack of feedback editing}
-
-\section{Sequence of Operations}
-In order to better grasp the sequence of operations that a class of users (student developers, testers, and teachers), I have developed the following sequence diagram. \todo{note that this was improved upon in the next iteration of development}\\
-\begin{figure}[ht]
-
-\caption{Sequence diagram showing how students, teacher and the website interact during a coursework exercise}
-\label{fig:i1sd}
-\end{figure}
-
-
-\section{Choosing Tools}
-There are many ways that the website could be built. To identify some options, I considered the available software on the university servers, and Identified languages and frameworks that could be used here:\par
-\textbf{Languages:} Java Server Pages, PHP, Python\par
-\textbf{Frameworks:} CakePHP, Django (Python), Flask (Python)\\
-I decided it would be beneficial to use a language I was familiar with, to allow me to prototype more rapidly, so I decided to choose between some sort of PHP or Python based option, having had previous experience with these.\par
-I considered if it would be better to use a framework or start scripting using raw files but decided it would be better to use a framework, as these often have abstractions that can offer standard security measures (for example, user form input validation), as well as other abstractions to help speed up creation of website applications (such as HTML templating\footnote{This is when you create a static HTML template, and at runtime fill it in with relevant values, enabling better re-use of HTML code}).\par
-Given that I would need to restrict the scope of the peer-testing website for this initial prototype I decided, with the suggestion from my supervisor, that it would make sense to use the same language in both the website and the coursework exercises that might be used within the live website, as having the same language features for developing both the website and the method for offering testing might be easier to develop. Such a design would need to be carefully chosen to be modular, as this might increase the temptation to form tightly coupled code.\par
-To this end, I have chosen to develop the application using a python web framework. For initial selection of some frameworks, I attempted to develop sites that allowed a user to authenticate themselves with a password. I found that this was much easier to do with Django, as it offered its own middleware for authentication, as well as many other features such as a clear model-view-controller style. Flask on the other hand was much more low level. I did not feel it would be worth spending a lot of time developing low-level web application technology myself, so decided to go with Django.\par
-\section{Initial Prototype Development}
-For this initial prototype, I would aim to get the core functionality implemented:
-\begin{itemize}
-\item User Authentication
-\item File Uploads and Serving
-\item Managing Coursework
-\item Running Tests
-\end{itemize}
-Given that Django offers some prefab content for authentication, this was easily implemented.\par
-For file uploads, the main issue was of how to get them from the file and store them on the filesystem. The standard Django methodology for doing this would be to create a form class with the relevant file upload field. Then, within a view, display this form and extract the file for saving through a POST request. Django can then store an uploaded file by instantiating a Model in a database. This process could have perhaps been done using a standard HTTP PUT request, however I felt it would be more secure to use the standard Django method.\par
-The file could be written directly to the system, but using the database offers a nice abstraction that means lower level file system management operations are not required. This also simplifies development of finding files later (if not necessarily the actual efficiency of the operation), as you would not have to search through a filesystem, just rows in a database tables.\par
-
-\section{Initial Interface Design}
-\doublespacing
-Given that the focus of this initial prototype was more concerned with testing that functionality could work, I have decided to place less of a focus on the UI implementation, However I prepared some mock-ups describing the main sections that users logged into the site would see. These mock-ups are included in an appendix \todo{which one, and remember to add it, and keep stage 2 separate, maybe add more comments on each}.
-\subsection{(Students) The Coursework Overview}
-After selecting a coursework from a list, the students would be displayed a page that contained all of the necessary instructions to complete the coursework, including links to where they could download full descriptors, code samples, etc. This page also offers a link to a page for uploading solutions to the site. This page also displayed links to the feedback view where students would either give or receive feedback.\par
-\todo{Display a mock-up of this early view - possibly the powerpoint slides attached somewhere, and then screenshots of what the initial prototype branch looked like in reality}
-\subsection{(Students) The Feedback View}
-The purpose of the feedback view is to display files to the student who will be testing and giving feedback. These files will include the solution being tested, the test case, and the results of running the test. In addition, there would be a section where either feedback could be given into a web form, or read if it had already been given.
-\subsection{(Teachers) Course Editor}
-The course editor is a place where a teacher could manage (or create) a course - e.g. the students who were enrolled on it, the name of the course and the course code.
-\subsection{(Teachers) Coursework Editor}
-This will likely be the most used view for the teacher - it acts as a way to edit (or create) coursework assignments. The view displays any files that have been uploaded, and lists any tests that have been run. It also offers a way to create test matches.
-
-\section{Initial System Design}
-Do we want UML diagrams here? At each `iteration of development stage? wherefore?
+\subsection{Sequence of Operations}
+In order to better grasp the sequence of operations that a class of users (student developers, testers, and teachers) would undergo when using the website, I have developed the following sequence diagram (figure \ref{fig:seqd}).\\
 \begin{figure}[ht]
 \centering
-\begin{tikzpicture}
-\tikzstyle{box} = [draw, minimum size=10]
-\tikzstyle{line} = [thick,>=stealth]
-\node (d) [box] {Django Application};
-\node (c) [box, below of=d] {Controllers};
-\node (m) [box, left of=c, node distance=2cm] {Models};
-\node (v) [box, right of=c, node distance=2cm] {Views};
-\node (db) [box, below of=m] {Database};
-\node (fs) [box, left of=db, node distance=2cm] {Filesystem};
-\node (ht) [box, below of=v] {HTML Templates};
-\draw [line] (d) -- (m);
-\draw [line] (d) -- (v);
-\draw [line] (d) -- (c);
-\draw [line] (m) -- (db);
-\draw [line] (db) -- (fs);
-\draw [line] (v) -- (ht);
-\end{tikzpicture}
-\caption{Diagram showing the main components of the system at this iteration}
-\label{fig:i1sysd}
+\includegraphics[width=0.8\textwidth]{fig/seq.png}
+\label{fig:seqd}
+\caption{Sequence diagram showing how students, teacher and the website interact during a coursework exercise}
 \end{figure}
-The initial system uses an MVC style architecture, as is recommended by Django.
-\subsection{Models}
-The models are defined as Django model classes and then Django automatically implements them in a database. One advantage of creating the models this way is that different database technologies can be switched out. for the prototyping stage, a basic sqlite database was used, that acts as a lightweight database stored in a single file, making it easier to manage during development. This could be switched out to use a dedicated MySQL database when implementation is complete. This method also makes it easier to access data from the database in a object oriented manner, which reduces the reliance on SQL commands for extracting information, and also allows for Django abstractions to offer some performance improvements. One such improvement is by storing queries in a QuerySet object, which can be passed around in code, the database query is executed on-demand which means \todo{finish this thought, make a nicer sentence structure}.\par
-Something something files on a filesystem \todo{am i repeating myself?}
-\todo{Remember to explain why each choice was made that way.}
-\subsection{Controllers}
-When a user makes a request to 
-
-\subsection{Views}
-In a Django application, the views are instantiated by the controller classes. These take the form of HTML templates, with information filled in at runtime. These support inheritance, which is useful, as it allows for a single template to be created that acts as a base for all part of the website... \todo{et.c. etc.}.\par
-Django also offers some standard HTTP responses that can be sent instead of the HTML templates, making it easy to support standard web request-response dialogue, such as informing a user they do not have sufficient permissions through a HTTP 403 Response View.
-
-\section{Notifications}
-As part of this initial prototype (but not included in later iterations), was a test of WebSocket-based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
-The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
-% END
-
-% 2nd iteration
-% BEGIN
-% [multi-file, improved test matching plugins, prep for pipeline]
-\chapter{Second Iteration Development}
-Once the initial prototype was created, I attended a course of two meetings with members of university staff in Edinburgh and Dubai who were interested in potentially using this peer-testing website.\par
-\section{Discussions with Stakeholders}
-The purpose of these meetings was to further refine what might be required for a full implementation of the website. These were quite insightful, and I have developed the following \todo{notes? changes? requirements?} as a result, including some uncompleted requirements from the initial prototype (marked with a $\succ$), and those that I have completed in this iteration are marked with a $\bigtriangleup$:
-\begin{longtable}{cclrc}
-\textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*}\\\hline
-\freq{Security}{Log students in}{High}{$\succ$}
-\end{longtable}
-
-\section{Modifications to system design}
-One of the requests suggested that it would be beneficial to allow multiple files to be part of a single solution or test case - this would be a definite requirement if additional languages are supported beyond python - e.g. languages like C that require separate header files. I have modified the models accordingly. This is the current working layout:
-\todo{add a database er diagram thingy}
-\todo{somethign something pipeline, originals folder, process inputs, modularity, python and other languages}
-
-\section{Modifications to interface design}
-As will be used within an evaluation study, more effort is placed into the design of the UI at this stage than the previous one. Most of the design stayed the same, but in some places it was improved:\par
-The \textit{feedback view} was changed to support multiple files being used per solution / test case. Instead of panels with files, there is a tab control that allows the user to switch between each of the files individually. A compromise that only allows one file to be viewed at once, but allows for multiple files to be seen without needing to change/reload the web page.\par
-Within the \textit{Coursework Overview}, to encourage students to familiarise themselves with how the system works\todo{a la joe wells suggestion}, they are offered the ability to create their own tests on the system, whereas previously any testing of their own would need to happen offline. This allows them to create a test match, and also lets them access the signature test and oracle. In a similar vein, to encourage additional testing, once students have been assigned someone elses work to test, they can upload additional tests to use when providing feedback.\par
-Given the ease with which HTML can be modified, and that much of what I needed was already present, I simply made the UI changes directly without preparing mock-ups. \todo{attach screenshots / appdx}\par
-To increase the level of anonyhmity everything public facing was given \todo{random slugs - anon, security etc.}
-\section{Further development}
-As part of supporting multiple files per submission
-\begin{itemize}
-\item Setting one submission as final
-\item Setting submissions as private
-\item ...
-\end{itemize}
-
-\section{Live Hosting}
-In order to prepare for a live test of the system, I identified some possible options that could be used to host the Django application:
-\begin{enumerate}
-\item Running the website from a private server
-\item Running the website in local debug mode from one of the university machines
-\item Running the website on the university Apache web server
-\end{enumerate}
-For the intended purpose of the website, that it would be used in an educational environment, the most obvious option would be 3. This way, we could ensure that all of the student-uploaded data is kept inside the university ecosystem.\par
-While discussing this setup with the University MACS administrators, it was found that in order to run the application on the Apache server either some packages would need to be upgraded or rebuilt, or the Django application would need to be modified to use an older version of Django and python. The latter was not possible, to while the MACS IT team investigated ways to upgrade the server, I worked with my Project Supervisor to host it in a private location.\par
-When the Django application was hosted as a daemon process within Apache under WSGI (Web Server Gateway Interface), the requests on a given URL path are routed to the Django application rather than the usual routing to static HTML / PHP scripts. This meant that some modification was needed for the Django application's configuration as errors in serving the website highlighted places where  hard-coded URLs had broken, where relative paths were incorrectly used and where the Apache Linux user did not have the correct permissions to operate on the application. These required relatively simple fixes.\par
-The MACS IT team was able to upgrade the required packages such that Apache could operate. Using the changes made for running on the private server as a base, setting up the Django application to run on the university server was easily possible.
-% END
+\subsection{Class/DB Hierarchies}
+...
 
 % EVAL
 % BEGIN
@@ -882,7 +897,7 @@ ytick=data,
 \caption{Question asked users to select all statements that applied to them}
 \label{fig:stmt-test}
 \end{figure}
-When asked about the testing functions used on the site, 8 / 11 respondents tested their own solution and 7/11 said they felt they had tested someone elses solution. As part of the feedback process all of them would have had to test the other persons solution, but this was done automatically, so it may not have been entirely clear what was happening. Similarly, comparatively few people used the identity\footnote{At this point, the test I was using to check the interfaces matched up was called the identity test. I decided to change it to something more meaningful - the Signature test, and this is the nomenclature used throughout the rest of this document.} test and oracle tests. This suggests that these also need better explanation. In the discussion session, one participant said they liked having a good working solution they could test against, so it would be worth emphasising the existence of these options more.\par
+When asked about the testing functions used on the site, 8 / 12 respondents tested their own solution and 7/12 said they felt they had tested someone elses solution. As part of the feedback process all of them would have had to test the other persons solution, but this was done automatically, so it may not have been entirely clear what was happening. Similarly, comparatively few people used the identity\footnote{At this point, the test I was using to check the interfaces matched up was called the identity test. I decided to change it to something more meaningful - the Signature test, and this is the nomenclature used throughout the rest of this document.} test and oracle tests. This suggests that these also need better explanation. In the discussion session, one participant said they liked having a good working solution they could test against, so it would be worth emphasising the existence of these options more.\par
 Further to this, when asked for a detailed explanation of any other problems with the site, One respondent said that the flow of the website when running tests was somewhat disrupted - When running tests you are shown a message saying the test is being run, but there is no indication of what to do next. Once tests are complete or files uploaded, you are left with many nonsensical IDs and these are hard to read and work with.
 \subsection{Permission Issues}
 \label{sec:permiss}
@@ -998,10 +1013,9 @@ The evidence I was able to collect did suggest that the website offers for a fas
 The website did seem to make some steps towards providing better feedback and learning. The way the website operates allows for cross-campus activity and forces students to make use of unit-testing. Both of these features help enhance the learning and feedback that occurs during the process. Students felt that peer activities would be welcome if they were used in university courses more, and that the website would work well with Large courseworks in courses such as Data Structures \& Algorithms where the courseworks have clearly laid out specifications. Praise was given for the anonymity offered by the website as this allowed for more open feedback.\par
 One change that was discussed would be to introduce a way of allowing for multi-way discussions for feedback, in place of the current single-comment-per-test. This would allow for better communication and discussion of results and allow for more learning and sharing of insights into the code.
 \subsection{Security}
-The security in terms of authentication on the website is very good, and I believe there are sufficient checks to make sure that only the right users are able to use the right parts of the website. However, once these users are logged in, they are given too much trust that they will not abuse the system. The output that they are given from the website having run tests should be stripped down, possibly as part of piping the output of the tests and making sure that any directories are removed
-
-%more stuff...
-Add more pipelining - possibly checks for filesize, process of results.txt to remove sensitive info Manuel made a suggestion at an earlier stage about using the filesystem directly instead of models - perhaps if i'm going to implement pipelines properly then I could simply forego the models for FILE. Because if I have the information from the submission model, that's enough to build up the file system\par
+The security in terms of authentication on the website is very good, and I believe there are sufficient checks to make sure that only the right users are able to use the right parts of the website. However, once these users are logged in, they are given too much trust that they will not abuse the system.\par
+The output that they are given from the website having run tests should be stripped down, possibly as part of piping\footnote{I had previously mentioned the use of pipelining the input files, and I believe that if the output files are to be pipelined also, then it may be worth re-thinking the architecture in use where the database models control the files individually. A single submission model instance would be sufficient to store files on the filesystem, and may make this pipleining easier.} the output of the tests and making sure that any directories are removed, as well as checking for large file output and cutting it if it becomes too large.
+Also, I will need to add restrictions in terms of how the scripts themselves are run. The previously mentioned security features (see \S\ref{subsec:security})would need to be further investigated and, for those that are appropriate, implemented.
 % END
 
 
@@ -1010,6 +1024,7 @@ Add more pipelining - possibly checks for filesize, process of results.txt to re
 \chapter{Conclusion}
 \section{Achievements}
 what I have achieved according to objectives, and prior work done in the area
+\section{Limitations}
 the main limitations
 \section{Future work}
 Discuss possible additions to allow this to be used within an actual learning context.\par
