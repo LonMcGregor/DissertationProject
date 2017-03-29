@@ -11,6 +11,7 @@
 \usepackage{listings}
 \usepackage{wrapfig}
 \usepackage{setspace}
+\usepackage{amssymb}
 \usepackage{datetime}
 \usepackage{enumitem}
 \usepackage{url}
@@ -37,24 +38,24 @@
 \newcommand{\titles}{\\\vspace{1cm}}
 \newcommand{\cn}{\textcolor{red}{[Citation Needed]}}
 \newcommand{\objv}[3]{\item \textbf{OBJ-#1}: \textit{#2}\\#3}
-\newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{lXr} \textbf{OBJ-#1} & #2 & #3\end{tabularx}\\#4\\}
+% \newcommand{\objitem}[4]{\begin{tabularx}{\textwidth}{lXr} \textbf{OBJ-#1} & #2 & #3\end{tabularx}\\#4\\}
+\newcommand{\objitem}[4]{\textbf{\\OBJ-#1} \quad #2 \hfill #3\par#4}
 \newcommand{\riskitem}[4]{\begin{tabularx}{\textwidth}{lcr} \textbf{RSK-#1} & #2 & #3 \\  \multicolumn{3}{X}{#4} \\  \end{tabularx}}
 \newcommand{\objts}{\multicolumn{3}{X}{}\\}
 \newcommand{\gi}[2]{\textbf{#1} - #2}
 \newcommand{\todo}[1]{\textcolor{red}{TODO: #1}}
 \newcommand{\eva}[2]{\textbf{EVA-#1} & #2\\}
-\newcommand{\gloss}[2]{\textbf{#1} - {#2}\\}
-% \newcommand{\ls5}{\cellcolor{green}5}
-% \newcommand{\ls4}{\cellcolor{limegreen}4}
-% \newcommand{\ls3}{\cellcolor{goldenrod}3}
-% \newcommand{\ls2}{\cellcolor{yelloworange}2}
-% \newcommand{\ls1}{\cellcolor{brickred}1}
-
+\newcommand{\gloss}[2]{\\\textbf{#1} - {#2}}
+\newcommand{\fiv}{& \cellcolor{Green}5}
+\newcommand{\fo}{& \cellcolor{LimeGreen}4}
+\newcommand{\tre}{& \cellcolor{Goldenrod}3}
+\newcommand{\tw}{& \cellcolor{YellowOrange}2}
+\newcommand{\on}{& \cellcolor{BrickRed}1}
 
 \newcounter{FunCount}
 \newcounter{NFunCount}
-\newcommand{\freq}[4]{\addtocounter{FunCount}{1}F\arabic{FunCount} & OBJ-#1 & #2 & #3 & #4\\}
-\newcommand{\nfreq}[4]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & OBJ-#1 & #2 & #3 & #4\\}
+\newcommand{\freq}[4]{\addtocounter{FunCount}{1}F\arabic{FunCount} & #1 & #2 & #3 & #4\\}
+\newcommand{\nfreq}[4]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & #1 & #2 & #3 & #4\\}
 
 \pdfinfo{%
   /Title    (Final Year Dissertation)
@@ -409,8 +410,8 @@ Given the many different aspects covered above, I have identified the following 
 % SIR GLOSSARYCK, OF TERMS
 % BEGIN
 \chapter{Glossary of Terms}
-The following is a glossary of terms used in the remainder of this dissertation. It is provided to consolidate some points made in the background research chapter and to make clear some terms that will be used later on, to prevent confusion.\\
-\gloss{Feedback}{Following a peer assessment, feedback is given to the testee indicating how good the solution found was\todo{not good definition}}
+The following is a glossary of terms used in the remainder of this dissertation. It is provided to consolidate some points made in the background research chapter and to make clear some terms that will be used later on.
+\gloss{Feedback}{Following a peer assessment, comments are given to the person who created the answer being reviewed, identifying good points and areas for improvement.}
 \gloss{Oracle}{A solution that offers a known-to-be correct implementation students can run their test cases against (although it will not be visible to them}
 \gloss{Peer Assessment}{The process of reviewing an assignment where the students assess each others work (in whole or in part), and the results of this may be further used in grading assignments.}
 \gloss{Peer-Testing}{A subset of peer assessment, in which students test each others programming code}
@@ -450,24 +451,17 @@ To further break down these aims, I wish for the project to meet the following o
 \end{itemize}
 
 \section{Prototype Objectives}
-These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in the next section on implementation (Chapter \ref{ch:proto1}).
+These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in \S\ref{sec:req1}.
 \objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to one (or more) other student for assessment.}
 \objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S\ref{subsec:bgtest}, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
 \objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata) on each test.}
-\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it.\par
-While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
-\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. This could include at the results of tests or on the source code.\par
-An ideal implementation of this would provide a way for testers to give feedback to the developers. Possible objectives that could interact with feedback include:
-\begin{itemize}
- \item OBJ-Results: Once tests are run, the tester could attach comments to the (results of) test cases
- \item OBJ-Source: Annotating the source code of solutions (possibly on a line by line basis, or by leaving general comments for a submitted solution)
- \item OBJ-Teacher: A teacher should be able to view all of the feedback that has been submitted by testers, in all the appropriate places
-\end{itemize}~}
+\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it. While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
+\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. As well as this, a teacher should be able to see any feedback. Once tests are run, the tester could attach comments to the (results of) test cases. Also, the source code of solutions could get feedback directly (possibly annotated on a line by line basis, or by leaving general comments for a submitted solution).}
 \objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
 \objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
-\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, such as Moodle.}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, for example Virtual Learning Environments.}
 \objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
 
 %END
@@ -480,39 +474,41 @@ An ideal implementation of this would provide a way for testers to give feedback
 Following the completion of the background researched, the next step of the project was to develop an initial prototype, to test that the concept could actually be built and tested. This would require identifying and choosing suitable technologies, designing an interface and designing and implementing a system.
 
 \section{Initial Prototype Requirements}
+\label{sec:req1}
 Based on the  prototype objectives previously outlined (\S4.1), I can establish the following system requirements:\par
 The following prioritisation is used: \textbf{Low} - Possible future addition, \textbf{Mid} - Would make a more useful system, \textbf{High} - Necessary for prototype.
-I also detail which of the requirements I was able to complete in this first iteration, denoted by a $\bigtriangleup$.
-\begin{longtable}{cclrc}
+I also detail which of the requirements I was able to complete in this first iteration ($\triangle$), those that were postponed and completed in the 2nd iteration of development ($\lozenge$), and those that were not completed ($\times$).
+\begin{longtable}{ccl@{}cc}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*} \\\hline
-\freq{Security}{Log students in}{High}{$\bigtriangleup$}
-\freq{Security}{Log teachers in}{Low}{$\bigtriangleup$}
-\freq{Submit}{Accept student uploads of solutions to assignments}{High}{$\bigtriangleup$}
-\freq{Submit}{Assign a submission to a student for assessment}{High}{$\bigtriangleup$}
-\freq{Test}{Accept uploads for test case files}{High}{$\bigtriangleup$}
+\freq{Security}{Log students in}{High}{$\triangle$}
+\freq{Security}{Log teachers in}{Low}{$\triangle$}
+\freq{Submit}{Accept student uploads of solutions to assignments}{High}{$\triangle$}
+\freq{Submit}{Assign a submission to a student for assessment}{High}{$\triangle$}
+\freq{Test}{Accept uploads for test case files}{High}{$\triangle$}
 \freq{Test}{Offer a more guided approach to writing test cases}{Mid}{}
-\freq{Run}{Run submitted test case for the submitted solution}{High}{$\bigtriangleup$}
-\freq{Run}{Record the results of test execution}{High}{$\bigtriangleup$}
+\freq{Run}{Run submitted test case for the submitted solution}{High}{$\triangle$}
+\freq{Run}{Record the results of test execution}{High}{$\triangle$}
 \freq{Run}{Run submitted test case against all solutions}{Low}{}
-\freq{View}{List all test case submitted}{High}{$\bigtriangleup$}
-\freq{View}{Display the results of running a test}{High}{$\bigtriangleup$}
-\freq{View}{Display the results of all solutions test run against}{Low}{}
-\freq{Results}{Let submitter of test see the results}{High}{$\bigtriangleup$}
-\freq{Source}{Let tester see source code of solution}{Mid}{$\bigtriangleup$}
-\freq{Feedback}{Let submitter of test add/edit feedback \todo{move edit as s2 req}}{Mid}{$\bigtriangleup$}
-\freq{Feedback}{Record testers general comments on solution}{Mid}{$\bigtriangleup$}
+\freq{View}{List all test case submitted}{High}{$\triangle$}
+\freq{View}{Display the results of running a test}{High}{$\triangle$}
+\freq{View}{Display the results of all solutions test run against}{Low}{$\times$}
+\freq{Results}{Let submitter of test see the results}{High}{$\triangle$}
+\freq{Source}{Let tester see source code of solution}{Mid}{$\triangle$}
+\freq{Feedback}{Let submitter of test add feedback}{Mid}{$\triangle$}
+\freq{Feedback}{Let submitter of test edit feedback}{Mid}{$\times$}
+\freq{Feedback}{Record testers general comments on solution}{Mid}{$\triangle$}
 \freq{Feedback}{Let tester attach feedback to lines in solution}{Low}{}
 \freq{Security}{Sandbox the execution of solutions}{Mid}{}
 \freq{Security}{Use malware detection to prevent malicious uploads}{Mid}{}
-\freq{Teacher}{Let teacher set coursework assignments}{Low}{$\bigtriangleup$}
-\freq{Teacher}{Let teacher see all submitted content}{Low}{$\bigtriangleup$}
-\nfreq{Website}{Operate on Desktop Web Browsers used in classroom}{High}{$\bigtriangleup$}
-\nfreq{Website}{Operate with multiple users accessing at once}{High}{$\bigtriangleup$}
+\freq{Teacher}{Let teacher set coursework assignments}{Low}{$\triangle$}
+\freq{Teacher}{Let teacher see all submitted content}{Low}{$\triangle$}
+\nfreq{Website}{Operate on Desktop Web Browsers used in classroom}{High}{$\triangle$}
+\nfreq{Website}{Operate with multiple users accessing at once}{High}{$\triangle$}
 \nfreq{Website}{Operate with a classroom of users accessing at once}{Low}{}
-\nfreq{Submit}{Not assign a student to assess their own work}{High}{$\bigtriangleup$}
-\nfreq{Submit}{Accept solutions that are python scripts}{High}{$\bigtriangleup$}
-\nfreq{Run}{Test cases should be run asynchronously}{High}{$\bigtriangleup$}
-\nfreq{Modular}{The system should be built in a modular manner}{Low}{$\bigtriangleup$}
+\nfreq{Submit}{Not assign a student to assess their own work}{High}{$\triangle$}
+\nfreq{Submit}{Accept solutions that are python scripts}{High}{$\triangle$}
+\nfreq{Run}{Test cases should be run asynchronously}{High}{$\triangle$}
+\nfreq{Modular}{The system should be built in a modular manner}{Low}{$\triangle$}
 \end{longtable}
 
 \subsection{Additional Notes on Requirements}
@@ -540,17 +536,24 @@ For file uploads, the main issue was of how to get them from the file and store 
 The file could be written directly to the system, but using the database offers a nice abstraction that means lower level file system management operations are not required. This also simplifies development of finding files later (if not necessarily the actual efficiency of the operation), as you would not have to search through a filesystem, just rows in a database tables.\par
 
 \section{Notification Experiments}
-As part of this initial prototype (but not included in later iterations), was a test of WebSocket-based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
+As part of this initial prototype (but not included in later iterations), was a test of WebSocket based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
 The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
 % END
 
 % 2nd iteration
 % BEGIN
 % [multi-file, improved test matching plugins, prep for pipeline]
-\chapter{Second Iteration Development}
+\chapter{Prototype Development II}
 Once the initial prototype was created, I attended a course of two meetings with members of university staff in Edinburgh and Dubai who were interested in potentially using this peer-testing website.\par
 \section{Discussions with Stakeholders}
-The purpose of these meetings was to further refine what might be required for a full implementation of the website. These were quite insightful, and I have developed the following \todo{notes? changes? requirements?} as a result, including some uncompleted requirements from the initial prototype (marked with a $\succ$), and those that I have completed in this iteration are marked with a $\bigtriangleup$:
+The purpose of these meetings was to further refine what might be required for a full implementation of the website. These were quite insightful, and I have improved my understanding of the task as a result. Some of the points of discussion raised include:
+\begin{itemize}
+\item Additional support for languages (beyond python3 which is supported by the prototype), and this would in turn require support of multiple files per submission
+\item Include more metrics to test files with, such as code coverage, naming conventions, code style
+\item Offer more encouragement for following the given interface for a coursework task, e.g. by providing a skeleton to fill out
+\item It is important for the students to be able to interact with the testing mechanism in place before their final submission
+\end{itemize}
+Based on these points, I was able to develop the additional requirements as follows. I detail which of the requirements I was able to complete ($\lozenge$), and those that were not completed ($\times$):
 \subsection{2nd Iteration Requirements}
 \begin{longtable}{cclrc}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*}\\\hline
@@ -595,35 +598,24 @@ The MACS IT team was able to upgrade the required packages such that Apache coul
 % END
 
 \chapter{Prototype System Design}
-After the 2nd iteration of development, the website was in a state that it was ready to be evaluated by real people. This chapter will detail the system design, as it was in this state.
+After the 2nd iteration of development, the website was in a state that it was ready to be evaluated by real people. This chapter will detail the system design, as it was in this state, as well as the development of the user interface overall.
 \section{User Interface Design}
-...
-\subsection{Initial Storyboards}
-This section will show some of the initial storyboarding ideas for how to lay out the important views of the website.\\
+This section will show some of the initial storyboarding ideas for how to lay out the important views of the website, and descriptions of how they changed as the website was developed.\\
 \scriptsize
 \makebox[\textwidth][c]{
 \begin{tabular}{cc}
-\includegraphics[page=3, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
-\includegraphics[page=4, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
-SB1 - This is a mock-up of the website login page &
-SB2 - This is a mock-up of the coursework listing page,\\ & detailing the various coursework tasks a user has access to.
-\end{tabular}
-}
-\makebox[\textwidth][c]{
-\begin{tabular}{cc}
-\includegraphics[page=5, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
-\includegraphics[page=6, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
-SB3 - This is a mock-up of the coursework descriptor page, &
-SB4 - This is a mock-up of the upload page,\\
-showing the various tasks that are to be completed & where a user will upload solutions and test cases
+\includegraphics[page=4, width=0.65\textwidth]{storyboard/storyboard2.pdf}& 
+\includegraphics[page=5, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
+SB1 - This is a mock-up of the coursework listing page, & SB2 - This is a mock-up of the coursework descriptor page,
+\\ detailing the various coursework tasks a user has access to & showing the various tasks that are to be completed
 \end{tabular}
 }
 \makebox[\textwidth][c]{
 \begin{tabular}{cc}
 \includegraphics[page=7, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
 \includegraphics[page=8, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
-SB5 - This is a mock-up of the feedback view, &
-SB6 - This is a mock-up of a page informing the user,\\
+SB3 - This is a mock-up of the feedback view, &
+SB4 - This is a mock-up of a page informing the user,\\
 showing the files and results for which feedback is requested & that tests are still waiting to be run, with notification showing when they are done
 \end{tabular}
 }
@@ -631,28 +623,75 @@ showing the files and results for which feedback is requested & that tests are s
 \begin{tabular}{cc}
 \includegraphics[page=9, width=0.65\textwidth]{storyboard/storyboard2.pdf} & 
 \includegraphics[page=10, width=0.65\textwidth]{storyboard/storyboard2.pdf} \\
-SB7 - This is a mock-up of the teacher overview, &
-SB8 - This is an improved view of the coursework descriptor page,\\
+SB5 - This is a mock-up of the teacher overview, &
+SB6 - This is an improved view of the coursework descriptor page,\\
 showing the all of the data and uploads for courseworks & showing the greater level of detail explaining the task
 \end{tabular}
 }
 \normalsize
 
-The mock-ups SB1 through SB7 were created during the 1st iteration of development. They were created to show a general sense of what would be required for the websites base functionality, and to guide the development of the views of the application. Mockup SB8 was created during the 2nd iteration of development, as I needed to improve upon the coursework descriptor page, and having a mock-up would help decide what detail could be included without overcrowding it.\par
-\todo{Do we really need such things as the login page? And do we want to have screenshots of the final implementation?}
+The mock-ups SB1 through SB5 were created during the 1st iteration of development. They were created to show a general sense of what would be required for the websites base functionality, and to guide the development of the views of the application. Mockup SB6 was created during the 2nd iteration of development, as I needed to improve upon the coursework descriptor page, and having a mock-up would help decide what detail could be included without overcrowding it.\par
+By the 2nd Iteration of development, the views finalised for the evaluation study were somewhat different to these mock-ups, but contained most of the same information. There was a lack of styling/design to these pages, which was something brought up in the results of the study. As such, I took some time after the evaluation to try and improve the appearance of these pages by introducing a common theme.\par
+\textbf{SB1} - By the 2nd Iteration, the coursework listing page had not changed very much. It lacked deadline information, as deadlines were left in control of the teacher rather than being pre-set dates.\par
+\textbf{SB2, SB6} - After selecting a coursework from a list, the students would be displayed a page that contained all of the necessary instructions to complete the coursework, including links to where they could download full descriptors, code samples, etc. This page also offers a link to a page for uploading solutions to the site. This page also displayed links to the feedback view where students would either give or receive feedback.\par
+The coursework task descriptor page was expanded upon quite a bit in the 2nd iteration, to allow for the inclusion of more information of the coursework task (hosted on the website itself), better handling of uploads and running of tests. To give a better idea, a screenshot is included in figure \ref{fig:final-cw}. The final version automatically showed and hid the various testing and upload forms based on the state the coursework was in (Accepting solutions, testing \& feedback, closed).\par
+\begin{figure}[ht]
+\includegraphics[height=0.8\textheight]{storyboard/Final-cw.png}
+\label{fig:final-cw}
+\caption{Screenshot of final version of the coursework details page}
+\end{figure}
+\textbf{SB3} - The original plan for the feedback view was to contain all of the results of unit tests, the unit tests themselves, the source file, and the feedback form itself on one page, using a panel layout. However this was not feasible for multiple reasons: A final version of the site ought to be able to support multiple files, and these would not be viewable in a strict panel layout, and showing the results of tests in-line would not make sense for non-x-unit style test cases. The finalised layout uses a tab-list to show all of the files relevant to a coursework, and the user can switch through these as needed. The source code files are also colourized according to their syntax. A screenshot of this view can be found in figure \ref{fig:final-fb}.\par
+\begin{figure}[ht]
+\includegraphics[width=\textwidth]{storyboard/final-feedback.png}
+\label{fig:final-fb}
+\caption{Screenshot of final version of the feedback page}
+\end{figure}
+\textbf{SB4} - The original \par
+\textbf{SB5} - The teacher feedback view was originally intended to show all of the details of uploaded files for given courses. However, this mock-up neglected to include some key components, such as the ability to create courseworks, and to have multiple courseworks per course. The final version split up the detail pages of courses and courseworks, and also includes the results of tests with some associated metadata such as the time it was run, who the developers and testers involved were. However, there are some limitations on this design with regards to the information density being much too high.\par
 
 \section{System Architecture}
-The bloody system architecture. Alright. Lets just get this fucking done.
 \subsection{Initial Architecture Plan}
-...
-\subsection{2nd Iteration Architecture}
-...
-\subsubsection{MVC}
-...
+The overall layout of the architectural components of the application are shown in figure \ref{fig:sysd}. 
+\begin{figure}[ht]
+	\centering
+	\begin{tikzpicture}
+	\tikzstyle{box} = [draw, minimum size=10]
+	\tikzstyle{line} = [thick,>=stealth]
+	\node (d) [box] {Django Application};
+	\node (c) [box, below of=d] {Controllers};
+	\node (m) [box, left of=c, node distance=2cm] {Models};
+	\node (v) [box, right of=c, node distance=2cm] {Views};
+	\node (db) [box, below of=m] {Database};
+	\node (fs) [box, left of=db, node distance=2cm] {Filesystem};
+	\node (ht) [box, below of=v] {HTML Templates};
+	\draw [line] (d) -- (m);
+	\draw [line] (d) -- (v);
+	\draw [line] (d) -- (c);
+	\draw [line] (m) -- (db);
+	\draw [line] (db) -- (fs);
+	\draw [line] (v) -- (ht);
+	\end{tikzpicture}
+	\caption{Diagram showing the main components of the system at this iteration}
+	\label{fig:sysd}
+\end{figure}
+The website uses an MVC style architecture, as is recommended by Django.
+\subsubsection{Models}
+The models are defined as Django model classes and then Django automatically implements them in a database. One advantage of creating the models this way is that different database technologies can be switched out. for the prototyping stage, a basic sqlite database was used, that acts as a lightweight database stored in a single file, making it easier to manage during development. This could be switched out to use a dedicated MySQL database when implementation is complete. This method also makes it easier to access data from the database in a object oriented manner, which reduces the reliance on SQL commands for extracting information, and also allows for Django abstractions to offer some performance improvements. One such improvement is by storing queries in a QuerySet object, which can be passed around in code, the database query is executed on-demand which means \todo{finish this thought, make a nicer sentence structure}.\par
+Something something files on a filesystem \todo{am i repeating myself?}
+\todo{Remember to explain why each choice was made that way.}
+\subsubsection{Controllers}
+When a user makes a request to 
+
+
+\subsubsection{Views}
+In a Django application, the views are instantiated by the controller methods. These take the form of HTML templates, with information filled in at runtime. These support inheritance, which is useful, as it allows for a single template to be created that acts as a base for all part of the website... \todo{et.c. etc.}.\par
+Django also offers some standard HTTP responses that can be sent instead of the HTML templates, making it easy to support standard web request-response dialogue, such as informing a user they do not have sufficient permissions through a HTTP 403 Response View.
+
 \subsection{Use Cases}
 To better describe and visualise the requirements for the application as a whole, the use cases described in figure \ref{fig:uc} (and the included extended descriptions) are given.
 \begin{figure}[ht]
 \centering
+\makebox[\textwidth][c]{
 \begin{tikzpicture} 
 \begin{umlsystem}[x=0, y=0]{Peer-testing website} 
 \umlusecase[y=-2, x=-2]{Authenticate}
@@ -678,6 +717,7 @@ To better describe and visualise the requirements for the application as a whole
 \umlassoc{teacher}{usecase-5}
 \umlassoc{teacher}{usecase-6}
 \end{tikzpicture}
+}
 \label{fig:uc}
 \caption{Diagram showing the main use cases implemented at this iteration of development. Both Student and teacher are sub-actors of User}
 \end{figure}
@@ -793,11 +833,12 @@ comment: \todo{note that the idea of giving feedback just on solutions may be fa
 In order to better grasp the sequence of operations that a class of users (student developers, testers, and teachers) would undergo when using the website, I have developed the following sequence diagram (figure \ref{fig:seqd}).\\
 \begin{figure}[ht]
 \centering
-\includegraphics[width=0.8\textwidth]{fig/seq.png}
+\includegraphics[height=0.9\textheight]{fig/seq.png}
 \label{fig:seqd}
 \caption{Sequence diagram showing how students, teacher and the website interact during a coursework exercise}
 \end{figure}
 \subsection{Class/DB Hierarchies}
+\doublespacing
 ...
 
 % EVAL
@@ -856,18 +897,26 @@ Additionally, one respondent raised the issue that they were unable to see the f
 \subsection{General Feedback Given}
 To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \ref{fig:likert-use}).\par
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
+% \includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
 \scriptsize
-\begin{tabular}{r|lllllllllll}
-How easy was it to understand the page with the details of the coursework?  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2   & \cellcolor{YellowOrange} 2\\
-How easy was it to submit a solution \& test case for the coursework?    & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2   & \cellcolor{RedOrange} 1\\
-How easy was it to understand the process for giving feedback?  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
-How easy was it to navigate the view where you give feedback?   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
-How easy was it to navigate the view where you give feedback?   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3\\
-How fast was the website responding as you used it? & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3\\
+\makebox[\textwidth][c]{
+\begin{tabular}{r|llllllllllll}
+How easy was it to understand the page with the details of the coursework?
+\fiv \fiv \fiv \fo \fo \fo \tre \tre \tre \tw \tw \tw\\
+How easy was it to submit a solution \& test case for the coursework?
+\fiv \fiv \fiv \fo \fo \fo \fo \fo \fo \tre \tw \on\\
+How easy was it to understand the process for giving feedback?
+\fiv \fiv \fiv \fo \fo \fo \fo \fo \tre \tre \tre \tre\\
+How easy was it to navigate the view where you give feedback?
+\fiv \fiv \fiv \fo \fo \fo \fo \fo \tre \tre \tre \tre\\
+How easy was it to navigate the view where you give feedback?
+\fiv \fiv \fiv \fo \fo \fo \fo \fo \fo \tre \tre \tre\\
+How fast was the website responding as you used it?
+\fiv \fiv \fiv \fiv \fiv \fo \fo \fo \fo \fo \fo \tre\\
 \end{tabular}
+}
 \normalsize
-\caption{Likert scale questions regarding the ease of use of the website}
+\caption{Likert scale questions regarding the ease of use of the website (5 - Positive, 1 - Negative)}
 \label{fig:likert-use}
 \end{figure}
 
@@ -947,24 +996,35 @@ During the discussion, a point was raised about how people normally do testing. 
 In order to find out students perceptions of peer activities, I asked if any had completed some before. Only 2 respondents to the survey had prior experience in peer activities. The peer activities were ``Essay peer-marking, giving feedback'' and ``Checking correctness and logic of code of other students in high school''. These responses would seem to suggest that peer activities are not currently utilised very much in programming courses at university.\par
 The participants were asked to rate their opinions on whether or not they agreed with certain website and peer-testing related statements. In figure \ref{tab:peer-test} the results can be seen.\\
 \begin{figure}[ht]
-\includegraphics[width=\textwidth]{eva-result/likert-peer-test.png}
-\caption{Responses for Likert questions with regards to peer-testing and the website}
+\tiny
+\makebox[\textwidth][c]{
+\begin{tabular}{r|llllllllllll}
+Receiving feedback from peer-testing helps me learn
+\fiv  \fiv  \fiv  \fiv  \fiv  \fiv  \fiv \fo \fo \fo \tre \tre\\
+Giving feedback during peer-testing helps me learn
+\fiv  \fiv  \fiv  \fiv  \fiv \fo \fo \fo \fo \fo \fo \tre\\
+Peer-testing is better for learning than having a teacher give feedback on my work
+\fiv \fo \fo \fo \tre \tre \tre \tre \tre \tre \tw \tw\\
+Peer-testing helped me understand how code testing works
+\fiv  \fiv  \fiv  \fiv \fo \fo \fo \tre \tre \tre \tw \on\\
+Peer-testing helped me understand how code review works
+\fiv  \fiv  \fiv  \fiv \fo \fo \tre \tre \tre \tre \tre \on\\
+Peer-testing helped me understand the coursework exercises
+\fiv  \fiv  \fiv \fo \fo \tre \tre \tre \tre \tre \tre \on\\
+Peer-testing helped me think differently about the coursework exercises
+\fiv \fo \fo \fo \fo \fo \tre \tre \tre \tw \tw \on\\
+Peer-testing helped me think of new solutions to the coursework exercises
+\fiv  \fiv  \fiv \fo \fo \fo \fo \tre \tre \tw \tw \tw\\
+I think peer-testing exercises should be included as part of university courses
+\fiv  \fiv  \fiv \fo \fo \fo \fo \fo \fo \fo \fo \tw\\
+Peer-testing exercises using a website should be included as part of university course
+\fiv \fiv \fo \fo \fo \fo \tre \tre \tre \tre \tw \tw\\
+\end{tabular}
+}
+\normalsize
+\caption{Responses for Likert questions "Do you agree..." with regards to peer-testing and the website (5 - Positive, 1 - Negative)}
 \label{tab:peer-test}
 \end{figure}\par
-\tiny
-\begin{tabular}{r|cccccccccccc}
-Receiving feedback from peer-testing helps me learn & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3 \\
-Giving feedback during peer-testing helps me learn  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4\\
-Peer-testing is better for learning than having a teacher give feedback on my work  & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2\\
-Peer-testing helped me understand how code testing works    & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{RedOrange} 1\\
-Peer-testing helped me understand how code review works & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{RedOrange} 1\\
-Peer-testing helped me understand the coursework exercises  & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{RedOrange} 1\\
-Peer-testing helped me think differently about the coursework exercises & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2    & \cellcolor{RedOrange} 1\\
-Peer-testing helped me think of new solutions to the coursework exercises   & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2    & \cellcolor{YellowOrange} 2\\
-I think peer-testing exercises should be included as part of university courses & \cellcolor{Green} 5   & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4\\
-I think peer-testing exercises using a website like the one in this study should be included as part of university courses  & \cellcolor{Green} 5   & \cellcolor{Green} 5    & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{LimeGreen} 4   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{Goldenrod} 3   & \cellcolor{YellowOrange} 2\\
-\end{tabular}
-\normalsize
 
 It is reassuring to see that the results affirm the previous research into this area \S\ref{sec:peer-test-why}, suggesting that students believe they learn more by giving feedback as opposed to receiving it. There seems to be a somewhat mixed response to the idea that peer-testing can be better than a teacher's response, so an addition the site may benefit would be from allowing teacher interaction as well as peers. For the most part, it seems that students respond positively that the peer-testing helps with completing the exercises, and that this should be encourage in the university. Interestingly, the response to using such a peer-testing website more in university was less positive. This may be an indicator that the participants did not find the website all that useful.\par
 Having had some experience with the site, I asked the participants in the discussion if they felt there were any courses or activities within courses they felt would be improved by using the peer-testing feedback offered by the website. They suggested that the website would be useful for
@@ -1023,9 +1083,10 @@ Also, I will need to add restrictions in terms of how the scripts themselves are
 % BEGIN
 \chapter{Conclusion}
 \section{Achievements}
-what I have achieved according to objectives, and prior work done in the area
+what I have achieved according to objectives, and prior work done in the area...\par
+I have managed to do create a website. It can take in file uploads.
 \section{Limitations}
-the main limitations
+The website lacks decent security.
 \section{Future work}
 Discuss possible additions to allow this to be used within an actual learning context.\par
 Some initial testing with the concept of WebSocket-based notifications was done at this stage, and a basic proof of concept showed that notifications could be used. However, this was not as simple as plugging in a module, as some changes to the base configuration of the Django application was needed. Therefore, to ease development of the prototype, the concept of the notifications was removed for later implementation.\todo{right place to put this?}\par
@@ -1042,8 +1103,8 @@ Some initial testing with the concept of WebSocket-based notifications was done 
 
 % ETHICAL
 %BEGIN
-\addcontentsline{toc}{section}{A: Ethical Analysis}
 \section*{A: Ethical Analysis}
+\addcontentsline{toc}{section}{A: Ethical Analysis}
 \label{app:ethical}
 \textbf{Student}: L\'eon McGregor\\
 \textbf{Title}: Web platform for code peer-testing\\
