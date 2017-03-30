@@ -1,8 +1,5 @@
 \documentclass[a4paper,11pt]{report}
 
-% PREAMBLE
-% BEGIN
-
 \usepackage[utf8]{inputenc}
 \usepackage{graphicx}
 \usepackage{tabularx}
@@ -85,11 +82,9 @@
   frame=L
 }
 
-% END
-% DOCUMENT START
 
 \begin{document}
-% BEGIN
+
 \pagestyle{empty}
 
 {\centering\Large
@@ -126,9 +121,9 @@ Andrew \textsc{Ireland}\\
 }
 \newpage
 \doublespacing
-% END
 
-% BEGIN
+
+
 \section*{Declaration}
 I, L\'eon McGregor confirm that this work submitted for assessment is my own and is expressed in my own words. Any uses made within it of the works of other authors in any form (e.g., ideas, equations, figures, text, tables, programs) are properly acknowledged at any point of their use. A list of the references employed is included.\par
 Signed: L\'eon McGregor\par
@@ -139,7 +134,7 @@ Date: \today
 \section*{Abstract}
 Undergraduate students in Computer Science courses take part in coursework exercises in the form of programming tasks. The primary aim of this project is to improve this process by facilitating peer-testing and peer feedback.\par
 Peer-testing is an activity in which peers, students within a university class, will attempt to provide feedback on each others solutions to a programming exercise. This will be done by performing tests on each others code, and discussing the results of these tests.\par
-To achieve this, I have implemented a prototype of a website that would combine the delivery of coursework assignments within Computer Science Programming courses, the self-testing of solutions to said coursework, and subsequently the peer testing that can take place after submission of the coursework is complete.\par
+To achieve this, I have implemented a prototype of a website that would combine the delivery of coursework assignments within Computer Science Programming courses, the self-testing of solutions to said coursework, and subsequently the peer testing that can take place after submission of the coursework is complete. This website was implemented using the Django web framework for python, and I hosted it on the university web server.\par
 An evaluation of my prototype has revealed that the prototype functions correctly, however there are several usability issues with regards to explaining how the process of peer-testing will work to the end user. The feedback that is enabled by the prototype peer-testing website, and comments made by evaluation test subjects suggests that such a site would be welcome in future iterations of university Computer Science courses.
 
 \newpage
@@ -152,58 +147,81 @@ Thanks to Manuel Maarek for helping me to organise this project. Additionally, t
 \pagestyle{headings}
 \markright{L\'eon McGregor - Final Year Dissertation}
 
-% END
 
-
-% INTRODUCTION
-%BEGIN
 \chapter{Introduction}
-\todo{make sure all notes from first report are resolved}
-% descibe organisation of dissertation
-% TODO summarise objectives
 % problems solved
 % methods of implementation and research
 % results
 % any big achievemtns
 % any limits.
 % cross reference each of these to their sections further within the report
-In Undergraduate Computer Science courses, students will complete coursework. Some of this coursework may involve programming exercises. This project aims to improve these programming exercises through the involvement of peer assessment. Specifically, peer testing of programs and peer feedback. To facilitate this, the project will create a prototype for a \textit{Web Platform for Code Peer-Testing}.\par
-The web platform (referred to as a website) will allow students to engage in peer assessment of each others solutions to exercises (in this case program code) by peer-testing. That is, students will share solutions through the website, view and test solutions for other students, and then give and receive feedback on solutions.\par
-Ideally, the peer assessment that takes place within the website will provide more immediate and useful feedback on coursework than having to wait for a teacher, and the results of testing could be used as a starting point for final grading of the coursework assignment.\par
 
-Much research has been already completed in the study of Peer Assessment, peer testing and technology-enhanced learning environments. Some relevant research into this will be analysed within this document, as well as a discussion of related or similar systems that have previously been implemented by others. I will also look into some aspects relating the the implementation of the desired web platform, such as security, and how program testing can be done.\par
+\section{Glossary of Terms}
+The following is a glossary of terms used in the remainder of this dissertation. It is provided to consolidate some points that will be made in the background research chapter and to make clear some terms that will be used later on.
+\gloss{Coursework}{This is an exercise that students would need to complete. It may or may not be graded, and should help the student learn.}
+\gloss{Developer}{A student that produces a solution to a coursework. After this, the student may become a tester.}
+\gloss{Feedback}{Following a peer assessment, comments are given to the person who created the answer being reviewed, identifying good points and areas for improvement.}
+\gloss{Oracle}{A solution that offers a known-to-be correct implementation students can run their test cases against (although it will not be visible to them}
+\gloss{Peer Assessment}{The process of reviewing an assignment where the students assess each others work (in whole or in part), and the results of this may be further used in grading assignments.}
+\gloss{Peer-Testing}{A subset of peer assessment, in which students test each others programming code}
+\gloss{Signature Test}{This is a test case designed to ensure that the student has met the interface that was described to them}
+\gloss{Solution}{A solution to a coursework assignment, possibly written by a student}
+\gloss{Student}{A person who is enrolled on a course and is completing the coursework exercise}
+\gloss{Submission}{A solution, test case, coursework descriptor, etc. Any item made up of one or more files that is uploaded to the system by a student or teacher.}
+\gloss{Teacher}{The teacher, course lecturer who will set coursework tasks and may grade them}
+\gloss{Tester}{A student that will test and review a solution produced by a different student}
+\gloss{Test Case}{A students test case that is to be run against a solution}
+\gloss{Test Match}{A matching of a test case and a solution. It will eventually have results, and may also have attached feedback}
+\gloss{VLE}{Virtual Learning Environment, see \S\ref{subsec:vle}}
+\gloss{Website}{A web platform or web application, a user will access it through a web browser}
 
-There are two high level aims that make up this project:
-\begin{enumerate}
-\item \textbf{Prototype} - Design and build a website that automates peer assessment - That is to say, it combines file upload, viewing, testing and providing feedback in one place.
-\item \textbf{Evaluate} - Prepare and execute an evaluation study into whether or not this website enhances peer assessment - By comparing a peer assessment process with and without this site, I can determine if it can offer any advantages to the users.
-\end{enumerate}
-
-\newpage
 \section{Overview of Concept}
-This is a description of the ideal usage of the website, and identifies some \textit{key terms}:
+In Undergraduate Computer Science courses, students will complete coursework. Some of this coursework may involve programming exercises. This project aims to improve these programming exercises through the involvement of peer assessment. Specifically, peer testing of programs and peer feedback. To facilitate this, the project will create a prototype for a \textit{Web Platform for Code Peer-Testing}.\par
+The web platform (referred to as a website) will allow students to engage in peer assessment of each others solutions to programming exercises by peer-testing. That is, students will share solutions through the website, view and test solutions for other students, and then give and receive feedback on solutions.\par
+Ideally, the peer assessment that takes place within the website will provide more immediate and useful feedback on coursework than having to wait for a teacher, and the results of testing could be used as a starting point for final grading of the coursework assignment.\par
+Such a website would operate as follows:
 \begin{enumerate}
- \item A \textit{teacher} (Course Lecturer/Professor) will set a coursework exercise
- \item A \textit{student} on the course will act as a \textit{developer}, and create a \textit{solution} to the exercise
- \item Students will then \textit{upload} the solution to the \textit{website}
- \item The website will randomly assign the solution to a different student
- \item Students take on the role of \textit{testers} for their assigned solution.
-    \begin{itemize}
-    \item This involves creating and submitting \textit{test cases} to the website
-    \end{itemize}
- \item The website will silently run these test cases and store the \textit{test results}
- \item Testers can view the test results and the \textit{source code} of the solution
- \item Testers can add feedback based on what they see from the source code and test results
- \item For a students original submission, they can see the feedback, and the test cases and test results.
- \item A teacher can see all data that has been submitted to the website 
+	\item A teacher will set a coursework exercise
+	\item A student on the course will act as a developer, and create a solution to the exercise
+	\item Students will then upload the solution to the website
+	\item The website will assign the role of tester of this solution to a different student
+	\item The tester will create and submit test cases to the website
+	\item The website will run these test cases and store the test results
+	\item Testers can add feedback based on what they see from the source code and test results
+	\item The developer of the original solution can see the feedback, and the test cases and results
+	\item A teacher can see all files, comments and data that has been submitted to the website 
 \end{enumerate}
-Considering this process in terms of a more traditional peer assessment, the testers and developers would be assessors and assessees respectively.
-%END
+
+\section{Primary Aims}
+The primary motivation of this project, as stated in the introduction, is to improve the student experience when completing programming coursework exercises by facilitating peer learning. The main aims for the project derived from this can be stated as:
+\begin{enumerate}
+	\item \textbf{Investigate Research}\par
+	Much research has been already completed in the study of Peer Assessment, peer testing and technology-enhanced learning environments. Some relevant research into this will be analysed within this document, in chapter \ref{ch:bg}. This will include information from researchers looking into peer assessment and how such activities help enhance learning. I will also investigate related or similar technologies that have previously been implemented by others, both for assisting peer assessment style activities and general tools for digitally enhancing learning. I discuss some aspects relating the implementation of the desired web platform, such as security, and how program testing can be done.
+	\item \textbf{Prototype a Website}\par
+	I have designed and built a website that assists in peer assessment, with a focus on peer-testing. This website aims to combine all the tasks that would normally have to be done manually by students and allows them to be completed from a website interface. This could include file uploads, file viewing, testing of programs and providing feedback. The objectives for the Prototype are broken down further in section \S \ref{sec:proto-obj}. I have developed this website using the Django web framework for python, and details of the implementation can be found in chapters \ref{ch:proto1}, \ref{ch:proto2}, \ref{ch:protosd}.
+	\item \textbf{Evaluate the Website}\par
+	\label{sec:aimeval}
+	Once a functioning prototype was created, I performed a study to determine the effectiveness of the website in terms of how well it enhances peer assessment and peer-testing within the confines of the coursework. This evaluation involved students who might potentially use this tool in a course. The exact properties I wish to ensure the website has, and the results of the evaluation, are expanded upon in the evaluation discussion, Chapter \ref{ch:eval}. Namely, the evaluation study aimed to test the Correctness, Usability, and Security of the implementation as well as seeing if this improves the peer-testing process by giving Enhanced Feedback, and improves the Speed of turnaround of testing. There were usability issues, but the prototype showed promise with respect to helping learning.
+\end{enumerate}
+
+\section{Prototype Objectives}
+\label{sec:proto-obj}
+These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in \S\ref{sec:req1}.
+\objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to one (or more) other student for assessment.}
+\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S\ref{subsec:bgtest}, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
+\objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
+\objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
+\objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata) on each test.}
+\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it. While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
+\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. As well as this, a teacher should be able to see any feedback. Once tests are run, the tester could attach comments to the (results of) test cases. Also, the source code of solutions could get feedback directly (possibly annotated on a line by line basis, or by leaving general comments for a submitted solution).}
+\objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
+\objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
+\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, for example Virtual Learning Environments.}
+\objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
 
 
-% BG CHAPTER
-% BEGIN
 \chapter{Background}
+\label{ch:bg}
 \section{Peer Assessment}
 \subsection{What is it?}
 Peer assessment is a process in which students assess each other. This opposes the more traditional stance where a teacher performs the assessment. As defined by topping \cite{topping_peer_2009},
@@ -256,11 +274,9 @@ Peer assessment can prove to be a very valuable experience for students. Falchik
 The process of peer assessment holds much value for all of the participants in the educational process, and can provide some skills that can be carried beyond students time in education. It can be used to provide more immediate feedback, help students to learn as they evaluate solutions and create this feedback, and could be integrated with some existing coursework assignments. Beyond just letting students learn about how to grade against a mark scheme, peer assessment can often teach students a lot about the subject material itself, letting them gain a deeper understanding about it. Peer assessment also helps to grow students ability to critically evaluate both their own, and others, work. Students who are to engage in Peer assessment should be given sufficient help so that they can perform the assessment with confidence, and work with multiple peers to get the full positive effects of peer assessment.
 
 
-% END
-% TECH + PLATFORM BACKGROUND
-% BEGIN
 \section{Technology-Enhanced Learning Platforms}
 \subsection{Virtual Learning Environments}
+\label{subsec:vle}
 There has been a rapid increase in the use of websites and Internet services in recent times, and many of these services can aid in student learning. One such style of website is the Virtual Learning Environment (VLE). Examples of such websites could include Moodle, \cite{moodle_about_2016} or Blackboard \cite{blackboard_blackboard_2016}. The use of a VLE can be very valuable to students learning, as they offer such features as integrated coursework submission systems, discussion forums, sections for storing and displaying class lecture notes and more.\par
 Analysis performed by Mogus et al. \cite{mogus_impact_2012} looked at data collected over two semesters of a teacher education course. The study then collected bulk data regarding usage statistics from the various tools offered by Moodle (the VLE of choice in the study). During analysis, this data was correlated against the success of students in that course, as measured by their final grade. The analysis 
 revealed that the interactions used within the VLE do have a positive influence on the eventual grades a student receives. It is worth noting this was not determined by using a control group, but by grouping students by their final grade, and then analysing the results.\par
@@ -292,7 +308,7 @@ Given that the user interface and flow of information through the application pr
 \begin{figure}[ht]
 \centering
 \includegraphics[width=0.8\textwidth]{fig/CAP.png}
-\caption{\footnotesize The CAP system, showing report viewer, marking instructions and comment field in its feedback view}
+\caption{CAP UI, showing report viewer, marking guide and comment field in its feedback view}
 \label{fig:cap}
 \end{figure}
 
@@ -330,7 +346,7 @@ Build-it, Break-it, Fix-it\cite{ruef_build_2016} is a programming contest that u
 \label{fig:bibifi}
 \end{figure}
 The contest requires participants to \textit{build} a working solution that matches functional specifications, as well as being as secure as possible. If the solution can be built and the functionality verified by an automated system, then the team can move on to the next stage. Following this, testers will attempt to \textit{break} the security of the solution, and points will be allocated according to a zero-sum-game. The builders can then gain points by \textit{fixing} their solutions.\par
-Throughout the contest, there is a central web-based infrastructure that manages running the contest website (with scoreboards, etc.), listening to builder git repositories, and also running and recording test results. The basic structure is as follows (detailed in figure \ref{fig:bibifi} \todo{ref properly}:
+Throughout the contest, there is a central web-based infrastructure that manages running the contest website (with scoreboards, etc.), listening to builder git repositories, and also running and recording test results. The basic structure is as follows (detailed in figure \ref{fig:bibifi}:
 \begin{enumerate}
  \item There is a listener component that tracks changes to the git repo of the builders
  \item This pulls metadata to the contest database
@@ -343,11 +359,6 @@ The basic architecture described here seems to work very well for the contest, a
 \subsection{Summary of Tech-Enhanced Platforms}
 There are many advantages, with respect to learning, brought forward by technology enhanced platforms. Some, such as web-based VLEs are more accessible, allowing students to take part in collaborative exercises from outwith the time and space constraints of a classroom. In Computer Science classrooms, technology is often used to aid in the automation of program testing. This can have positive effects such as giving quicker feedback on solutions and more accurately checking the correctness of solutions with many inputs. These tools could also provide more feedback to the teacher of a class, such as the progress being made by students, to help identify any problems. These systems can also be useful in contests, outwith classrooms and within. Within classrooms, contests using such systems can encourage students to perform better. Such systems can also evoke ideas for how a new technology enhanced learning system could be implemented. This includes the style of architecture, the interfaces that could be used and the general flow of the applications in use.\par
 
-
-
-% END
-% IMPLEMENTATION BACKGROUND
-% BEGIN
 
 \section{Implementation Considerations}
 From the previous sections I can see that there is definitely a space for a website to aid in peer testing code. However, there are many issues to consider when choosing how the website should be developed and implemented.
@@ -405,70 +416,7 @@ Given the many different aspects covered above, I have identified the following 
  \item Feedback could be collected from the testers through free comment in various places of the application, or by checking against a marking criteria.
 \end{itemize}
 
-% END
 
-% SIR GLOSSARYCK, OF TERMS
-% BEGIN
-\chapter{Glossary of Terms}
-The following is a glossary of terms used in the remainder of this dissertation. It is provided to consolidate some points made in the background research chapter and to make clear some terms that will be used later on.
-\gloss{Feedback}{Following a peer assessment, comments are given to the person who created the answer being reviewed, identifying good points and areas for improvement.}
-\gloss{Oracle}{A solution that offers a known-to-be correct implementation students can run their test cases against (although it will not be visible to them}
-\gloss{Peer Assessment}{The process of reviewing an assignment where the students assess each others work (in whole or in part), and the results of this may be further used in grading assignments.}
-\gloss{Peer-Testing}{A subset of peer assessment, in which students test each others programming code}
-\gloss{Signature Test}{This is a test case designed to ensure that the student has met the interface that was described to them}
-\gloss{Solution}{A solution to a coursework assignment, possibly written by a student}
-\gloss{Submission}{A solution, test case, coursework descriptor, etc. Any item made up of one or more files that is uploaded to the system by a student or teacher.}
-\gloss{Test Case}{A students test case that is to be run against a solution}
-\gloss{Test Match}{A matching of a test case and a solution. It will eventually have results, and may also have attached feedback}
-\gloss{Website}{Shortened form referring to a web platform or web application}
-% END
-
-
-% objectives
-% BEGIN
-\chapter{Objectives}
-\section{Primary Aim}
-The primary motivation of this project, as stated in the introduction, is to improve the student experience when completing programming coursework exercises by facilitating peer learning. The main aims for the project derived from this can be stated as:
-\begin{enumerate}
-\item \textbf{Prototype a Website}\par
-Design and build a website that automates peer assessment, with a focus on peer-testing. This website should combine all the tasks that would normally have to be done manually by students and allows them to be completed from a website interface. This could include file uploads, file viewing, testing of programs and providing feedback. The objectives for the Prototype are broken down further in section \S4.1 \todo{pop them in here as well, or is that going to repeat too much?}.
-\item \textbf{Evaluate the Website}\par
-\label{sec:aimeval}
-Once a functioning prototype is created, perform a study to determine the effectiveness of the website in terms of how well it enhances peer assessment and peer-testing within the confines of the coursework. This evaluation should involve students who might potentially use this tool in a course. The exact properties I wish to ensure the website has are expanded upon in the evaluation discussion, Chapter 7. Namely, these are to test the Correctness, Usability, and Security of the implementation as well as seeing if this improves the peer-testing process by giving Enhanced Feedback, and improves the Speed of turnaround of testing.
-\end{enumerate}
-
-\section{High Level Objectives}
-To further break down these aims, I wish for the project to meet the following objectives:
-\begin{itemize}
-\item Create a website that...
-\begin{itemize}
-\item Let developers submit solutions to website
-\item Let testers run test cases against solutions
-\item Let testers give feedback on the solutions
-\item Report this feedback / results of tests to developer
-\end{itemize}
-\item Evaluate that this website performs well
-\end{itemize}
-
-\section{Prototype Objectives}
-These are the objectives that relate to the Prototyping of the peer testing website. These are further broken down into requirements in \S\ref{sec:req1}.
-\objitem{Submit}{File upload for solutions}{High Priority}{The website will let students upload solutions to assignments. The website will also assign this solution to one (or more) other student for assessment.}
-\objitem{Test}{Build test cases}{High Priority}{The website will let students build, and subsequently submit test cases in a simple way. As previously discussed in \S\ref{subsec:bgtest}, possible implementations of this subsystem include many different forms of testing, such as Unit Testing, Property based testing and more.}
-\objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
-\objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
-\objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata) on each test.}
-\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it. While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
-\objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. As well as this, a teacher should be able to see any feedback. Once tests are run, the tester could attach comments to the (results of) test cases. Also, the source code of solutions could get feedback directly (possibly annotated on a line by line basis, or by leaving general comments for a submitted solution).}
-\objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
-\objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
-\objitem{Modular}{Create a modular system}{Low Priority}{One motivation for building the system would be to plug it into other learning tools, for example Virtual Learning Environments.}
-\objitem{Record}{Record metadata about run solutions}{Low Priority}{When running solutions with test cases, record metadata such as time taken to complete, memory usage, code coverage, etc. Store this data for display with each test result.}
-
-%END
-
-
-% 1st iteration
-% BEGIN
 \chapter{Prototype Development I}
 \label{ch:proto1}
 Following the completion of the background researched, the next step of the project was to develop an initial prototype, to test that the concept could actually be built and tested. This would require identifying and choosing suitable technologies, designing an interface and designing and implementing a system.
@@ -538,13 +486,12 @@ The file could be written directly to the system, but using the database offers 
 \section{Notification Experiments}
 As part of this initial prototype (but not included in later iterations), was a test of WebSocket based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
 The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
-% END
 
-% 2nd iteration
-% BEGIN
-% [multi-file, improved test matching plugins, prep for pipeline]
+
 \chapter{Prototype Development II}
+\label{ch:proto2}
 Once the initial prototype was created, I attended a course of two meetings with members of university staff in Edinburgh and Dubai who were interested in potentially using this peer-testing website.\par
+
 \section{Discussions with Stakeholders}
 The purpose of these meetings was to further refine what might be required for a full implementation of the website. These were quite insightful, and I have improved my understanding of the task as a result. Some of the points of discussion raised include:
 \begin{itemize}
@@ -552,6 +499,7 @@ The purpose of these meetings was to further refine what might be required for a
 \item Include more metrics to test files with, such as code coverage, naming conventions, code style
 \item Offer more encouragement for following the given interface for a coursework task, e.g. by providing a skeleton to fill out
 \item It is important for the students to be able to interact with the testing mechanism in place before their final submission
+\item \todo{multi-file, improved test matching plugins, prep for pipeline}
 \end{itemize}
 Based on these points, I was able to develop the additional requirements as follows. I detail which of the requirements I was able to complete ($\lozenge$), and those that were not completed ($\times$):
 \subsection{2nd Iteration Requirements}
@@ -595,9 +543,10 @@ For the intended purpose of the website, that it would be used in an educational
 While discussing this setup with the University MACS administrators, it was found that in order to run the application on the Apache server either some packages would need to be upgraded or rebuilt, or the Django application would need to be modified to use an older version of Django and python. The latter was not possible, to while the MACS IT team investigated ways to upgrade the server, I worked with my Project Supervisor to host it in a private location.\par
 When the Django application was hosted as a daemon process within Apache under WSGI (Web Server Gateway Interface), the requests on a given URL path are routed to the Django application rather than the usual routing to static HTML / PHP scripts. This meant that some modification was needed for the Django application's configuration as errors in serving the website highlighted places where  hard-coded URLs had broken, where relative paths were incorrectly used and where the Apache Linux user did not have the correct permissions to operate on the application. These required relatively simple fixes.\par
 The MACS IT team was able to upgrade the required packages such that Apache could operate. Using the changes made for running on the private server as a base, setting up the Django application to run on the university server was easily possible.
-% END
+
 
 \chapter{Prototype System Design}
+\label{ch:protosd}
 After the 2nd iteration of development, the website was in a state that it was ready to be evaluated by real people. This chapter will detail the system design, as it was in this state, as well as the development of the user interface overall.
 \section{User Interface Design}
 This section will show some of the initial storyboarding ideas for how to lay out the important views of the website, and descriptions of how they changed as the website was developed.\\
@@ -841,9 +790,9 @@ In order to better grasp the sequence of operations that a class of users (stude
 \doublespacing
 ...
 
-% EVAL
-% BEGIN
+
 \chapter{Evaluation Study}
+\label{ch:eval}
 \section{Methodology}
 In order to conduct the evaluation study I aimed to test the live system with participants pretending to be students completing coursework. Ideally we would have two groups -- one doing the peer-testing using the website and one not. For this study, the participants that were not using the website would be communicating via email.\par
 To try and get as fair a response as possible, each participant in each group would complete two tasks, but the pairing of which task would be completed using the website or by email would be swapped between each group. Examples of the tasks that would be completed are given in appendix E (p\pageref{app:descriptors}).\par
@@ -897,7 +846,6 @@ Additionally, one respondent raised the issue that they were unable to see the f
 \subsection{General Feedback Given}
 To get a quick feel for how usable the site was, I asked some questions in the survey. These were in the form of likert scales (fig \ref{fig:likert-use}).\par
 \begin{figure}[ht]
-% \includegraphics[width=\textwidth]{eva-result/likert-site-usable.png}
 \scriptsize
 \makebox[\textwidth][c]{
 \begin{tabular}{r|llllllllllll}
@@ -1076,11 +1024,8 @@ One change that was discussed would be to introduce a way of allowing for multi-
 The security in terms of authentication on the website is very good, and I believe there are sufficient checks to make sure that only the right users are able to use the right parts of the website. However, once these users are logged in, they are given too much trust that they will not abuse the system.\par
 The output that they are given from the website having run tests should be stripped down, possibly as part of piping\footnote{I had previously mentioned the use of pipelining the input files, and I believe that if the output files are to be pipelined also, then it may be worth re-thinking the architecture in use where the database models control the files individually. A single submission model instance would be sufficient to store files on the filesystem, and may make this pipleining easier.} the output of the tests and making sure that any directories are removed, as well as checking for large file output and cutting it if it becomes too large.
 Also, I will need to add restrictions in terms of how the scripts themselves are run. The previously mentioned security features (see \S\ref{subsec:security})would need to be further investigated and, for those that are appropriate, implemented.
-% END
 
 
-% CONCLUDE
-% BEGIN
 \chapter{Conclusion}
 \section{Achievements}
 what I have achieved according to objectives, and prior work done in the area...\par
@@ -1090,19 +1035,12 @@ The website lacks decent security.
 \section{Future work}
 Discuss possible additions to allow this to be used within an actual learning context.\par
 Some initial testing with the concept of WebSocket-based notifications was done at this stage, and a basic proof of concept showed that notifications could be used. However, this was not as simple as plugging in a module, as some changes to the base configuration of the Django application was needed. Therefore, to ease development of the prototype, the concept of the notifications was removed for later implementation.\todo{right place to put this?}\par
-% END
-
-
-
-% APPENDICES AND BIBLIOGRAPHY
 
 \pagebreak
 \singlespacing
 \printbibliography
 \addcontentsline{toc}{chapter}{Appendices}
 
-% ETHICAL
-%BEGIN
 \section*{A: Ethical Analysis}
 \addcontentsline{toc}{section}{A: Ethical Analysis}
 \label{app:ethical}
@@ -1136,11 +1074,8 @@ I confirm that, in accordance with Data Protection legislation:
 \subsection*{Health and Safety}
 I confirm that the project involves only standard IT equipment and exposes participants to no more hazards than a conventional office environment.
 
-% END
-
 \newpage
 \addcontentsline{toc}{section}{B: Evaluation Consent Form}
-% BEGIN
 \label{app:consent}
 \includepdf[pages={1}]{eva/consent2.pdf}
 \includepdf[pages={2}]{eva/consent2.pdf}
@@ -1158,12 +1093,11 @@ I confirm that the project involves only standard IT equipment and exposes parti
 \includepdf[pages={7}]{eva/survey2.pdf}
 \includepdf[pages={8}]{eva/survey2.pdf}
 \includepdf[pages={9}]{eva/survey2.pdf}
-% END
+
 
 
 \newpage
 \addcontentsline{toc}{section}{D: Evaluation Extended Discussion Questions}
- % BEGIN
 \section*{D: Evaluation Extended Discussion Questions}
 \label{app:discussion}
 These questions were discussed in a debriefing session after the evaluation study had completed. Both Myself and Manuel Maarek had prepared some questions to ask during this evaluation study. The following were questions prepared by myself:\par
@@ -1187,12 +1121,9 @@ The following questions were prepared by Manuel Maarek:
 \item Was it clear what the website was doing behind the scenes?
 \item What are your feelings on cross-campus interactions?
 \end{itemize}
-% END
-
 
 \newpage
 \addcontentsline{toc}{section}{E: Evaluation Study Task Descriptors}
-% BEGIN
 \section*{E: Evaluation Study Task Descriptors}
 \label{app:descriptors}
 What follows is a complete listing of the materials provided to the participants, who acted as students, for the study. Included is The main task descriptor, and for each coursework task (tree and quicksort):
@@ -1215,6 +1146,5 @@ What follows is a complete listing of the materials provided to the participants
 \lstinputlisting{eva/cw2/signature.py}\section*{}
 \lstinputlisting{eva/cw2/sample_test.py}\section*{}
 \lstinputlisting{eva/cw2/oracle/quicksort.py}
-% END
 
 \end{document}
