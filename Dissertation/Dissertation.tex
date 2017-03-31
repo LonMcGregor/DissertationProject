@@ -51,8 +51,8 @@
 
 \newcounter{FunCount}
 \newcounter{NFunCount}
-\newcommand{\freq}[4]{\addtocounter{FunCount}{1}F\arabic{FunCount} & #1 & #2 & #3 & #4\\}
-\newcommand{\nfreq}[4]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} & #1 & #2 & #3 & #4\\}
+\newcommand{\freq}[4]{\addtocounter{FunCount}{1}F\arabic{FunCount} \label{itm:freq\arabic{FunCount}}& #1 & #2 & #3 & #4\\}
+\newcommand{\nfreq}[4]{\addtocounter{NFunCount}{1}N\arabic{NFunCount} \label{itm:nfreq\arabic{NFunCount}}& #1 & #2 & #3 & #4\\}
 
 \pdfinfo{%
   /Title    (Final Year Dissertation)
@@ -150,11 +150,9 @@ Thanks to Manuel Maarek for helping me to organise this project. Additionally, t
 
 \chapter{Introduction}
 % problems solved
-% methods of implementation and research
 % results
 % any big achievemtns
 % any limits.
-% cross reference each of these to their sections further within the report
 
 \section{Glossary of Terms}
 The following is a glossary of terms used in the remainder of this dissertation. It is provided to consolidate some points that will be made in the background research chapter and to make clear some terms that will be used later on.
@@ -212,7 +210,7 @@ These are the objectives that relate to the Prototyping of the peer testing webs
 \objitem{Run}{Run test cases}{High Priority}{Once the test cases are built, run them. The results of running them will be stored for later display. This is done asynchronously to the main interface, as running the test cases may take some time. This could extend to running a submitted test against all solutions.}
 \objitem{View}{Viewing own solution}{High Priority}{Let the student see their own submission, which test cases have been run against it, the status of each test, any feedback from peer assessors.}
 \objitem{Results}{Display test results}{High Priority}{Display the results of a test against a particular solution. Display the results (passed, failed, error, metadata) on each test.}
-\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it. While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. However, this prototype will need to have some form of authentication in place, to make sure that only developers and test subjects may access the website.}
+\objitem{Security}{Secure the System}{Medium Priority}{As the website acts as an open interface for running python, it is important that it be secured against attacks (malicious or accidental), and that only the relevant people may access it. While in a production system, security would normally hold a high priority, in this prototype stage, the focus will be more so on the functionality that evaluation test subjects will interact with. Given that this evaluation will be monitored, test subjects can be prevented from uploading malicious code. This prototype will have authentication in place, to make sure that only authorised users may access the website.}
 \objitem{Feedback}{Provide feedback on solution}{Medium Priority}{A tester should be able to provide feedback to the developer at various stages of the assessment. As well as this, a teacher should be able to see any feedback. Once tests are run, the tester could attach comments to the (results of) test cases. Also, the source code of solutions could get feedback directly (possibly annotated on a line by line basis, or by leaving general comments for a submitted solution).}
 \objitem{Source}{Show source code}{Medium Priority}{A tester should be able to read the source code of a solution, for example to inspect the coding style (variable names, structure etc.)}
 \objitem{Teacher}{Teacher overview screen}{Low Priority}{Provide a way for the teacher of the class to set the coursework. Also, to see all of the solutions and the tests run on each of them, as well as any feedback.}
@@ -423,9 +421,8 @@ Following the completion of the background researched, the next step of the proj
 
 \section{Initial Prototype Requirements}
 \label{sec:req1}
-Based on the  prototype objectives previously outlined (\S4.1), I can establish the following system requirements:\par
-The following prioritisation is used: \textbf{Low} - Possible future addition, \textbf{Mid} - Would make a more useful system, \textbf{High} - Necessary for prototype.
-I also detail which of the requirements I was able to complete in this first iteration ($\triangle$), those that were postponed and completed in the 2nd iteration of development ($\lozenge$), and those that were not completed ($\times$).
+Based on the  prototype objectives previously outlined (\S\ref{sec:proto-obj}), I can establish the following system requirements:\par
+The following prioritisation is used: \textbf{Low} - Possible future addition, \textbf{Mid} - Would make a more useful system, \textbf{High} - Necessary for prototype. I also detail which of the requirements I was able to complete in this first iteration ($\triangle$), those that were postponed and completed in the 2nd iteration of development ($\lozenge$), and those that were not completed ($\times$).
 \begin{longtable}{ccl@{}cc}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*} \\\hline
 \freq{Security}{Log students in}{High}{$\triangle$}
@@ -433,10 +430,10 @@ I also detail which of the requirements I was able to complete in this first ite
 \freq{Submit}{Accept student uploads of solutions to assignments}{High}{$\triangle$}
 \freq{Submit}{Assign a submission to a student for assessment}{High}{$\triangle$}
 \freq{Test}{Accept uploads for test case files}{High}{$\triangle$}
-\freq{Test}{Offer a more guided approach to writing test cases}{Mid}{}
+\freq{Test}{Offer a more guided approach to writing test cases}{Mid}{$\lozenge$}
 \freq{Run}{Run submitted test case for the submitted solution}{High}{$\triangle$}
 \freq{Run}{Record the results of test execution}{High}{$\triangle$}
-\freq{Run}{Run submitted test case against all solutions}{Low}{}
+\freq{Run}{Run submitted test case against all solutions}{Low}{$\times$}
 \freq{View}{List all test case submitted}{High}{$\triangle$}
 \freq{View}{Display the results of running a test}{High}{$\triangle$}
 \freq{View}{Display the results of all solutions test run against}{Low}{$\times$}
@@ -445,14 +442,14 @@ I also detail which of the requirements I was able to complete in this first ite
 \freq{Feedback}{Let submitter of test add feedback}{Mid}{$\triangle$}
 \freq{Feedback}{Let submitter of test edit feedback}{Mid}{$\times$}
 \freq{Feedback}{Record testers general comments on solution}{Mid}{$\triangle$}
-\freq{Feedback}{Let tester attach feedback to lines in solution}{Low}{}
-\freq{Security}{Sandbox the execution of solutions}{Mid}{}
-\freq{Security}{Use malware detection to prevent malicious uploads}{Mid}{}
+\freq{Feedback}{Let tester attach feedback to lines in solution}{Low}{$\times$}
+\freq{Security}{Sandbox the execution of solutions}{Mid}{$\times$}
+\freq{Security}{Use malware detection to prevent malicious uploads}{Mid}{$\times$}
 \freq{Teacher}{Let teacher set coursework assignments}{Low}{$\triangle$}
 \freq{Teacher}{Let teacher see all submitted content}{Low}{$\triangle$}
 \nfreq{Website}{Operate on Desktop Web Browsers used in classroom}{High}{$\triangle$}
 \nfreq{Website}{Operate with multiple users accessing at once}{High}{$\triangle$}
-\nfreq{Website}{Operate with a classroom of users accessing at once}{Low}{}
+\nfreq{Website}{Operate with a classroom of users accessing at once}{Low}{$\times$}
 \nfreq{Submit}{Not assign a student to assess their own work}{High}{$\triangle$}
 \nfreq{Submit}{Accept solutions that are python scripts}{High}{$\triangle$}
 \nfreq{Run}{Test cases should be run asynchronously}{High}{$\triangle$}
@@ -460,7 +457,8 @@ I also detail which of the requirements I was able to complete in this first ite
 \end{longtable}
 
 \subsection{Additional Notes on Requirements}
-Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.
+Regarding requirements which are prioritised as low, this is because for the purposes of our prototype and evaluation, these requirements are not fully necessary. For example, teacher interactions can be hard coded for the evaluation. The main focus at this stage of development is to ensure that the interactions for students who will test the website work as well as possible.\par
+Regarding requirement N\ref{itm:nfreq3}, I was not able to test the site with a number of students comparable to what you would find in an actual university class, so I cannot say for sure whether or not the website would manage coping with a large number of users.
 
 \section{Choosing Tools}
 There are many ways that the website could be built. To identify some options, I considered the available software on the university servers, and Identified languages and frameworks that could be used here:\par
@@ -485,7 +483,21 @@ The file could be written directly to the system, but using the database offers 
 
 \section{Notification Experiments}
 As part of this initial prototype (but not included in later iterations), was a test of WebSocket based notifications. These are an example of a Server-Push architecture, as opposed to the regular Client-Server architecture the rest of the site uses. Under server push, a client subscribes to a web socket, and the server may send out notifications. For the purpose of the site, the end product would ``push'' a notification to a user for certain events, such as a new piece of feedback that was received. This would give the website a more dynamic feel.\par
-The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. While it was possible to set this up it required additional tools, such as switching from a WSGI web interface to an ASGI interface.\todo{repeating future work? leave it here? mention why it was removed here?}
+To better describe how notifications might work, see how a client would connect to both the main webserver and notification server, as shown in figure \ref{fig:seq-note}.
+\begin{figure}[ht]
+\includegraphics[width=0.8\textwidth]{fig/seq-note.png}
+\caption{Sequence Diagram showing how a client requests a webpage, and through a script on the webpage, contacts a notification server and communicates via a socket.}
+\label{fig:seq-note}
+\end{figure}
+The way that notifications would be sent acted as follows:
+\begin{enumerate}
+\item The client would make some interaction with the main web server, such as queueing a test to be run, or giving a piece of feedback
+\item The main web server would then process whatever interaction this was and tell the notification server to keep a record of this
+\item If the relevant client currently had an open websocket to the notification webserver, then the notification would be pushed to the client
+\item If this was not possible, a record of it would have been made and sent to the client the next time they requested old notifications
+\end{enumerate}
+The initial experimentation I had done in the 1st iteration with regards to notifications managed to use a script that, when a web page was loaded from the server, would contact and attempt to open a websocket. The server would open this websocket and would then send a notification showing the connection number of that client, counting up. This way I could check to make sure that the websockets were acting correctly.\par
+The initial prototype for this offered a simple way to connect to the server, to test if it would be feasible or not. In order to set this up however, the general architecture of the entry point to the website needed to be changed. By default, the website was set up to interact according to WSGI (The web-server gateway interface), the common interface supported by most web servers to run python web applications\cite{python_software_foundation_pep_2010}. However, in order to allow for websockets to be used, this needed to be changed to the ASGI (ASynchronous Gateway Interface), which requires routing all connections through both a Daphne server as well as a REDIS server \cite{django_channels_2016}. This poses complications for running the server live, as it is much more complex and requires more configuration on the side of the server, including using relatively new technology which may act in an unstable manner. For this reason, further development of the notifications server was halted after the 1st iteration. Continuing development of this could be a good consideration for future work.
 
 
 \chapter{Prototype Development II}
@@ -499,38 +511,48 @@ The purpose of these meetings was to further refine what might be required for a
 \item Include more metrics to test files with, such as code coverage, naming conventions, code style
 \item Offer more encouragement for following the given interface for a coursework task, e.g. by providing a skeleton to fill out
 \item It is important for the students to be able to interact with the testing mechanism in place before their final submission
-\item \todo{multi-file, improved test matching plugins, prep for pipeline}
+\item It would be useful to support automatic matching of students (for feedback) according to certain rulesets, e.g. based on gender or location
+\item It would be useful to be able to upload multiple tests according to the various features that are to be implemented in the coursework
+\item It would be nice to be able to support actual marking/grading by a teacher within the website, alongside the peer feedback
 \end{itemize}
-Based on these points, I was able to develop the additional requirements as follows. I detail which of the requirements I was able to complete ($\lozenge$), and those that were not completed ($\times$):
+Based on these points, I was able to develop the additional requirements as follows. The following prioritisation is used: \textbf{Low} - Possible future addition, \textbf{Mid} - Would make a more useful system, \textbf{High} - Necessary for prototype. I detail which of the requirements I was able to complete ($\lozenge$), and those that were not completed ($\times$):
 \subsection{2nd Iteration Requirements}
-\begin{longtable}{cclrc}
+\begin{longtable}{ccl@{}cc}
 \textbf{ID} & \textbf{Objective} & \textbf{Description} & \textbf{Priority} & \textbf{*}\\\hline
-\freq{Security}{Log students in}{High}{$\succ$}
+\freq{Submit}{Allow multiple files per submission}{High}{$\lozenge$}
+\nfreq{Submit}{Limit number of files / filesize}{Mid}{$\times$}
+\nfreq{Teacher}{Store advanced details for each coursework}{Mid}{$\lozenge$}
+\nfreq{Teacher}{Store advanced details for each student added}{Mid}{$\lozenge$}
+\freq{Modular}{Support coursework of different language types}{Low}{$\times$}
+\freq{Analyse}{Teacher can add feedback to something}{Low}{$\times$}
+\freq{Analyse}{Record metadata about student interactions}{Low}{$\times$}
+\freq{Analyse}{Record and Track student grades for a coursework}{Low}{$\times$}
+\freq{Analyse}{Allow teacher to see 'overview' of a given student}{Low}{$\times$}
+\freq{Match}{Allow teacher to create custom match rules}{High}{$\lozenge$}
+\freq{Modular}{Support plugins like test coverage, code similarity}{Mid}{$\times$}
+\freq{View}{Show students commands used to generate results}{Low}{$\times$}
+\freq{Submit}{Offer interface check for solutions to test against}{High}{$\lozenge$}
+\freq{Submit}{Offer oracle to show expected output for given input}{Mid}{$\lozenge$}
+\freq{Test}{Extend to allow more test types, e.g. I/O}{Low}{$\times$}
+\freq{Test}{Allow students to test their own work}{High}{$\lozenge$}
+\freq{Modular}{Plug Notifications in}{Mid}{$\times$}
 \end{longtable}
+\subsubsection{Notes on Requirements}
+Custom match rules are created by adding a new python algorithm for matching students. This may need to be modified in the future for teachers who do not wish to write code to support this.
 
-\subsection{Changes from 1st Iteration Prototype}
-\todo{Brief notes, mind.}
-\subsubsection{Modifications to system design}
-One of the requests suggested that it would be beneficial to allow multiple files to be part of a single solution or test case - this would be a definite requirement if additional languages are supported beyond python - e.g. languages like C that require separate header files. I have modified the models accordingly. This is the current working layout:
-\todo{add a database er diagram thingy}
-\todo{somethign something pipeline, originals folder, process inputs, modularity, python and other languages}
-\subsubsection{Modifications to interface design}
-As will be used within an evaluation study, more effort is placed into the design of the UI at this stage than the previous one. Most of the design stayed the same, but in some places it was improved:\par
-The \textit{feedback view} was changed to support multiple files being used per solution / test case. Instead of panels with files, there is a tab control that allows the user to switch between each of the files individually. A compromise that only allows one file to be viewed at once, but allows for multiple files to be seen without needing to change/reload the web page.\par
-Within the \textit{Coursework Overview}, to encourage students to familiarise themselves with how the system works\todo{a la joe wells suggestion}, they are offered the ability to create their own tests on the system, whereas previously any testing of their own would need to happen offline. This allows them to create a test match, and also lets them access the signature test and oracle. In a similar vein, to encourage additional testing, once students have been assigned someone elses work to test, they can upload additional tests to use when providing feedback.\par
-Given the ease with which HTML can be modified, and that much of what I needed was already present, I simply made the UI changes directly without preparing mock-ups. \todo{attach screenshots / appdx}\par
-To increase the level of anonyhmity everything public facing was given \todo{random slugs - anon, security etc.}
 \section{2nd Iteration Development}
-As part of supporting multiple files per submission
-\begin{itemize}
-\item Setting one submission as final
-\item Setting submissions as private
-\item ...
-\end{itemize}
-\subsection{Managing Tests}
-Users need to be able to interact with the testing right from the start, etc.
-\subsection{Pipelines}
-I never really completed this because i'm an incompetent.
+\subsection{Multiple Files \& Pipelines}
+As part of the improvements for supporting multiple files and filetypes, the process for uploading  files was changed. I investigated two possible avenues for this. The first avenue was a 3rd party Django module that purported to allow a Form Model to be created that used the multiple file selection attribute in the HTML5 form element. Having installed and tested this module, I found it to be faulty. Although it allowed for selection of multiple files, it would not properly read them into the form model. I therefore deemed it unsuitable for my use. My secondary option, and the one I used, was to simply hard-code the form in HTML5 myself, and forgo the form model.\par
+This would allow for multiple files to be uploaded at once, for a single submission. This could allow for more complex development in python, and languages like C that have individual header and source files. However, this does not solve the problem of languages which require strict directory management, like Java libraries. Future investigation would be required to support those. \todo{future work}.\par
+Once a single submission is stored on the server, I had considered how it could be processed. Given that from the submission instance you can determine the filepath, it would be possible to take an entire submission by directory path, and pass it through any range of other programs to process it - for example to sanitize or anonymize it by removing comments. The original files are stored in a sub-directory of the submission directory. Ideally, the input files from the originals folder would be sent through a pipeline of various other plugins, and then sent to a directory called "final". However, at this stage I have not implemented the use of any such plugin programs to the file processing pipeline.\par
+\subsection{Feedback View}
+To increase the level of anonymity everything public facing was given a random slug, matching the form [a-zA-Z0-9\-\_]{4}. This would be used in URLs instead of the ID login or number of a user, for example "domain/er4H/file.py" would be used in the URL. This aids in anonymity as it hides who created a file, and prevents a user from knowing if they are getting the same persons files each time. It also adds to security as havign random IDs prevents people from guessing the files to try and view them.\par
+The feedback view was changed to support multiple files being used per solution / test case. Instead of panels with files, there is a tab control that allows the user to switch between each of the files individually. A compromise that only allows one file to be viewed at once, but allows for multiple files to be seen without needing to change/reload the web page.\par
+\subsection{Courseworks \& Managing Tests}
+As part of improvements to the coursework descriptors, teachers can upload files when they create a coursework. These could be sample code with skeletons to fill in, or PDFs describing the task details. These can be seen from the coursework details page.\par
+Within the Coursework Overview, to encourage students to familiarise themselves with how the system works, they are offered the ability to create their own tests on the system, whereas previously any testing of their own would need to happen offline. This allows them to create a test match, and also lets them access the signature test and oracle. In a similar vein, to encourage additional testing, once students have been assigned someone elses work to test, they can upload additional tests to use when providing feedback.\par
+To encourage students to make use of this, a submission of a solution or test can be made multiple times. I included the ability for a submission to be marked as private, and this would prevent others from seeing it\footnote{In practice, any submission is considered private unless it is marked for sharing through feedback by being a final submission, so this feature was redundant, and may have caused confusion, as detailed in \S\ref{sec:permiss}}. Then, some time before the submission deadline, a student would need to select one of their uploaded solutions and one of their tests and mark it as their Final Submission - this is the one that would be shared to other students for feedback.\par
+Once a person has been given a solution to test, they are allowed to make more uploads, but only of new test cases, so that a person might be able to try multiple ways of testing the solution in order to give better feedback. By default, the initial test case used is the one the tester marked as their Final test.
 
 \section{Live Hosting}
 In order to prepare for a live test of the system, I identified some possible options that could be used to host the Django application:
