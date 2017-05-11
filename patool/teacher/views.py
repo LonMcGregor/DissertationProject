@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponseForbidden, HttpResponse
 from django.shortcuts import render, redirect
@@ -10,6 +9,7 @@ import student.models as m
 import teacher.forms as f
 import teacher.permission as p
 from runner import matcher
+
 
 @login_required()
 @p.is_teacher
@@ -192,7 +192,7 @@ def create_coursework_update(user, request, course_code):
         m.File(file=each, submission=oracle_exec).save()
 
     identity = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
-                            creator=user, type=m.SubmissionType.IDENTITY_TEST, private=False)
+                            creator=user, type=m.SubmissionType.SIGNATURE_TEST, private=False)
     identity.save()
     for each in request.FILES.getlist('identity'):
         m.File(file=each, submission=identity).save()
@@ -282,13 +282,11 @@ def manual_test_match_update(request):
     if not tm_form.is_valid():
         return HttpResponse("Invalid form data")
     try:
-        matcher.create_single_test_match(
+        matcher.create_peer_test(
             tm_form.cleaned_data['solution_sub'],
             tm_form.cleaned_data['test_sub'],
             tm_form.cleaned_data['coursework'],
-            tm_form.cleaned_data['to_be_marked_by'],
-            tm_form.cleaned_data['visible_to_developer'],
-            request.user
+            True
         )
     except Exception as e:
         return HttpResponse(str(e))

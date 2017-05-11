@@ -8,13 +8,27 @@ import student.models as m
 """File containing the various pipelines for uploading files"""
 
 
-def python_solution():
-    """When a solution file is uploaded, save it
+def python_solution(solution):
+    """When a @solution instance is uploaded, save it
     then process it accordingly"""
     pass
 
 
-def python_test_case():
+def python_test_case(test):
+    """When a @test instance is uploaded, save it
+    then process it accordingly"""
+    pass
+
+
+def java_solution_uploaded(solution):
+    """When a java @solution submission is created
+    process it accordingly, e.g. compile"""
+    pass
+
+
+def java_test_uploaded(test):
+    """When a java @solution submission is created
+    process it accordingly, e.g. compile"""
     pass
 
 
@@ -35,5 +49,3 @@ def python_results(content, tm):
     result_file = m.File(submission=result_sub)
     result_file.file.save('results.txt', ContentFile(content))
     result_file.save()
-
-

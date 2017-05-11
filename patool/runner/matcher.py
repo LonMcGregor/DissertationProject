@@ -41,7 +41,7 @@ def first_available(coursework, initiator, marker, visible):
 
 
 @transaction.atomic()
-def create_single_test_match(solution, test, cw, marker, visible, initiator):
+def create_peer_test(solution, test, cw, created_by_teacher=False):
     """Create a new test match with data specified by the IDs of @solution,
     @test, @cw, @marker, @visible and the instance of @initiator user"""
     solution = m.Submission.objects.get(id=solution)
@@ -49,37 +49,33 @@ def create_single_test_match(solution, test, cw, marker, visible, initiator):
     if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
         raise Exception("Need 1 solution and 1 test")
     cw = m.Coursework.objects.get(id=cw)
-    marker = User.objects.get(username=marker)
-    if m.EnrolledUser.objects.filter(course=cw.course, login=marker).count() != 1:
-        raise Exception("You're not allowed to edit this course")
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
-                         coursework=cw, initiator=initiator, waiting_to_run=True,
-                         visible_to_developer=visible,
-                         marker=marker)
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
+                         solution=solution, coursework=cw,
+                         type=m.TestType.TEACHER if created_by_teacher else m.TestType.PEER)
+    # todo probably want to plug some sort of proxy in here for the feedback
     new_tm.save()
 
 
 @transaction.atomic()
-def student_create_single_test_match(solution_id, test_id, coursework, user):
+def create_self_test(solution_id, test_id, coursework, user):
     """Receive data to create a student-specific test match. Pass in IDs for
-    @solution_id, @test_id and a @cw, @user instance. Return the newly created test.
-    WARNING: PASSING DATA INTO HERE ASSUMES IT HAS PROPERLY BEEN VALIDATED"""
+    @solution_id, @test_id and a @cw, @user instance. Return the newly created test."""
     if 'solution' == 'O' and 'test' == 'I':
         raise Exception("Either test, solution or both need to be one of your uploads")
     if solution_id != 'O':
-        solution = m.Submission.objects.get(id=solution_id, type=m.SubmissionType.SOLUTION)
+        solution = m.Submission.objects.get(id=solution_id, creator=user,
+                                            type=m.SubmissionType.SOLUTION)
     else:
         solution = m.Submission.objects.get(coursework=coursework,
                                             type=m.SubmissionType.ORACLE_EXECUTABLE)
     if test_id != 'I':
-        test_case = m.Submission.objects.get(id=test_id, type=m.SubmissionType.TEST_CASE)
+        test_case = m.Submission.objects.get(id=test_id, creator=user,
+                                             type=m.SubmissionType.TEST_CASE)
     else:
         test_case = m.Submission.objects.get(coursework=coursework,
-                                             type=m.SubmissionType.IDENTITY_TEST)
-    marker = user if solution.creator != user and solution.type != m.SubmissionType.ORACLE_EXECUTABLE else None
+                                             type=m.SubmissionType.SIGNATURE_TEST)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
-                         coursework=coursework, initiator=user, waiting_to_run=True,
-                         visible_to_developer=True, marker=marker)
+                         coursework=coursework, type=m.TestType.SELF)
     new_tm.save()
     return new_tm
 

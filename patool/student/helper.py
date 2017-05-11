@@ -34,16 +34,6 @@ def get_test_match_for_developer(user, coursework):
     return chosen
 
 
-def read_file_by_line(file):
-    """Read back the contents of a @file as a string"""
-    content = ""
-    while True:
-        buf = file.readline()
-        content += buf.decode('utf-8')
-        if buf == b'':
-            return content
-
-
 def first_model_item_or_none(query):
     """Working on the assumption that a user will only submit an item
     once in a given state, take the output of the @query, and give
@@ -78,12 +68,13 @@ def get_files(submission):
     return list_files
 
 
-def get_file(submission_id, filename):
-    """For a specified @submission_id, and @filename, get
-    the file object associated with that"""
-    sub = m.Submission.objects.get(id=submission_id)
-    files = m.File.objects.filter(submission=sub)
-    for file in files:
-        if file.file.name.split('/')[-1] == filename:
-            return file
-    raise Exception("File not found")
+def coursework_for_user(user):
+    """For a given @request, return a list of coursework available to the user"""
+    enrolled_courses = m.EnrolledUser.objects.filter(login=user).values('course')
+    courses_for_user = m.Course.objects.filter(code__in=enrolled_courses)
+    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
+    visible_courseworks = []
+    for item in all_courseworks_for_user:
+        if p.can_view_coursework(user, item):
+            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
+    return visible_courseworks

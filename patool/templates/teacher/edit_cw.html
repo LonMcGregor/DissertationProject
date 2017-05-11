@@ -1,108 +1,34 @@
 {% extends "teacher/base.html" %}
-{% block title %}View Course{% endblock %}
+{% block title %}Edit Coursework{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
     <form method="POST" action="" enctype="multipart/form-data">
-    {% csrf_token %}
-        {% if cw_form %}
-            {{ cw_form }}
-            {% else %}
-    <label for="id_name">Coursework Name:</label><input id="id_name" maxlength="128" name="name" type="text" required="">
-<label for="id_state">Coursework State:</label><select id="id_state" name="state" required="">
-<option value="i">Invisible to Students</option>
-<option value="c">Closed for Submissions</option>
-<option value="u">Accepting Uploads</option>
-<option value="f">Accepting Feedback</option>
-</select>
-<label for="id_descriptor">Files for Coursework descriptor:</label><input id="id_descriptor" multiple="multiple" name="descriptor" type="file" required="">
-<label for="id_oracle_exec">Files for Oracle implementation:</label><input id="id_oracle_exec" multiple="multiple" name="oracle_exec" type="file" required="">
-<label for="id_identity">Files for Identity test:</label><input id="id_identity" multiple="multiple" name="identity" type="file" required="">
-
-
-        {% endif %}<input type="submit" value="Save">
-</form>
-<p></p>
-    <h1>Coursework Files</h1>
-    <table>
-    <thead>
-    <tr>
-        <th>SUBID</th>
-        <th>Filepath</th>
-        <th>Creator</th>
-        <th>Type</th>
-        <th>View</th>
-    </tr>
-    </thead>
-    {% for s, files in submissions %}
-    {% for f in files %}
-        <tr>
-        <td>{{ s.id }}</td>
-        <td>{{ f }}</td>
-        <td>{{ s.creator }}</td>
-        <td>{% if s.private %}({% endif %}{{ s.type }}{% if s.private %}){% endif %}{% if s.final %}F{% endif %}</td>
-        <td><a href="{% url 'download_file' s.id f %}?pretty=1">Html</a> <a href="{% url 'download_file' s.id f %}?show=1">Raw</a></td>
-        </tr>
-    {% endfor %}
-    {% endfor %}
-    </table>
-    <p></p>
-<h1>Coursework Results</h1>
-    <h3>Make a new Test Match</h3>
-    <form action="{% url 'make_tm' %}" method="POST">
         {% csrf_token %}
-        {{ tm_form }}
-        <input type="submit" value="Create test match"/>
-    </form>
-    <h3>Auto create test matches for users</h3>
-    <form action="{% url 'make_tm' %}" method="POST">
-        {% csrf_token %}
-        {{ atm_form }}
-        <input type="submit" value="Create test matches"/>
+            {% if cw_form %}
+                {{ cw_form }}
+                {% else %}
+        <label for="id_name">Coursework Name:</label><input id="id_name" maxlength="128" name="name" type="text" required="">
+        <label for="id_state">Coursework State:</label><select id="id_state" name="state" required="">
+        <option value="i">Invisible to Students</option>
+        <option value="c">Closed for Submissions</option>
+        <option value="u">Accepting Uploads</option>
+        <option value="f">Accepting Feedback</option>
+        </select>
+        <label for="id_descriptor">Files for Coursework descriptor:</label><input id="id_descriptor" multiple="multiple" name="descriptor" type="file" required="">
+        <label for="id_oracle_exec">Files for Oracle implementation:</label><input id="id_oracle_exec" multiple="multiple" name="oracle_exec" type="file" required="">
+        <label for="id_signature">Files for Identity test:</label><input id="id_signature" multiple="multiple" name="signature" type="file" required="">
+            {% endif %}<input type="submit" value="Save">
     </form>
     <p></p>
-    <h3>Results</h3>
-    <table>
-    <thead>
-    <tr>
-        <th>ID</th>
-        <th>Test</th>
-        <th>Solution</th>
-        <th>Results</th>
-        <th>Feedback</th>
-        <th>Error Level</th>
-        <th>Initiator</th>
-        <th>Marker</th>
-        <th>Developer</th>
-        <th>Waiting to Run</th>
-    </tr>
-    </thead>
-    {% for f in results %}
-        <tr>
-            <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
-        <td>{%  if f.test %}
-            {{ f.test.id }}
-        {% endif %}</td>
-        <td>{%  if f.solution %}
-           {{ f.solution.id }}
-        {% endif %}</td>
-        <td>{%  if f.result %}
-            {{ f.result.id }}
-        {% endif %}</td>
-        <td>{%  if f.feedback %}
-            {{ f.feedback.id }}
-        {% endif %}</td>
-        <td>{{ f.error_level }}</td>
-        <td>{{ f.initiator }}</td>
-        <td>{% if f.marker %}{{ f.marker }}{% endif %}</td>
-        <td>{% if f.visible_to_developer %}{{ f.solution.creator }}{% else %}({{ f.solution.creator }}){% endif %}</td>
-        {% if f.waiting_to_run %}
-            <td><a href="{% url 'force_test_run' f.id %}">Run Now</a></td>
-        {% else %}
-            <td>Has Run</td>
-        {% endif %}
-        </tr>
+    {% for files, name, formname in allfiles %}
+    <form method="POST" action="" enctype="multipart/form-data">
+        <h3>{{ name }}</h3>
+        <a>Delete</a>
+        <input id="id_{{ formname }}" multiple="multiple" name="replace_{{ formname }}" type="file" required="">
+        <input type="submit" value="Submit new files to replace current">
+        {% for type, url, name in files %}
+            <a href="{{ url }}" class="{{ type }} file">name</a>
+        {% endfor %}
+    </form>
     {% endfor %}
-    </table>
-    <p>Key: (developer) indicates that this is not visible to developer</p>
-    <a href="{% url 'run_all_test_in_cw' coursework.id %}">Run all queued tests</a>
 {% endblock %}

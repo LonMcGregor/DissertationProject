@@ -9,22 +9,22 @@ def upload_directory_path(instance, filename):
     """For a given @instance of File, and a client-side @filename,
     generate a path where the file should be stored on the system
     This will be appended to the settings BASE_DIR and MEDIA_ROOT"""
-    return '%s/%s/%s/%s/originals/%s' % (instance.submission.coursework.id,
-                                         instance.submission.creator.id,
-                                         instance.submission.type,
-                                         instance.submission.id,
-                                         filename)
+    return '%s/%s/%s/originals/%s' % (instance.submission.coursework.id,
+                                      instance.submission.creator.id,
+                                      instance.submission.id,
+                                      filename)
 
 
 slug_characters = ['-', '_'] + list(string.ascii_letters) + list(string.digits)
 
 
-def new_random_slug(model, primary_key='id', length=4):
+def new_random_slug(model, primary_key='id', length=8):
     """For a given @model, find a new random slug of @length
     which is unique against the primary key of the model"""
     exists = True
     new_slug = ""
     while exists:
+        new_slug = ""
         for count in range(length):
             new_slug += random.choice(slug_characters)
         exists = model.objects.filter(**{primary_key: new_slug}).count() > 0
@@ -52,8 +52,8 @@ class CourseworkState:
     POSSIBLE_STATES = (
         (INVISIBLE, 'Invisible to Students'),
         (CLOSED, 'Closed for Submissions'),
-        (UPLOAD, 'Accepting Uploads'),
-        (FEEDBACK, 'Accepting Feedback'),
+        (UPLOAD, 'Self-Testing and Solutions'),
+        (FEEDBACK, 'Peer-Testing and Feedback'),
     )
 
 
@@ -78,15 +78,15 @@ class SubmissionType:
     FEEDBACK = 'f'
     CW_DESCRIPTOR = 'd'
     ORACLE_EXECUTABLE = 'e'
-    IDENTITY_TEST = 'i'
+    SIGNATURE_TEST = 'i'
     POSSIBLE_TYPES = (
         (SOLUTION, 'Solution to Coursework'),
         (TEST_CASE, 'Test Case for Solution'),
         (TEST_RESULT, 'Results of Running Test Case'),
         (FEEDBACK, 'Feedback for a Solution'),
-        (CW_DESCRIPTOR, 'Coursework Task Descriptor'),
-        (ORACLE_EXECUTABLE, 'Executable that will act as Oracle'),
-        (IDENTITY_TEST, 'Test to ensure Solution matches Interface'),
+        (CW_DESCRIPTOR, 'Coursework Task Descriptor, sample files'),
+        (ORACLE_EXECUTABLE, 'Executable that tests run against that gives expected output'),
+        (SIGNATURE_TEST, 'Test solution matches signature, interface, compiles, etc.'),
     )
 
 
@@ -95,8 +95,9 @@ class Submission(m.Model):
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
-    private = m.BooleanField()
-    final = m.BooleanField(default=False)
+    student_name = m.CharField(max_length=64)
+    peer_name = m.CharField(max_length=64)
+    teacher_name = m.CharField(max_length=64)
 
 
 class File(m.Model):
@@ -104,15 +105,28 @@ class File(m.Model):
     submission = m.ForeignKey(Submission, m.CASCADE, null=True)
 
 
+class TestType:
+    SELF = 's'
+    PEER = 'p'
+    TEACHER = 't'
+    POSSIBLE_TYPES = (
+        (SELF, 'A Self-Test, the developer of the solution testing their own code'),
+        (PEER, 'A Peer-Test, the tester is testing someone elses code'),
+        (TEACHER, 'A teacher wants to test the code of a student')
+    )
+
+
 class TestMatch(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
     test = m.ForeignKey(Submission, m.CASCADE, related_name="tm_test_sub")
     solution = m.ForeignKey(Submission, m.CASCADE, related_name="tm_sol_sub")
     result = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_res_sub")
-    feedback = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_fdbk_sub")
     error_level = m.IntegerField(null=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE, related_name="tm_cw")
-    initiator = m.ForeignKey(User, m.CASCADE, related_name="tm_init")
-    marker = m.ForeignKey(User, m.CASCADE, null=True, related_name="tm_marker")
-    waiting_to_run = m.BooleanField()
-    visible_to_developer = m.BooleanField()
+    type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
+
+
+class Feedback(m.Model):
+    test_match = m.ForeignKey(TestMatch, m.CASCADE)
+    marker = m.ForeignKey(User, m.CASCADE)
+    feedback = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_fdbk_sub")

@@ -1,0 +1,75 @@
+{% extends "teacher/base.html" %}
+{% block title %}View Coursework{% endblock %}
+{% block content %}
+<h1>Coursework Details for {{ coursework.name }}:</h1>
+<p></p>
+    <h1>Coursework Files</h1>
+    <table>
+    <thead>
+    <tr>
+        <th>ID</th>
+        <th>Type</th>
+        <th>Creator</th>
+        <th>Name</th>
+        <th>Files</th>
+        <th>View</th>
+    </tr>
+    </thead>
+    {% for s, files in submissions %}
+    {% for f in files %}
+        <tr>
+        <td>{{ s.id }}</td>
+        <td>{{ s.type }}</td>
+        <td>{{ s.creator }}</td>
+        <td>{{ f }}</td>
+        <td><a href="{% url 'download_file' s.id f %}?pretty=1">Html</a> <a href="{% url 'download_file' s.id f %}?show=1">Raw</a></td>
+        </tr>
+    {% endfor %}
+    {% endfor %}
+    </table>
+    <p></p>
+<h1>Coursework Results</h1>
+    <h3>Make a new Test Match</h3>
+    <form action="{% url 'make_tm' %}" method="POST">
+        {% csrf_token %}
+        {{ tm_form }}
+        <input type="submit" value="Create test match"/>
+    </form>
+    <h3>Auto create test matches for users</h3>
+    <form action="{% url 'make_tm' %}" method="POST">
+        {% csrf_token %}
+        {{ atm_form }}
+        <input type="submit" value="Create test matches"/>
+    </form>
+    <p></p>
+    <h3>Results</h3>
+    <table>
+    <thead>
+    <tr>
+        <th>ID / View</th>
+        <th>Test</th>
+        <th>Solution</th>
+        <th>Feedback</th>
+        <th>Error Level</th>
+        <th>Has Run</th>
+        <th>Test Type</th>
+    </tr>
+    </thead>
+    {% for f in results %}
+        <tr>
+            <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
+        <td>{%  if f.test %}
+            {{ f.test.teacher_name }}
+        {% endif %}</td>
+        <td>{%  if f.solution %}
+           {{ f.solution.teacher_name }}
+        {% endif %}</td>
+        <td>--</td>
+        <td>{% if f.error_level %}{{ f.error_level }}{% else %}Queued...{% endif %}</td>
+        <td>{{ f.type }}</td>
+        </tr>
+    {% endfor %}
+    </table>
+    <p>Key: (developer) indicates that this is not visible to developer</p>
+    <a href="{% url 'run_all_test_in_cw' coursework.id %}">Run all queued tests</a>
+{% endblock %}

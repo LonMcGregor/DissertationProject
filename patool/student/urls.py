@@ -2,6 +2,7 @@ from django.conf.urls import url
 from django.contrib.auth import views as auth_views
 
 from . import views
+from . import fileviewer
 
 urlpatterns = [
     url('login', auth_views.login, name='login'),
@@ -14,7 +15,6 @@ urlpatterns = [
         name='make_ptm_student'),
     url('cw/(?P<cw>[0-9a-zA-Z\-_]*)', views.detail_coursework, name='cw'),
     url('file/(?P<sub_id>[0-9a-zA-Z\-_]*)/(?P<filename>[0-9a-zA-Z\-_.]*)',
-        views.download_file, name='download_file'),
-    url('setfinal/(?P<sub_id>[0-9a-zA-Z\-_]*)', views.set_final, name='set_final_sub'),
+        fileviewer.download_file, name='download_file'),
     url(r'^$', views.index, name='student_index'),
 ]

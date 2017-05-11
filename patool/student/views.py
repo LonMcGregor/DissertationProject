@@ -2,12 +2,7 @@ from django.contrib.auth.decorators import login_required
 from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import Http404, HttpResponseForbidden, HttpResponse
-from django.http.response import FileResponse
 from django.shortcuts import render
-from mimetypes import guess_type
-from pygments import highlight as pyghi
-from pygments.formatters import html as pygform
-from pygments.lexers import python as pyglex
 
 from runner import matcher
 import runner.runner as r
@@ -41,9 +36,9 @@ def upload_solution(request, cw=None):
     if error:
         return error
     if request.method == 'POST':
-        result = upload_solution_post(request, cw_instance)
-        if result:
-            return result
+        try_upload_error = upload_solution_post(request, cw_instance)
+        if try_upload_error:
+            return try_upload_error
         msg = "Upload of files was completed",
         allow_upload = False
     detail = {
@@ -65,10 +60,8 @@ def upload_solution_post(request, cw_instance):
     if not p.user_can_upload_of_type(user, cw_instance, data['file_type']):
         return HttpResponseForbidden("You can't upload submissions of this type")
     file_type = data['file_type']
-    is_private = 'keep_private' in data
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
-                              creator=user, type=file_type,
-                              private=is_private)
+                              creator=user, type=file_type)
     submission.save()
     for each in request.FILES.getlist('chosen_files'):
         m.File(file=each, submission=submission).save()
@@ -102,7 +95,7 @@ def detail_coursework(request, cw=None):
     """If a coursework @cw is specified,return the page detailing it
     otherwise return a listing of all currently available tasks. """
     if cw is None or cw == "":
-        available = retrieve_coursework(request)
+        available = h.coursework_for_user(request.user)
         return render(request, 'student/choose_coursework.html', {'courseworks': available})
     return single_coursework(request, cw)
 
@@ -158,31 +151,38 @@ def single_coursework(request, coursework):
 
 
 @login_required()
-def create_test_match(request, cw):
-    """Receive a POST request to create a student test match for what they are marking"""
+def create_new_test_match(request, cw):
+    """Given a coursework id, @cw, this is an entry point into creating
+    a new test match, which will then be run"""
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
     coursework = m.Coursework.objects.get(id=cw)
-    if coursework.state not in [m.CourseworkState.FEEDBACK]:
+    if not p.can_view_coursework(request.user, coursework):
+        return HttpResponseForbidden("You're not enrolled in this course")
+    if coursework.state == m.CourseworkState.UPLOAD:
+        return create_self_test_match(coursework, request.user, request.POST)
+    elif coursework.state == m.CourseworkState.FEEDBACK:
+        return create_peer_test_match(coursework, request.user, request.POST)
+    else:
         return HttpResponseForbidden("This coursework isn't accepting new test matches")
+
+
+def create_peer_test_match(coursework, user, post):
+    """given a @post request, allow @user to create a test match
+    within the @coursework instance"""
     my_public_tests = ((test.id, test.id) for test in m.Submission.objects.filter(
-        coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE,
-        private=False))
-    marking = m.TestMatch.objects.filter(coursework=coursework, marker=request.user)
+        coursework=coursework, creator=user, type=m.SubmissionType.TEST_CASE))
+    marking = []
+    # todo this will be the tests, solutions available to the peer group doing testing
     my_testable_solutions = []
-    for tm in marking:
-        tup = (tm.solution.id, tm.solution.id)
-        if tup not in my_testable_solutions:
-            my_testable_solutions.append(tup)
-    tm_form = f.EasyMatchForm(my_public_tests, my_testable_solutions, request.POST)
+    tm_form = f.EasyMatchForm(my_public_tests, my_testable_solutions, post)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     try:
-        new_tm = matcher.student_create_single_test_match(
+        new_tm = matcher.create_peer_test(
             tm_form.cleaned_data['solution'],
             tm_form.cleaned_data['test'],
-            coursework,
-            request.user
+            coursework
         )
         r.run_test_on_thread(new_tm, r.execute_python3_unit)
     except Exception as e:
@@ -190,49 +190,30 @@ def create_test_match(request, cw):
     return HttpResponse("Test has been created")
 
 
-@login_required()
-def create_personal_test_match(request, cw):
+def create_self_test_match(coursework, user, post):
     """Receive a POST request to create a student test match for self"""
-    if not request.POST:
-        return HttpResponseForbidden("You're supposed to POST a form here")
-    coursework = m.Coursework.objects.get(id=cw)
-    if coursework.state not in [m.CourseworkState.UPLOAD]:
-        return HttpResponseForbidden("This coursework isn't accepting new test matches")
     solutions = m.Submission.objects.filter(
-        coursework=coursework, creator=request.user, type=m.SubmissionType.SOLUTION)
+        coursework=coursework, creator=user, type=m.SubmissionType.SOLUTION)
     tests = m.Submission.objects.filter(
-        coursework=coursework, creator=request.user, type=m.SubmissionType.TEST_CASE)
+        coursework=coursework, creator=user, type=m.SubmissionType.TEST_CASE)
     all_my_tests = [(test.id, test.id) for test in tests]
     all_my_tests.append(('I', 'Identity Test'))
     all_my_solutions = [(sol.id, sol.id) for sol in solutions]
     all_my_solutions.append(('O', 'Oracle Solution'))
-    tm_form = f.EasyMatchForm(all_my_tests, all_my_solutions, request.POST)
+    tm_form = f.EasyMatchForm(all_my_tests, all_my_solutions, post)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     try:
-        new_tm = matcher.student_create_single_test_match(
+        new_tm = matcher.create_self_test(
             tm_form.cleaned_data['solution'],
             tm_form.cleaned_data['test'],
             coursework,
-            request.user
+            user
         )
         r.run_test_on_thread(new_tm, r.execute_python3_unit)
     except Exception as e:
         return HttpResponseForbidden(str(e))
     return HttpResponse("Test has been created")
-
-
-def retrieve_coursework(request):
-    """For a given @request, return a list of coursework available to the user"""
-    logged_in_user = request.user
-    enrolled_courses = m.EnrolledUser.objects.filter(login=logged_in_user).values('course')
-    courses_for_user = m.Course.objects.filter(code__in=enrolled_courses)
-    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
-    visible_courseworks = []
-    for item in all_courseworks_for_user:
-        if p.can_view_coursework(logged_in_user, item):
-            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
-    return visible_courseworks
 
 
 @login_required()
@@ -279,71 +260,3 @@ def feedback_upload(request, test_match_instance):
     feedback_file.save()
     test_match_instance.feedback = feedback_sub
     test_match_instance.save()
-
-
-@login_required()
-def download_file(request, sub_id, filename):
-    file = h.get_file(sub_id, filename)
-    if not p.can_view_file(request.user, file):
-        return HttpResponseForbidden("You are not allowed to see this file")
-    if 'pretty' in request.GET:
-        return render_file(request, file, filename)
-    if 'show' in request.GET:
-        return show_file(file, filename)
-    return attachment_file(file, filename)
-
-
-def render_file(request, file, filename):
-    """For a given @file and @filename,  pretty print the contents
-    of the file as an HTML page using pygments"""
-    mime = guess_type(filename, True)
-    if mime[0] is None or mime[0].split('/')[0] != 'text':
-        return show_file(file, filename)
-    content = h.read_file_by_line(file.file)
-    detail = {
-        "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))
-    }
-    return render(request, 'student/pretty_file.html', detail)
-
-
-def show_file(file, filename):
-    """For a given @file/@filename, display this in-browser"""
-    response = FileResponse(file.file)
-    response['Content-Type'] = str(guess_type(filename, False)[0])
-    return response
-
-
-def attachment_file(file, filename):
-    """return a @file fieldfile and @filename as an http attachment"""
-    response = FileResponse(file.file)
-    response['Content-Disposition'] = 'attachment; filename="%s"' % filename
-    return response
-
-
-@login_required()
-def set_final(request, sub_id):
-    """Given the ID of a submission, @sub_id, set this as being
-    the final submission for the coursework specified, if we
-    are still within the submission deadline"""
-    submission = m.Submission.objects.get(id=sub_id)
-    if submission.coursework.state != m.CourseworkState.UPLOAD:
-        return HttpResponseForbidden("You cannot eedit this coursework - deadline has passed")
-    if submission.creator != request.user:
-        return HttpResponseForbidden("You can only set your own submissions as final")
-    set_final_update(submission)
-    return HttpResponse("Final submission updated")
-
-
-@transaction.atomic()
-def set_final_update(submission):
-    """Update the database, setting the current submission as
-    final and removing final from any other submissions"""
-    other_subs = m.Submission.objects.filter(coursework=submission.coursework,
-                                             type=submission.type, creator=submission.creator,
-                                             private=False, final=True)
-    for old_final in other_subs:
-        old_final.final = False
-        old_final.save()
-    submission.final=True
-    submission.save()
-
