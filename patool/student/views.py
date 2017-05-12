@@ -72,9 +72,10 @@ def upload_test(request, cw=None):
     detail = {
         "msg": "Upload Test Case for coursework",
         "allow_upload": state in [p.UserCourseworkState.UPLOADS, p.UserCourseworkState.FEEDBACK],
-        "file_type": "t",
-        "crumbs": [("Homepage", reverse("student_index"),
-                    "Coursework", reverse("cw", args=[cw]))]
+        "file_type": "c",
+        "cw": cw,
+        "crumbs": [("Homepage", reverse("student_index")),
+                   ("Coursework", reverse("cw", args=[cw]))]
     }
     return render(request, 'student/upload_solution.html', detail)
 
@@ -94,8 +95,9 @@ def upload_solution(request, cw=None):
         "msg": "(Re-)Upload Solution for coursework",
         "allow_upload": state == p.UserCourseworkState.UPLOADS,
         "file_type": "s",
-        "crumbs": [("Homepage", reverse("student_index"),
-                    "Coursework", reverse("cw", args=[cw]))]
+        "cw": cw,
+        "crumbs": [("Homepage", reverse("student_index")),
+                    ("Coursework", reverse("cw", args=[cw]))]
     }
     return render(request, 'student/upload_solution.html', detail)
 
@@ -182,7 +184,7 @@ def create_new_test_match(request, cw):
     coursework = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(request.user, coursework):
         return HttpResponseForbidden("You're not enrolled in this course")
-    tm_form = generate_easy_match_form(coursework, request.user, post=request.post)
+    tm_form = generate_easy_match_form(coursework, request.user, post=request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     if coursework.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
@@ -222,14 +224,14 @@ def feedback(request, test_match):
         feedback_upload(request, test_match_instance)
         return redirect(request, "Your feedback has been recorded",
                         reverse("feedback", args=[test_match_instance.id]))
-    feedback_files = h.get_files(test_match_instance.feedback)
+    # feedback_files = h.get_files(test_match_instance.feedback)
     details = {
         "test_match": test_match_instance,
         "can_submit": perm == p.UserFeedbackModes.WRITE,
         "test_files": h.get_files(test_match_instance.test),
         "result_files": h.get_files(test_match_instance.result),
         "solution_files": h.get_files(test_match_instance.solution),
-        "feedback_files": feedback_files if len(feedback_files) > 0 else None,
+        # "feedback_files": feedback_files if len(feedback_files) > 0 else None,
         # todo for now, assume only 1 files
         "crumbs": [("Homepage", reverse("student_index")),
                    ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
@@ -241,6 +243,7 @@ def feedback(request, test_match):
 def feedback_upload(request, test_match_instance):
     """Once the user has uploaded their feedback, write it
     to a file and update the database"""
+    return
     feedback_text = request.POST["feedback"]
     feedback_sub = m.Submission(id=m.new_random_slug(m.Submission),
                                 coursework=test_match_instance.coursework, creator=request.user,

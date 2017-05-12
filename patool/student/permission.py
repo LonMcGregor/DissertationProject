@@ -92,12 +92,13 @@ def user_feedback_mode(user, test_match_instance):
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
     if is_teacher(user):
-        return UserFeedbackModes.WRITE if test_match_instance.marker == user else \
+        return UserFeedbackModes.WRITE if user in [0, 1, 2] else \
             UserFeedbackModes.READ
+    # that is to say, if the user is inside the feedback group (TODO)
     if is_owner_of_solution(user, test_match_instance) or \
             (test_match_instance.test.creator == user and
              test_match_instance.solution.type == m.SubmissionType.ORACLE_EXECUTABLE):
-        return UserFeedbackModes.WAIT if test_match_instance.waiting_to_run else \
+        return UserFeedbackModes.WAIT if test_match_instance.error_level is None else \
             UserFeedbackModes.READ
     if test_match_instance.marker != user:
         return UserFeedbackModes.DENY

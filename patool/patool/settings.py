@@ -25,7 +25,7 @@ SECRET_KEY = '$cn(%o3r-mdc8ku_$0xnyo4bf+g!gxt4%0!i^hi%3)odr_4%!w'
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ["peer-testing.com"]
 
 
 # Application definition
