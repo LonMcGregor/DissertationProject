@@ -3,16 +3,18 @@
 {% block content %}
 <h1>{{ msg }}</h1>
     {% if allow_upload %}
-        <p>Please make sure to select the correct file type</p>
-<form action="" method="post" enctype="multipart/form-data">
-    {% csrf_token %}
-    <label for="id_file_type">File Type:</label><select id="id_file_type" name="file_type" required="">
-<option value="s">Solution to Coursework</option>
-<option value="c">Test Case for Solution</option>
-</select>
-<label for="id_chosen_files">Selected files:</label><input id="id_chosen_files" multiple="multiple" name="chosen_files" type="file" required="">
-<label for="id_keep_private">Keep this submission private?</label><input id="id_keep_private" name="keep_private" type="checkbox">
-    <input type="submit">
-</form>
+        <p>
+            You should select the files you want to include in your solution
+            <br/>
+            To select multiple files, press & hold Ctrl and click the files you want to upload
+        </p>
+        <form action="" method="post" enctype="multipart/form-data">
+            {% csrf_token %}
+            <input type="hidden" name="file_type" required="" value="{{ file_type }}" />
+            <label for="id_chosen_files">Selected files:</label><input id="id_chosen_files" multiple="multiple" name="chosen_files" type="file" required="">
+            <input type="submit">
+        </form>
+    {% else %}
+        <p>Unfortunately, you can't upload files of this type right now</p>
     {% endif %}
 {% endblock %}

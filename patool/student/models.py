@@ -95,9 +95,9 @@ class Submission(m.Model):
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
-    student_name = m.CharField(max_length=64)
-    peer_name = m.CharField(max_length=64)
-    teacher_name = m.CharField(max_length=64)
+    student_name = m.CharField(max_length=64, null=True)
+    peer_name = m.CharField(max_length=64, null=True)
+    teacher_name = m.CharField(max_length=64, null=True)
 
 
 class File(m.Model):

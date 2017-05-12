@@ -10,6 +10,18 @@ import student.helper as h
 import student.models as m
 
 
+def coursework_available_for_user(user):
+    """For a given @request, return a list of coursework available to the user"""
+    enrolled_courses = m.EnrolledUser.objects.filter(login=user).values('course')
+    courses_for_user = m.Course.objects.filter(code__in=enrolled_courses)
+    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
+    visible_courseworks = []
+    for item in all_courseworks_for_user:
+        if can_view_coursework(user, item):
+            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
+    return visible_courseworks
+
+
 def can_view_coursework(user, coursework):
     """BOOL: Check if the given @user instance is
     allowed to view the specified @coursework instance"""
@@ -80,19 +92,20 @@ def user_feedback_mode(user, test_match_instance):
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
     if is_teacher(user):
-        return UserFeedbackModes.WRITE if test_match_instance.marker==user else UserFeedbackModes.READ
-    if is_owner_of_solution(user, test_match_instance) or (test_match_instance.test.creator==user
-            and test_match_instance.solution.type==m.SubmissionType.ORACLE_EXECUTABLE):
+        return UserFeedbackModes.WRITE if test_match_instance.marker == user else \
+            UserFeedbackModes.READ
+    if is_owner_of_solution(user, test_match_instance) or \
+            (test_match_instance.test.creator == user and
+             test_match_instance.solution.type == m.SubmissionType.ORACLE_EXECUTABLE):
         return UserFeedbackModes.WAIT if test_match_instance.waiting_to_run else \
             UserFeedbackModes.READ
     if test_match_instance.marker != user:
         return UserFeedbackModes.DENY
     if test_match_instance.waiting_to_run:
         return UserFeedbackModes.WAIT
-    return UserFeedbackModes.WRITE if test_match_instance.feedback is None and \
-                                      test_match_instance.coursework.state == \
-                                      m.CourseworkState.FEEDBACK else \
-        UserFeedbackModes.READ
+    return UserFeedbackModes.WRITE if (test_match_instance.feedback is None and
+                                       test_match_instance.coursework.state ==
+                                       m.CourseworkState.FEEDBACK) else UserFeedbackModes.READ
 
 
 def can_view_file(user, file):
@@ -106,7 +119,7 @@ def can_view_submission(user, submission):
         return False
     if is_teacher(user):
         return True
-    if submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.IDENTITY_TEST]:
+    if submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.SIGNATURE_TEST]:
         return True
     if submission.type == m.SubmissionType.ORACLE_EXECUTABLE:
         return False

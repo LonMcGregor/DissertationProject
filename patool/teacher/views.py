@@ -1,7 +1,8 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import HttpResponseForbidden, HttpResponse
-from django.shortcuts import render, redirect
+from django.http import HttpResponseForbidden, HttpResponseBadRequest
+from django.shortcuts import render
+from django.urls import reverse
 
 import runner.runner as r
 import student.helper as h
@@ -38,8 +39,8 @@ def create_course_render(request):
     detail = {
         "course_name": "New Course",
         "courseworks": None,
-        "uf": f.CourseForm({"student": str(request.user)+','}),
-        "crumbs": [("Homepage", "/teacher")]
+        "uf": f.CourseForm({"student": str(request.user) + ','}),
+        "crumbs": [("Homepage", reverse("teacher_index"))]
     }
     return render(request, 'teacher/edit_course.html', detail)
 
@@ -70,7 +71,7 @@ def create_course_update(request, new_details):
         new_item = m.EnrolledUser(login=owner, course=course)
         new_item.save()
 
-    return redirect('edit_course', c=new_code)
+    return redirect(request, "Course created", reverse('edit_course', args=[new_code]))
 
 
 @login_required()
@@ -134,7 +135,7 @@ def edit_course_render(request, requested_course_code):
         "course_code": course.code,
         "courseworks": courseworks,
         "uf": update_form,
-        "crumbs": [("Homepage", "/teacher")]
+        "crumbs": [("Homepage", reverse("teacher_index"))]
     }
     return render(request, 'teacher/edit_course.html', detail)
 
@@ -162,7 +163,8 @@ def create_coursework_render(request, code):
         "identity": [],
         "solutions": [],
         "tests": [],
-        "crumbs": [("Homepage", "/teacher"), ("Course", "/teacher/course/%s" % code)]
+        "crumbs": [("Homepage", reverse("teacher_index")),
+                   ("Course", reverse("edit_course", args=[code]))]
     }
     return render(request, 'teacher/edit_cw.html', detail)
 
@@ -180,24 +182,30 @@ def create_coursework_update(user, request, course_code):
     coursework.save()
 
     descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
-                              creator=user, type=m.SubmissionType.CW_DESCRIPTOR, private=False)
+                              creator=user, type=m.SubmissionType.CW_DESCRIPTOR,
+                              student_name="Coursework Descriptor",
+                              teacher_name="Descriptor")
     descriptor.save()
     for each in request.FILES.getlist('descriptor'):
         m.File(file=each, submission=descriptor).save()
 
     oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
-                               creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE, private=False)
+                               creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE,
+                               student_name="Oracle Solution",
+                               teacher_name="Oracle")
     oracle_exec.save()
     for each in request.FILES.getlist('oracle_exec'):
         m.File(file=each, submission=oracle_exec).save()
 
-    identity = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
-                            creator=user, type=m.SubmissionType.SIGNATURE_TEST, private=False)
-    identity.save()
+    sig = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
+                       creator=user, type=m.SubmissionType.SIGNATURE_TEST,
+                       student_name="Signature Test",
+                       teacher_name="Signature")
+    sig.save()
     for each in request.FILES.getlist('identity'):
-        m.File(file=each, submission=identity).save()
+        m.File(file=each, submission=sig).save()
 
-    return redirect('edit_cw', c=coursework.id)
+    return redirect(request, "Coursework created", reverse('edit_cw', args=[coursework.id]))
 
 
 @login_required()
@@ -229,39 +237,50 @@ def edit_coursework_render(request, coursework):
     page for a given @coursework, including the
     file suploaded for it, test data instances and
     of course the metadata about the coursework itself"""
-    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(coursework=coursework)]
-    results = m.TestMatch.objects.filter(coursework=coursework)
+    desc_types = [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.ORACLE_EXECUTABLE,
+                  m.SubmissionType.SIGNATURE_TEST]
+    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
+        coursework=coursework, type__in=desc_types)]
     initial = {"name": coursework.name,
                "state": coursework.state}
-    tm_initial = {"coursework": coursework.id}
     cw_form = f.CourseworkForm(initial)
-    tm_form = f.TestMatchForm(tm_initial)
-    atm_form = f.AutoTestMatchForm(tm_initial)
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
-        "tm_form": tm_form,
-        "atm_form": atm_form,
         "submissions": submissions,
-        "results": results,
-        "crumbs": [("Homepage", "/teacher"),
-                   ("Course", "/teacher/course/%s" % coursework.course.code)]
+        "crumbs": [("Homepage", reverse("teacher_index")),
+                   ("Course", reverse("edit_course", args=[coursework.course.code]))]
     }
     return render(request, 'teacher/edit_cw.html', detail)
 
 
 @login_required()
 @p.is_teacher
-def force_start_test_run(request, kwargs):
-    """Given a particular test data id @[t], force it to run"""
-    requested_test = kwargs['t']
-    test_instance = m.TestMatch.objects.get(id=requested_test)
-    if not test_instance.waiting_to_run:
-        return HttpResponseForbidden("Test has already been run")
-    if not p.is_enrolled_on_course(request.user, test_instance.coursework.course):
+def view_coursework(request, kwargs=None):
+    """A teacher has made a @request to view the view
+    page for coursewok with @[c]. display files, tests"""
+    coursework = m.Coursework.objects.get(id=kwargs['c'])
+    if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
-    r.run_test_on_thread(test_instance, r.execute_python3_unit)
-    return HttpResponse("Test Run %s Force Started" % kwargs['t'])
+    submissions = [(s, h.get_files(s)) for s in
+                   m.Submission.objects.filter(coursework=coursework)
+                   .exclude(type=m.SubmissionType.FEEDBACK)
+                   .exclude(type=m.SubmissionType.TEST_RESULT)]
+    tm_initial = {"coursework": coursework.id}
+    tm_form = f.TestMatchForm(tm_initial)
+    atm_form = f.AutoTestMatchForm(tm_initial)
+    results = m.TestMatch.objects.filter(coursework=coursework)
+    detail = {
+        "coursework": coursework,
+        "submissions": submissions,
+        "tm_form": tm_form,
+        "atm_form": atm_form,
+        "results": results,
+        "crumbs": [("Homepage", reverse("teacher_index")),
+                   ("Course", reverse("edit_course", args=[coursework.course.code]))]
+
+    }
+    return render(request, 'teacher/view_cw.html', detail)
 
 
 @login_required()
@@ -280,7 +299,7 @@ def manual_test_match_update(request):
     """Create a new test match with data specified in @request"""
     tm_form = f.TestMatchForm(request.POST)
     if not tm_form.is_valid():
-        return HttpResponse("Invalid form data")
+        return HttpResponseBadRequest("Invalid form data")
     try:
         matcher.create_peer_test(
             tm_form.cleaned_data['solution_sub'],
@@ -289,8 +308,9 @@ def manual_test_match_update(request):
             True
         )
     except Exception as e:
-        return HttpResponse(str(e))
-    return HttpResponse("Test has been created")
+        return HttpResponseBadRequest(str(e))
+    return redirect(request, "Test created",
+                    reverse('view_cw', args=[tm_form.cleaned_data['coursework']]))
 
 
 def auto_test_match_update(request):
@@ -298,7 +318,7 @@ def auto_test_match_update(request):
     test match creation algorithm."""
     atm = f.AutoTestMatchForm(request.POST)
     if not atm.is_valid():
-        return HttpResponseForbidden("Invalid form data")
+        return HttpResponseBadRequest("Invalid form data")
     try:
         matcher.first_available(
             atm.cleaned_data['coursework'],
@@ -307,8 +327,9 @@ def auto_test_match_update(request):
             atm.cleaned_data['visible_to_developer']
         )
     except Exception as e:
-        return HttpResponse(str(e))
-    return HttpResponse("Tests have been created")
+        return HttpResponseBadRequest(str(e))
+    return redirect(request, "Tests created",
+                    reverse('view_cw', args=[atm.cleaned_data['coursework']]))
 
 
 @login_required()
@@ -319,4 +340,37 @@ def run_all_test_in_cw(request, c):
     if not p.is_enrolled_on_course(request.user, cw.course):
         return HttpResponseForbidden("you're not enrolled on this course")
     r.run_all_queued_on_thread(cw)
-    return HttpResponse("Starting to run queued tests")
+    return redirect(request, "Starting to run queued tests", reverse('view_cw', args=[cw.id]))
+
+
+@login_required()
+@p.is_teacher
+@transaction.atomic()
+def update_content(request):
+    if request.method != "POST":
+        return HttpResponseForbidden("You are only allowed to POST here")
+    old_sub = m.Submission.objects.get(id=request.POST['old_id'])
+    if not p.is_enrolled_on_course(request.user, old_sub.coursework.course):
+        return HttpResponseForbidden("you're not enrolled on this course")
+
+    new_sub = m.Submission(id=m.new_random_slug(m.Submission), coursework=old_sub.coursework,
+                           creator=request.user, type=old_sub.type,
+                           student_name=old_sub.student_name,
+                           peer_name=old_sub.peer_name,
+                           teacher_name=old_sub.teacher_name)
+    new_sub.save()
+    old_sub.delete()
+    for each in request.FILES.getlist('new_content'):
+        m.File(file=each, submission=new_sub).save()
+
+    return redirect(request, "Content Updated", reverse('edit_cw', args=[new_sub.coursework.id]))
+
+
+def redirect(request, message, location):
+    """Render a view that does pretty auto-redirection
+    for  a given @request, showing @message and leading
+    to the specified @location"""
+    return render(request,
+                  'common/redirect.html',
+                  {"message": message,
+                   "redirect": location})

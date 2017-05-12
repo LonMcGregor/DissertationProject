@@ -2,6 +2,7 @@
 {% block title %}Edit Coursework{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
+    <a href="{% url '' %}"
     <form method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
             {% if cw_form %}
@@ -20,14 +21,15 @@
             {% endif %}<input type="submit" value="Save">
     </form>
     <p></p>
-    {% for files, name, formname in allfiles %}
-    <form method="POST" action="" enctype="multipart/form-data">
-        <h3>{{ name }}</h3>
+    {% for sub, files in submissions %}
+    <form method="POST" action="{% url 'update_content' %}" enctype="multipart/form-data">
+        <h3>{{ sub.teacher_name }}</h3>
         <a>Delete</a>
-        <input id="id_{{ formname }}" multiple="multiple" name="replace_{{ formname }}" type="file" required="">
-        <input type="submit" value="Submit new files to replace current">
+        <input id="id_new_content" multiple="multiple" name="new_content" type="file" required="" />
+        <input type="hidden" required="" value="{{ sub.id }}" name="old_id" />
+        <input type="submit" value="Submit new files to replace current" />
         {% for type, url, name in files %}
-            <a href="{{ url }}" class="{{ type }} file">name</a>
+            <a href="{{ url }}" class="{{ type }} file">{{ name }}</a>
         {% endfor %}
     </form>
     {% endfor %}

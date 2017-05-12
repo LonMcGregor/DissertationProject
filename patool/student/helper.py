@@ -11,29 +11,6 @@ def string_id(item):
     return str(item.id) if item is not None else ''
 
 
-def get_test_match_for_developing(user, coursework):
-    """Get the test matches that @user created while in development of a solution for @coursework"""
-    initiated = m.TestMatch.objects.filter(coursework=coursework, initiator=user)
-    chosen = []
-    for tm in initiated:
-        if (tm.solution.creator == user or tm.solution.type == m.SubmissionType.ORACLE_EXECUTABLE) and tm.test.creator == user:
-            chosen.append(tm)
-        elif (tm.test.creator == user or tm.test.type == m.SubmissionType.IDENTITY_TEST) and tm.solution.creator == user:
-            chosen.append(tm)
-    return chosen
-
-
-def get_test_match_for_developer(user, coursework):
-    """Get the test matches for the developer @user, for given @coursework"""
-    visibles = m.TestMatch.objects.filter(coursework=coursework,
-                                          visible_to_developer=True).exclude(initiator=user)
-    chosen = []
-    for tm in visibles:
-        if tm.solution.creator == user:
-            chosen.append(tm)
-    return chosen
-
-
 def first_model_item_or_none(query):
     """Working on the assumption that a user will only submit an item
     once in a given state, take the output of the @query, and give
@@ -49,7 +26,7 @@ def get_test_match_with_associated_submission(submission):
     that a file will only be used once"""
     if submission.type in [m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE]:
         return first_model_item_or_none(m.TestMatch.objects.filter(solution=submission))
-    if submission.type in [m.SubmissionType.TEST_CASE, m.SubmissionType.IDENTITY_TEST]:
+    if submission.type in [m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST]:
         return first_model_item_or_none(m.TestMatch.objects.filter(test=submission))
     if submission.type == m.SubmissionType.TEST_RESULT:
         return first_model_item_or_none(m.TestMatch.objects.filter(result=submission))
@@ -68,13 +45,35 @@ def get_files(submission):
     return list_files
 
 
-def coursework_for_user(user):
-    """For a given @request, return a list of coursework available to the user"""
-    enrolled_courses = m.EnrolledUser.objects.filter(login=user).values('course')
-    courses_for_user = m.Course.objects.filter(code__in=enrolled_courses)
-    all_courseworks_for_user = m.Coursework.objects.filter(course__in=courses_for_user)
-    visible_courseworks = []
-    for item in all_courseworks_for_user:
-        if p.can_view_coursework(user, item):
-            visible_courseworks.append((item.id, item.state, item.course.code, item.name))
-    return visible_courseworks
+def delete_old_solution(user, cw_instance):
+    """For a given @cw_instance, and a @user, delete the existing
+    solution file if it exists as it is about to be replaced.
+    By itself, this method is NOT ATOMIC"""
+    sol_query = m.Submission.objects.filter(creator=user, coursework=cw_instance,
+                                            type=m.SubmissionType.SOLUTION)
+    solution = first_model_item_or_none(sol_query)
+    if solution is not None:
+        solution.delete()
+
+
+def delete_submission(user, submission):
+    """Given a @user and a @submission, see if the user
+    is allowed to delete said submission, and carry out"""
+    if submission.creator != user:
+        return False
+    if can_delete(submission):
+        submission.delete()
+        return True
+    return False
+
+
+def can_delete(submission):
+    """Assuming that the owner of the @submission is verified,
+    check that it can actually be deleted safely"""
+    cw = submission.coursework
+    if cw.state == m.CourseworkState.UPLOAD and submission.type == m.SubmissionType.TEST_CASE:
+        return True
+    if cw.state == m.CourseworkState.FEEDBACK and submission.type == m.SubmissionType.TEST_CASE \
+            and m.TestMatch.objects.filter(test=submission).count == 0:
+            return True
+    return False
