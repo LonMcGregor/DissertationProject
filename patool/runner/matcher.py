@@ -34,8 +34,8 @@ def first_available(coursework, initiator, marker, visible):
                     chosen_marker = user
                     break
         m.TestMatch(id=m.new_random_slug(m.TestMatch), test=chosen_test, solution=sol,
-                    coursework=cw, initiator=initiator, waiting_to_run=True,
-                    visible_to_developer=visible, marker=chosen_marker.login).save()
+                    coursework=cw, initiator=initiator).save()
+        # todo this is likely broken  - dont use
         unassigned_tests.remove(chosen_test)
         unassigned_users.remove(chosen_marker)
 

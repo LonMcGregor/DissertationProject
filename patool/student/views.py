@@ -208,7 +208,7 @@ def create_new_test_match(request, cw):
 
 
 @login_required()
-def feedback(request, test_match):
+def feedback(request, test_match, teacher_view=None):
     """Render the page that allows a user to give feedback to a certain
     test data instance. Also handle the case of POST data upload."""
     test_match_instance = m.TestMatch.objects.get(id=test_match)
@@ -224,6 +224,10 @@ def feedback(request, test_match):
         feedback_upload(request, test_match_instance)
         return redirect(request, "Your feedback has been recorded",
                         reverse("feedback", args=[test_match_instance.id]))
+    crumbs = [("Homepage", reverse("student_index")),
+                   ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
+    if teacher_view is not None:
+        crumbs = teacher_view
     # feedback_files = h.get_files(test_match_instance.feedback)
     details = {
         "test_match": test_match_instance,
@@ -233,8 +237,7 @@ def feedback(request, test_match):
         "solution_files": h.get_files(test_match_instance.solution),
         # "feedback_files": feedback_files if len(feedback_files) > 0 else None,
         # todo for now, assume only 1 files
-        "crumbs": [("Homepage", reverse("student_index")),
-                   ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
+        "crumbs": crumbs
     }
     return render(request, 'student/feedback.html', details)
 

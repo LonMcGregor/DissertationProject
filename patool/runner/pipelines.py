@@ -43,9 +43,10 @@ def python_results(content, tm):
 
     result_sub = m.Submission(id=m.new_random_slug(m.Submission),
                               coursework=tm.coursework,
-                              creator=tm.initiator,
+                              creator=tm.test.creator,
                               type=m.SubmissionType.TEST_RESULT)
     result_sub.save()
     result_file = m.File(submission=result_sub)
     result_file.file.save('results.txt', ContentFile(content))
     result_file.save()
+    return result_sub

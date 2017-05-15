@@ -57,7 +57,7 @@
     </thead>
     {% for f in results %}
         <tr>
-            <td><a href="{% url 'feedback' f.id %}">{{ f.id }}</a></td>
+            <td><a href="{% url 'view_test' coursework.id f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
             {{ f.test.teacher_name }}
         {% endif %}</td>
@@ -65,7 +65,7 @@
            {{ f.solution.teacher_name }}
         {% endif %}</td>
         <td>--</td>
-        <td>{% if f.error_level %}{{ f.error_level }}{% else %}Queued...{% endif %}</td>
+        <td>{% if f.error_level != None %}{{ f.error_level }}{% else %}Queued...{% endif %}</td>
         <td>{{ f.type }}</td>
         </tr>
     {% endfor %}

@@ -21,13 +21,12 @@ def run_test(test_match_instance, exec_method):
     the results to be created by the initiator (which will
      likely be the test creator). Then update the database.
      Utilize the given @exec_method"""
-    if not test_match_instance.waiting_to_run:
+    if test_match_instance.error_level is not None:
         return
     result, output = exec_method(test_match_instance.solution, test_match_instance.test)
-    result_file = pipes.python_results(output, test_match_instance)
-    test_match_instance.result = result_file.submission
+    result_submission = pipes.python_results(output, test_match_instance)
+    test_match_instance.result = result_submission
     test_match_instance.error_level = result
-    test_match_instance.waiting_to_run = False
     test_match_instance.save()
 
 
@@ -71,7 +70,7 @@ def run_queued_tests(coursework):
     """go through all of the test data instances that are
     tagged as waiting to run for @coursework, and run them"""
     while True:
-        tests = m.TestMatch.objects.filter(coursework=coursework, waiting_to_run=True)
+        tests = m.TestMatch.objects.filter(coursework=coursework, error_level=None)
         if tests.count() == 0:
             return
         for test in tests:

@@ -9,6 +9,7 @@ import student.helper as h
 import student.models as m
 import teacher.forms as f
 import teacher.permission as p
+import student.views as student_views
 from runner import matcher
 
 
@@ -374,3 +375,13 @@ def redirect(request, message, location):
                   'common/redirect.html',
                   {"message": message,
                    "redirect": location})
+
+@login_required
+def view_test(request, c, t):
+    """Render the virw showing tets details (feedback view)
+    from the student app, but add teacher specific links
+    given id for coursework @c and test @t"""
+    return student_views.feedback(request, t, [
+        ("Homepage", reverse("teacher_index")),
+        ("Coursework", reverse("view_cw", args=[c]))
+    ])

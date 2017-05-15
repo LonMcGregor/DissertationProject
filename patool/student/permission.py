@@ -102,7 +102,7 @@ def user_feedback_mode(user, test_match_instance):
             UserFeedbackModes.READ
     if test_match_instance.marker != user:
         return UserFeedbackModes.DENY
-    if test_match_instance.waiting_to_run:
+    if test_match_instance.error_level is None:
         return UserFeedbackModes.WAIT
     return UserFeedbackModes.WRITE if (test_match_instance.feedback is None and
                                        test_match_instance.coursework.state ==
