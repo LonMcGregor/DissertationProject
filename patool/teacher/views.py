@@ -8,9 +8,11 @@ import runner.runner as r
 import student.helper as h
 import student.models as m
 import teacher.forms as f
+import student.forms as sf
 import teacher.permission as p
 import student.views as student_views
 from runner import matcher
+from runner import runner
 
 
 @login_required()
@@ -77,10 +79,9 @@ def create_course_update(request, new_details):
 
 @login_required()
 @p.is_teacher
-def edit_course(request, kwargs):
+def edit_course(request, c):
     """Handle creation of form, or post request for editing a course"""
-    requested_course_code = kwargs['c']
-    cw = m.Course.objects.get(code=requested_course_code)
+    cw = m.Course.objects.get(code=c)
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
@@ -143,10 +144,9 @@ def edit_course_render(request, requested_course_code):
 
 @login_required()
 @p.is_teacher
-def create_coursework(request, kwargs):
+def create_coursework(request, c):
     """Handle form for creating a coursework in course @[c]"""
-    requested_course_code = kwargs['c']
-    cw = m.Course.objects.get(code=requested_course_code)
+    cw = m.Course.objects.get(code=c)
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
@@ -211,9 +211,9 @@ def create_coursework_update(user, request, course_code):
 
 @login_required()
 @p.is_teacher
-def edit_coursework(request, kwargs=None):
+def edit_coursework(request, c):
     """Prepare a page to view and edit coursework @[c]"""
-    coursework = m.Coursework.objects.get(id=kwargs['c'])
+    coursework = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
@@ -257,10 +257,10 @@ def edit_coursework_render(request, coursework):
 
 @login_required()
 @p.is_teacher
-def view_coursework(request, kwargs=None):
+def view_coursework(request, c):
     """A teacher has made a @request to view the view
     page for coursewok with @[c]. display files, tests"""
-    coursework = m.Coursework.objects.get(id=kwargs['c'])
+    coursework = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
     submissions = [(s, h.get_files(s)) for s in
@@ -268,7 +268,7 @@ def view_coursework(request, kwargs=None):
                    .exclude(type=m.SubmissionType.FEEDBACK)
                    .exclude(type=m.SubmissionType.TEST_RESULT)]
     tm_initial = {"coursework": coursework.id}
-    tm_form = f.TestMatchForm(tm_initial)
+    tm_form = generate_teacher_easy_match_form(coursework)
     atm_form = f.AutoTestMatchForm(tm_initial)
     results = m.TestMatch.objects.filter(coursework=coursework)
     detail = {
@@ -284,45 +284,61 @@ def view_coursework(request, kwargs=None):
     return render(request, 'teacher/view_cw.html', detail)
 
 
+def generate_teacher_easy_match_form(coursework, post=None):
+    """Given an instance of @coursework, generate a
+    relevant easymatchform"""
+    tests = [(t.id, t.teacher_name) for t in m.Submission.objects.filter(
+        coursework=coursework, type__in=[m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST])]
+    solutions = [(s.id, s.teacher_name) for s in m.Submission.objects.filter(
+        coursework=coursework, type__in=[m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE])]
+    if post is None:
+        return sf.EasyMatchForm(tests, solutions)
+    return sf.EasyMatchForm(tests, solutions, post)
+
+
 @login_required()
 @p.is_teacher
-def create_test_match(request):
+def create_test_match(request, c):
     """Create a new test match, according to what is specified in the POST request"""
+    coursework = m.Coursework.objects.get(id=c)
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
+    if not p.is_enrolled_on_course(request.user, coursework.course):
+        return HttpResponseForbidden("You're not enrolled on this course")
     if "algorithm" in request.POST:
-        return auto_test_match_update(request)
+        return auto_test_match_update(request, coursework)
     else:
-        return manual_test_match_update(request)
+        return manual_test_match_update(request, coursework)
 
 
-def manual_test_match_update(request):
-    """Create a new test match with data specified in @request"""
-    tm_form = f.TestMatchForm(request.POST)
+def manual_test_match_update(request, coursework):
+    """Create a new test match with data specified in @request for @coursework"""
+    tm_form = generate_teacher_easy_match_form(coursework, request.POST)
     if not tm_form.is_valid():
         return HttpResponseBadRequest("Invalid form data")
     try:
-        matcher.create_peer_test(
-            tm_form.cleaned_data['solution_sub'],
-            tm_form.cleaned_data['test_sub'],
-            tm_form.cleaned_data['coursework'],
+        new_tm = matcher.create_peer_test(
+            tm_form.cleaned_data['solution'],
+            tm_form.cleaned_data['test'],
+            coursework.id,
             True
         )
+        runner.run_test_on_thread(new_tm, runner.execute_python3_unit)
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return redirect(request, "Test created",
-                    reverse('view_cw', args=[tm_form.cleaned_data['coursework']]))
+                    reverse('view_cw', args=[coursework.id]))
 
 
-def auto_test_match_update(request):
+def auto_test_match_update(request, coursework):
     """Given an @request, extract the form data and call an automatic
-    test match creation algorithm."""
+    test match creation algorithm and run in @coursework"""
     atm = f.AutoTestMatchForm(request.POST)
     if not atm.is_valid():
         return HttpResponseBadRequest("Invalid form data")
     try:
         matcher.first_available(
-            atm.cleaned_data['coursework'],
+            coursework.id,
             request.user,
             atm.cleaned_data['assign_markers'],
             atm.cleaned_data['visible_to_developer']
@@ -337,7 +353,7 @@ def auto_test_match_update(request):
 @p.is_teacher
 def run_all_test_in_cw(request, c):
     """Run all of the queued tests for coursework with id @c"""
-    cw = m.Coursework.objects.get(id=c['c'])
+    cw = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, cw.course):
         return HttpResponseForbidden("you're not enrolled on this course")
     r.run_all_queued_on_thread(cw)

@@ -126,13 +126,12 @@ def can_view_submission(user, submission):
         return False
     if user == submission.creator:
         return True
-    if submission.private:
-        return False
     test_containing_file = h.get_test_match_with_associated_submission(submission)
     if test_containing_file is None:
         return False
-    if test_containing_file.marker == user:
-        return True
-    if test_containing_file.visible_to_developer:
+    # todo true if in testing group
+    if (test_containing_file.test.type == m.SubmissionType.SIGNATURE_TEST and
+        submission.type == m.SubmissionType.TEST_RESULT and
+        test_containing_file.solution.creator == user):
         return True
     return False

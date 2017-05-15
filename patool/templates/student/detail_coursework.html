@@ -2,6 +2,7 @@
 {% block title %}Detail Coursework{% endblock %}
 {% block content %}
     <h1>{{ cw.course.code }}: {{ cw.name }}</h1>
+    <div class="submission">
     <p>Attached files:</p>
     <ul>
     {% for sub, files in descriptors %}
@@ -10,68 +11,85 @@
         {% endfor %}
     {% endfor %}
     </ul>
+    </div>
 
+    <section id="tasklist">
     <h2>Your Tasks:</h2>
-    <ul>
     {% if subs_open %}
-        <h3>☐ Write your solution</h3>
+        <h3>Current Task: Write your solution</h3>
+        <ul>
         <li>You should now develop a solution to the coursework described in the above files.</li>
         <li>You should upload a solution to the website</li>
         <li>You can re-upload a new solution before the deadline</li>
         <li>You are encouraged to write test cases and upload these to the website to test.</li>
-        <h4>☐ Test your Peers</h4>
+        </ul>
+        <h4>Later: Test your Peers</h4>
     {% endif %}
     {% if feedback_open %}
         <h4>☑ Write your solution</h4>
-        <h3>☐ Test your Peers</h3>
+        <h3>Current Task: Test your Peers</h3>
+        <ul>
         <li>You should now either use your own test cases, or write new ones to investigate the correctness of your peer’s solution</li>
         <li>You should run these test cases</li>
         <li>You should give feedback on the results</li>
+        </ul>
     {% endif %}
     {% if not subs_open and not feedback_open %}
         <h4>☑ Write your solution</h4>
         <h4>☑ Test your Peers</h4>
         This coursework has closed
     {% endif %}
-    </ul>
+    </section>
 
     <p></p>
     <h2>My Submissions</h2>
-    {% if subs_open %}
-    <a href="{% url 'solution' cw.id %}">(Re-)Submit Solution</a>
-    {% endif %}
+    <div class="submission solution">
     {% for sub, files in solution %}
         <h3>{{ sub.student_name }}</h3>
+        {% if subs_open %}
+        <a href="{% url 'solution' cw.id %}">(Re-)Submit Solution</a>
+        {% endif %}
         <ul>
         {% for f in files%}
             <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
         {% endfor %}
         </ul>
     {% endfor %}
+    </div>
     <p></p>
+    {% for sub, files, can_del in tests %}
+    <div class="submission test">
+        <h3>{{ sub.student_name }}</h3>
+        {% if can_del %}
+        <form action="{% url 'delsub'%}" method="post" onsubmit="return window.confirm('Are you sure you want to delete {{sub.student_name}}?');">
+            {% csrf_token %}
+            <input type="hidden" name="sub_id" value="{{sub.id}}" />
+            <input type="Submit" value="❌ Delete this Test Case" />
+        </form>
+        {% endif %}
+        <ul>
+        {% for f in files%}
+            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
+        {% endfor %}
+        </ul>
+    </div>
+    {% endfor %}
     {% if subs_open %}
     <a href="{% url 'test' cw.id %}">Submit Test Case</a>
     {% endif %}
     {% if feedback_open %}
     <a href="{% url 'test' cw.id %}">Submit Test Case</a>
     {% endif %}
-    {% for sub, files, can_del in tests %}
-        <h3>{{ sub.student_name }}</h3>
-        {% if can_del %}<a href="{% url 'delsub' sub.id %}">Delete this Test Case</a>{% endif %}
-        <ul>
-        {% for f in files%}
-            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
-        {% endfor %}
-        </ul>
-    {% endfor %}
 
     <p></p>
     {% if subs_open %}
         <h2>Testing</h2>
         <p>
-            You can run your own tests here
-            <br/>
-            You can run your own test case against the oracle solution (?) to see the expected output
+            <ul>
+                <li>You can run your tests here to make sure that your solution is working correctly</li>
+                <li>You can also run your tests against the oracle to see what a correct solution does</li>
+            </ul>
+
         </p>
     {% else %}
         <h2>Peer-Testing</h2>

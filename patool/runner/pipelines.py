@@ -4,6 +4,8 @@ from django.core.files.base import ContentFile
 from django.db import transaction
 
 import student.models as m
+from . import matcher as matcher
+from . import runner as r
 
 """File containing the various pipelines for uploading files"""
 
@@ -11,7 +13,8 @@ import student.models as m
 def python_solution(solution):
     """When a @solution instance is uploaded, save it
     then process it accordingly"""
-    pass
+    tm = matcher.create_self_test(solution.id, "S", solution.coursework, solution.creator)
+    r.run_test_on_thread(tm, r.execute_python3_unit)
 
 
 def python_test_case(test):

@@ -15,16 +15,8 @@ class CourseworkForm(f.Form):
     state = f.ChoiceField(label="Coursework State", choices=m.CourseworkState.POSSIBLE_STATES)
 
 
-class TestMatchForm(f.Form):
-    solution_sub = f.SlugField(label="Run Solution", max_length=4)
-    test_sub = f.SlugField(label="against Test Case", max_length=4)
-    to_be_marked_by = f.CharField(label="to be Marked by", max_length=64)
-    visible_to_developer = f.BooleanField(label="Visible to developer", required=False)
-    coursework = f.SlugField(widget=f.HiddenInput, max_length=4)
-
-
 class AutoTestMatchForm(f.Form):
     algorithm = f.ChoiceField(label="Choice of Match Algorithm", choices=matcher.AVAILABLE_MATCHES)
-    coursework = f.SlugField(widget=f.HiddenInput, max_length=4)
     assign_markers = f.BooleanField(label="Assign Markers", required=False)
     visible_to_developer = f.BooleanField(label="Visible to developer", required=False)
+

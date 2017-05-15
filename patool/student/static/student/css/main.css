@@ -90,3 +90,37 @@ a.coursework_f::before, a.coursework_u::before, a.coursework_c::before {
     padding-right: 5px;
     text-decoration: none;
 }
+
+#tasklist {
+    border-radius: 5px;
+    border: 1px solid thistle;
+    background: lavender;
+    padding: 5px;
+}
+
+.submission {
+    border-left: 2px solid grey;
+    padding-left: 2px;
+}
+.solution {
+    border-color: blue;
+}
+.test {
+    border-color: green;
+}
+.submission ul {
+    list-style: none;
+}
+
+table.styled * {
+    border: none;
+}
+table.styled td, table.styled th {
+    padding: 4px;
+}
+table.styled th {
+    background-color: LightGray;
+}
+table.styled tr:nth-child(even){
+    background-color: PowderBlue;
+}

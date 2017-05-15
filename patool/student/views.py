@@ -11,6 +11,7 @@ import student.forms as f
 import student.helper as h
 import student.models as m
 import student.permission as p
+import runner.pipelines as pipe
 
 
 @login_required()
@@ -19,7 +20,6 @@ def index(request):
 
 
 @login_required()
-@transaction.atomic
 def upload_submission(request, cw=None):
     """Given a @request, handle a POST upload form
     for the specified coursework @cw."""
@@ -40,13 +40,24 @@ def upload_submission(request, cw=None):
         s_name = "My Solution"
         p_name = "Solution"
         t_name = str(request.user) + " Sol"
+        sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
+        pipe.python_solution(sub)
+        msg = "Your solution has been tested using the signature test. You should check the results of this test to make sure that our solution is written correctly"
     else:
         current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
         s_name = "My Test Case #%s" % str(current+1)
         p_name = "Test Case #%s" % str(current+1)
         t_name = str(request.user) + " Test #%s" % str(current+1)
+        sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
+        msg = "You can run your newly uploaded test against the oracle to make sure that your are testing for the correct output"
         # todo note this counting will end up being incorrect if user deletes something
         # todo it may end up beign better to dynamically generate names
+    return redirect(request, "Upload completed." + msg, reverse("cw", args=[cw]))
+
+
+@transaction.atomic
+def save_submission(cw_instance, request, file_type, s_name, p_name, t_name):
+    """Do the atomic database actions required to save the new files"""
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
                               creator=request.user, type=file_type,
                               student_name=s_name,
@@ -55,7 +66,7 @@ def upload_submission(request, cw=None):
     submission.save()
     for each in request.FILES.getlist('chosen_files'):
         m.File(file=each, submission=submission).save()
-    return redirect(request, "Upload completed", reverse("cw", args=[cw]))
+    return submission
 
 
 @login_required()
@@ -163,7 +174,7 @@ def generate_easy_match_form(cw, user, post=None):
     solution = [s for s in m.Submission.objects.filter(
         coursework=cw, creator=user, type=m.SubmissionType.SOLUTION)]
     usable_tests = [(test.id, test.student_name) for test in tests]
-    usable_tests.append(('I', 'Signature Test'))
+    usable_tests.append(('S', 'Signature Test'))
     if cw.state == m.CourseworkState.UPLOAD:
         testable_sols = [(sol.id, sol.student_name) for sol in solution]
     else:
@@ -261,13 +272,14 @@ def feedback_upload(request, test_match_instance):
 
 @login_required()
 @transaction.atomic()
-def delete_submission(request, subid):
-    """A user has requested deletion of a file"""
-    cw = m.Submission.objects.get(id=subid).coursework
-    status = h.delete_submission(request.user, m.Submission.objects.get(id=subid))
+def delete_submission(request):
+    """A user has requested deletion of a file, with id in post"""
+    sub_id = request.POST['sub_id']
+    cw = m.Submission.objects.get(id=sub_id).coursework
+    status = h.delete_submission(request.user, m.Submission.objects.get(id=sub_id))
     if status:
-        return redirect(request, "Submission Deleted", reverse("cw", args=[cw]))
-    return redirect(request, "Failed to delete file", reverse("cw", args=[cw]))
+        return redirect(request, "Submission Deleted", reverse("cw", args=[cw.id]))
+    return redirect(request, "Failed to delete file", reverse("cw", args=[cw.id]))
 
 
 def redirect(request, message, location):

@@ -14,7 +14,7 @@ def is_teacher(f):
             if not args:
                 return f(request)
             else:
-                return f(request, args)
+                return f(request, **args)
         else:
             return HttpResponseForbidden()
 

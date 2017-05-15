@@ -54,13 +54,14 @@ def create_peer_test(solution, test, cw, created_by_teacher=False):
                          type=m.TestType.TEACHER if created_by_teacher else m.TestType.PEER)
     # todo probably want to plug some sort of proxy in here for the feedback
     new_tm.save()
+    return new_tm
 
 
 @transaction.atomic()
 def create_self_test(solution_id, test_id, coursework, user):
     """Receive data to create a student-specific test match. Pass in IDs for
     @solution_id, @test_id and a @cw, @user instance. Return the newly created test."""
-    if 'solution' == 'O' and 'test' == 'I':
+    if solution_id == 'O' and solution_id == 'S':
         raise Exception("Either test, solution or both need to be one of your uploads")
     if solution_id != 'O':
         solution = m.Submission.objects.get(id=solution_id, creator=user,
@@ -68,7 +69,7 @@ def create_self_test(solution_id, test_id, coursework, user):
     else:
         solution = m.Submission.objects.get(coursework=coursework,
                                             type=m.SubmissionType.ORACLE_EXECUTABLE)
-    if test_id != 'I':
+    if test_id != 'S':
         test_case = m.Submission.objects.get(id=test_id, creator=user,
                                              type=m.SubmissionType.TEST_CASE)
     else:
