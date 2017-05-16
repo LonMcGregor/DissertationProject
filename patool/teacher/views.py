@@ -85,8 +85,8 @@ def edit_course(request, c):
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
-        edit_course_update(request, requested_course_code, request.POST)
-    return edit_course_render(request, requested_course_code)
+        edit_course_update(request, c, request.POST)
+    return edit_course_render(request, c)
 
 
 @transaction.atomic
@@ -150,8 +150,8 @@ def create_coursework(request, c):
     if not p.is_enrolled_on_course(request.user, cw):
         return HttpResponseForbidden("You are not enrolled on this course")
     if request.method == "POST":
-        return create_coursework_update(request.user, request, requested_course_code)
-    return create_coursework_render(request, requested_course_code)
+        return create_coursework_update(request.user, request, c)
+    return create_coursework_render(request, c)
 
 
 def create_coursework_render(request, code):
@@ -159,11 +159,6 @@ def create_coursework_render(request, code):
     detail = {
         "courseworks": {"name": "New Coursework"},
         "cw_form": False,
-        "descriptor": [],
-        "oracle_exec": [],
-        "identity": [],
-        "solutions": [],
-        "tests": [],
         "crumbs": [("Homepage", reverse("teacher_index")),
                    ("Course", reverse("edit_course", args=[code]))]
     }
@@ -185,6 +180,7 @@ def create_coursework_update(user, request, course_code):
     descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                               creator=user, type=m.SubmissionType.CW_DESCRIPTOR,
                               student_name="Coursework Descriptor",
+                              peer_name="Coursework Descriptor",
                               teacher_name="Descriptor")
     descriptor.save()
     for each in request.FILES.getlist('descriptor'):
@@ -193,6 +189,7 @@ def create_coursework_update(user, request, course_code):
     oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                                creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE,
                                student_name="Oracle Solution",
+                               peer_name="Oracle Solution",
                                teacher_name="Oracle")
     oracle_exec.save()
     for each in request.FILES.getlist('oracle_exec'):
@@ -201,9 +198,10 @@ def create_coursework_update(user, request, course_code):
     sig = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                        creator=user, type=m.SubmissionType.SIGNATURE_TEST,
                        student_name="Signature Test",
+                       peer_name="Signature Test",
                        teacher_name="Signature")
     sig.save()
-    for each in request.FILES.getlist('identity'):
+    for each in request.FILES.getlist('signature'):
         m.File(file=each, submission=sig).save()
 
     return redirect(request, "Coursework created", reverse('edit_cw', args=[coursework.id]))
@@ -236,7 +234,7 @@ def edit_coursework_update(new_details, old_coursework):
 def edit_coursework_render(request, coursework):
     """Get all of the necessary details to display a
     page for a given @coursework, including the
-    file suploaded for it, test data instances and
+    files uploaded for it, test data instances and
     of course the metadata about the coursework itself"""
     desc_types = [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.ORACLE_EXECUTABLE,
                   m.SubmissionType.SIGNATURE_TEST]
@@ -259,7 +257,7 @@ def edit_coursework_render(request, coursework):
 @p.is_teacher
 def view_coursework(request, c):
     """A teacher has made a @request to view the view
-    page for coursewok with @[c]. display files, tests"""
+    page for coursework with @[c]. display files, tests"""
     coursework = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
@@ -332,7 +330,7 @@ def manual_test_match_update(request, coursework):
 
 def auto_test_match_update(request, coursework):
     """Given an @request, extract the form data and call an automatic
-    test match creation algorithm and run in @coursework"""
+    test match creation algorithm and run in @coursework
     atm = f.AutoTestMatchForm(request.POST)
     if not atm.is_valid():
         return HttpResponseBadRequest("Invalid form data")
@@ -346,7 +344,8 @@ def auto_test_match_update(request, coursework):
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return redirect(request, "Tests created",
-                    reverse('view_cw', args=[atm.cleaned_data['coursework']]))
+                    reverse('view_cw', args=[atm.cleaned_data['coursework']]))"""
+    return
 
 
 @login_required()
@@ -392,9 +391,10 @@ def redirect(request, message, location):
                   {"message": message,
                    "redirect": location})
 
+
 @login_required
 def view_test(request, c, t):
-    """Render the virw showing tets details (feedback view)
+    """Render the view showing test details (feedback view)
     from the student app, but add teacher specific links
     given id for coursework @c and test @t"""
     return student_views.feedback(request, t, [

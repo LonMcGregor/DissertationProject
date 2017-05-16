@@ -1,5 +1,4 @@
 from django.contrib.auth.decorators import login_required
-from django.core.files.base import ContentFile
 from django.db import transaction
 from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
@@ -42,16 +41,18 @@ def upload_submission(request, cw=None):
         t_name = str(request.user) + " Sol"
         sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
         pipe.python_solution(sub)
-        msg = "Your solution has been tested using the signature test. You should check the results of this test to make sure that our solution is written correctly"
+        msg = "Your solution has been tested using the signature test. You should check the " \
+              "results of this test to make sure that our solution is written correctly "
     else:
         current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
         s_name = "My Test Case #%s" % str(current+1)
         p_name = "Test Case #%s" % str(current+1)
         t_name = str(request.user) + " Test #%s" % str(current+1)
-        sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        msg = "You can run your newly uploaded test against the oracle to make sure that your are testing for the correct output"
+        save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
+        msg = "You can run your newly uploaded test against the oracle to make sure that you are " \
+              "testing for the correct output "
         # todo note this counting will end up being incorrect if user deletes something
-        # todo it may end up beign better to dynamically generate names
+        # todo it may end up being better to dynamically generate names
     return redirect(request, "Upload completed." + msg, reverse("cw", args=[cw]))
 
 
@@ -108,7 +109,7 @@ def upload_solution(request, cw=None):
         "file_type": "s",
         "cw": cw,
         "crumbs": [("Homepage", reverse("student_index")),
-                    ("Coursework", reverse("cw", args=[cw]))]
+                   ("Coursework", reverse("cw", args=[cw]))]
     }
     return render(request, 'student/upload_solution.html', detail)
 
@@ -140,7 +141,7 @@ def single_coursework(request, cwid):
     if cw.state == m.CourseworkState.UPLOAD:
         tms = [tm for tm in m.TestMatch.objects.filter(
             type=m.TestType.SELF, coursework=cw
-        ) if tm.solution.creator == request.user]
+        ) if tm.solution.creator == request.user or tm.test.creator == request.user]
     else:
         # todo get testing group
         tm_group = [1, 2, 3]
@@ -236,7 +237,7 @@ def feedback(request, test_match, teacher_view=None):
         return redirect(request, "Your feedback has been recorded",
                         reverse("feedback", args=[test_match_instance.id]))
     crumbs = [("Homepage", reverse("student_index")),
-                   ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
+              ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
     if teacher_view is not None:
         crumbs = teacher_view
     # feedback_files = h.get_files(test_match_instance.feedback)
@@ -246,6 +247,8 @@ def feedback(request, test_match, teacher_view=None):
         "test_files": h.get_files(test_match_instance.test),
         "result_files": h.get_files(test_match_instance.result),
         "solution_files": h.get_files(test_match_instance.solution),
+        "user_owns_test": test_match_instance.test.creator == request.user,
+        "user_owns_sol": test_match_instance.solution.creator == request.user,
         # "feedback_files": feedback_files if len(feedback_files) > 0 else None,
         # todo for now, assume only 1 files
         "crumbs": crumbs
@@ -256,8 +259,7 @@ def feedback(request, test_match, teacher_view=None):
 @transaction.atomic()
 def feedback_upload(request, test_match_instance):
     """Once the user has uploaded their feedback, write it
-    to a file and update the database"""
-    return
+    to a file and update the database
     feedback_text = request.POST["feedback"]
     feedback_sub = m.Submission(id=m.new_random_slug(m.Submission),
                                 coursework=test_match_instance.coursework, creator=request.user,
@@ -267,7 +269,8 @@ def feedback_upload(request, test_match_instance):
     feedback_file.file.save('feedback.txt', ContentFile(feedback_text))
     feedback_file.save()
     test_match_instance.feedback = feedback_sub
-    test_match_instance.save()
+    test_match_instance.save()"""
+    return
 
 
 @login_required()

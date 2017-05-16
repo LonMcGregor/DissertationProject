@@ -1,3 +1,5 @@
+patool/.idea/dataSources/*
+
 #tex
 *.aux
 *.tex.backup

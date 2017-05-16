@@ -89,16 +89,7 @@ iframe{
     height: calc(100% - 20px);
 }
 
-span.test::before {
-    content: '[test]'
-}
-span.result::before {
-    content: '[result]'
-}
-span.solution::before {
-    content: '[solution]'
-}
-span.test::before, span.result::before, span.solution::before {
+span.sub_name {
     color: #333;
     font-size: small;
     padding-right: 5px;

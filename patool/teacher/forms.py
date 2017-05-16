@@ -1,7 +1,6 @@
 import django.forms as f
 
 import student.models as m
-from runner import matcher
 
 
 class CourseForm(f.Form):
@@ -16,7 +15,7 @@ class CourseworkForm(f.Form):
 
 
 class AutoTestMatchForm(f.Form):
-    algorithm = f.ChoiceField(label="Choice of Match Algorithm", choices=matcher.AVAILABLE_MATCHES)
+    algorithm = f.ChoiceField(label="Choice of Match Algorithm", choices=[])
     assign_markers = f.BooleanField(label="Assign Markers", required=False)
     visible_to_developer = f.BooleanField(label="Visible to developer", required=False)
 

@@ -2,6 +2,7 @@
 {% block title %}View Coursework{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
+    <a href="{% url 'edit_cw' coursework.id %}">Edit Coursework</a>
     <p></p>
     <h2>Coursework Files</h2>
     <table class="styled">

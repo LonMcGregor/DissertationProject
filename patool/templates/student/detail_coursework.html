@@ -44,11 +44,11 @@
     <p></p>
     <h2>My Submissions</h2>
     <div class="submission solution">
+    {% if subs_open %}
+    <a href="{% url 'solution' cw.id %}">(Re-)Submit Solution</a>
+    {% endif %}
     {% for sub, files in solution %}
         <h3>{{ sub.student_name }}</h3>
-        {% if subs_open %}
-        <a href="{% url 'solution' cw.id %}">(Re-)Submit Solution</a>
-        {% endif %}
         <ul>
         {% for f in files%}
             <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
@@ -81,20 +81,19 @@
     <a href="{% url 'test' cw.id %}">Submit Test Case</a>
     {% endif %}
 
-    <p></p>
     {% if subs_open %}
+        <p></p>
         <h2>Testing</h2>
-        <p>
-            <ul>
-                <li>You can run your tests here to make sure that your solution is working correctly</li>
-                <li>You can also run your tests against the oracle to see what a correct solution does</li>
-            </ul>
-
-        </p>
+        <ul>
+            <li>You can run your tests here to make sure that your solution is working correctly</li>
+            <li>You can also run your tests against the oracle to see what a correct solution does</li>
+        </ul>
     {% else %}
+        <p></p>
         <h2>Peer-Testing</h2>
         <p>As well as you, there are (n) peers in your testing group</p>
     {% endif %}
+    <p></p>
     <form action="{% url 'make_tm_student' cw.id %}" method="POST">
         {% csrf_token %}
         {{ easy_match_form }}

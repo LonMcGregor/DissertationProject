@@ -8,10 +8,18 @@
         <div id="file_view_container">
             <div id="file_tabs">
                 {% for filename in test_files %}
-                    <span class="test inactive" data-id="{{ test_match.test.id }}{{ filename }}">{{ filename }}</span>
+                    <span class="test inactive" data-id="{{ test_match.test.id }}{{ filename }}">
+                        <span class="sub_name">[
+                            {% if user_owns_test %}{{ test_match.test.student_name }}
+                            {% else %}{{ test_match.test.peer_name }}
+                            {% endif %}]</span>{{ filename }}</span>
                 {% endfor %}
                 {% for filename in solution_files %}
-                    <span class="solution inactive" data-id="{{ test_match.solution.id }}{{ filename }}">{{ filename }}</span>
+                    <span class="solution inactive" data-id="{{ test_match.solution.id }}{{ filename }}">
+                        <span class="sub_name">[
+                            {% if user_owns_sol %}{{ test_match.solution.student_name }}
+                            {% else %}{{ test_match.solution.peer_name }}
+                            {% endif %}]</span>{{ filename }}</span>
                 {% endfor %}
                 {% for filename in result_files %}
                     <span class="result inactive" data-id="{{ test_match.result.id }}{{ filename }}">{{ filename }}</span>

@@ -111,7 +111,7 @@ class TestType:
     TEACHER = 't'
     POSSIBLE_TYPES = (
         (SELF, 'A Self-Test, the developer of the solution testing their own code'),
-        (PEER, 'A Peer-Test, the tester is testing someone elses code'),
+        (PEER, 'A Peer-Test, the tester is testing someone else\'s code'),
         (TEACHER, 'A teacher wants to test the code of a student')
     )
 
@@ -124,9 +124,3 @@ class TestMatch(m.Model):
     error_level = m.IntegerField(null=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE, related_name="tm_cw")
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
-
-
-class Feedback(m.Model):
-    test_match = m.ForeignKey(TestMatch, m.CASCADE)
-    marker = m.ForeignKey(User, m.CASCADE)
-    feedback = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_fdbk_sub")

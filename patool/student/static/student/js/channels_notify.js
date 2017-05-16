@@ -6,7 +6,7 @@ for notification updates
 var note_count = 0;
 
 function update_note_count(){
-    /* increment and update the notificaiton count */
+    /* increment and update the notification count */
     note_count++;
     var note_count_box = document.getElementById('note_count');
     note_count_box.innerText = "Notifications (" + note_count + ")";
@@ -20,7 +20,7 @@ function notify(o){
 }
 
 function html_notify(o){
-    /* add an item to the basic html notificaitons box */
+    /* add an item to the basic html notifications box */
     var note_message_box = document.getElementById('note_messages_container');
     var note = document.createElement('div');
     note.className = 'note';
@@ -29,7 +29,7 @@ function html_notify(o){
 }
 
 function html_5_notify(o){
-    /* display an HTML5 web notificaiton */
+    /* display an HTML5 web notification */
     if(Notification.permission === "granted"){
         new Notification(o.toString());
     }
@@ -66,8 +66,9 @@ socketMan = {
 };
 
 
-/* actually connect to socket on page load */
+/* actually connect to socket on page load
 var sock = new WebSocket('ws://localhost:8000/messages');
 sock.onopen = socketMan.open;
 sock.onmessage = socketMan.msg;
 sock.onclose = socketMan.close;
+ */

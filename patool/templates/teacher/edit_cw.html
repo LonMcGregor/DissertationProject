@@ -2,6 +2,10 @@
 {% block title %}Edit Coursework{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
+    {% if cw_form %}
+    <a href="{% url 'view_cw' coursework.id %}">View Results</a>
+    {% endif %}
+    <p></p>
     <form method="POST" action="" enctype="multipart/form-data">
         {% csrf_token %}
             {% if cw_form %}
