@@ -9,6 +9,7 @@ urlpatterns = [
     url(r'^admin/', admin.site.urls),
     url(r'^student/', include('student.urls')),
     url(r'^teacher/', include('teacher.urls')),
+    url(r'^feedback/', include('feedback.urls')),
     url(r'^prepdb', views.populate_database, name='prepdb'),
     url(r'^$', views.default_index, name='site_root'),
 ] + static(

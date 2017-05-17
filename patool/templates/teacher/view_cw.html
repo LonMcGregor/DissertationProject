@@ -37,13 +37,30 @@
         {{ tm_form }}
         <input type="submit" value="Create test match"/>
     </form>
-    <!--
-    <h3>Auto create test matches for users</h3>
-    <form action="{% url 'make_tm' coursework.id %}" method="POST">
+
+    <p></p>
+    <h2>Feedback Grouping</h2>
+    <form action="" method="post" class="hidden" id="group_form_template">
         {% csrf_token %}
-        {{ atm_form }}
-        <input type="submit" value="Create test matches"/>
-    </form>-->
+        {{ feedback_form }}
+        <button onclick="$.post('{% url 'modify_feedback_group' %}', $(this).parent().serialize());">Save</button>
+        <button onclick="if(confirm('Delete This Group?')){
+            $.post('{% url 'delete_feedback_group' %}', $(this).parent().serialize())}" >Delete</button>
+    </form>
+    <div id="feedback_group_forms">
+    {% for form in feedback_forms %}
+        <form action="" method="post" >
+            {% csrf_token %}
+            {{ form }}
+            <button onclick="$.post('{% url 'modify_feedback_group' %}', $(this).parent().serialize());">Save</button>
+        <button onclick="if(confirm('Delete This Group?')){
+            $.post('{% url 'delete_feedback_group' %}', $(this).parent().serialize())}" >Delete</button>
+        </form>
+    {% endfor %}
+    </div>
+    <button onclick="var clone = $('#group_form_template').clone();
+                    clone.removeClass('hidden');
+                    $('#feedback_group_forms').append(clone);">+ Group</button>
 
     <p></p>
     <h2>Test Match Results</h2>

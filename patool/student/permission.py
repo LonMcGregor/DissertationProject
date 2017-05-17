@@ -8,6 +8,7 @@ from django.contrib.auth.models import Group
 
 import student.helper as h
 import student.models as m
+import feedback.models as fm
 
 
 def coursework_available_for_user(user):
@@ -87,14 +88,16 @@ def is_owner_of_solution(user, test_match_instance):
 
 def user_feedback_mode(user, test_match_instance):
     """Return the status that the @user has in relation
-    to a particular @test_data_instance wrt feedback"""
+    to a particular @test_match_instance wrt feedback"""
     cw = test_match_instance.coursework
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
     if is_teacher(user):
         return UserFeedbackModes.WRITE if user in [0, 1, 2] else \
             UserFeedbackModes.READ
-    # that is to say, if the user is inside the feedback group (TODO)
+    feedback_group = fm.FeedbackForTestMatch.objects.get(test_match=test_match_instance)
+    if fm.FeedbackMembership.objects.filter(group=feedback_group, user=user).count() == 0:
+        return UserFeedbackModes.DENY
     if is_owner_of_solution(user, test_match_instance) or \
             (test_match_instance.test.creator == user and
              test_match_instance.solution.type == m.SubmissionType.ORACLE_EXECUTABLE):
@@ -129,7 +132,13 @@ def can_view_submission(user, submission):
     test_containing_file = h.get_test_match_with_associated_submission(submission)
     if test_containing_file is None:
         return False
-    # todo true if in testing group
+    submission_groups = [member.group for member in
+                         fm.FeedbackMembership.objects.filter(user=submission.creator)]
+    user_groups = [member.group for member in fm.FeedbackMembership.objects.filter(user=user)]
+    common = list(set(submission_groups).intersection(user_groups))
+    for group in common:
+        if fm.FeedbackPlan.objects.filter(group=group, coursework=submission.coursework).count() == 1:
+            return True
     if (test_containing_file.test.type == m.SubmissionType.SIGNATURE_TEST and
         submission.type == m.SubmissionType.TEST_RESULT and
         test_containing_file.solution.creator == user):

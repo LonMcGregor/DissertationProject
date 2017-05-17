@@ -9,6 +9,7 @@ import student.helper as h
 import student.models as m
 import teacher.forms as f
 import student.forms as sf
+import feedback.forms as ff
 import teacher.permission as p
 import student.views as student_views
 from runner import matcher
@@ -269,12 +270,17 @@ def view_coursework(request, c):
     tm_form = generate_teacher_easy_match_form(coursework)
     atm_form = f.AutoTestMatchForm(tm_initial)
     results = m.TestMatch.objects.filter(coursework=coursework)
+    base_ff_form = ff.FeedbackGroupForm(tm_initial)
+    extra_ff_forms = [ff.FeedbackGroupForm(initial) for
+                      initial in ff.get_feedback_groups_as_iterable_forms(coursework)]
     detail = {
         "coursework": coursework,
         "submissions": submissions,
         "tm_form": tm_form,
         "atm_form": atm_form,
         "results": results,
+        "feedback_form": base_ff_form,
+        "feedback_forms": extra_ff_forms,
         "crumbs": [("Homepage", reverse("teacher_index")),
                    ("Course", reverse("edit_course", args=[coursework.course.code]))]
 

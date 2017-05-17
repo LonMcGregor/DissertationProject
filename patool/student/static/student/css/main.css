@@ -124,3 +124,5 @@ table.styled th {
 table.styled tr:nth-child(even){
     background-color: PowderBlue;
 }
+
+.hidden {display: none}
