@@ -138,15 +138,13 @@ def single_coursework(request, cwid):
         coursework=cw, creator=request.user, type=m.SubmissionType.TEST_CASE)]
 
     if cw.state == m.CourseworkState.UPLOAD:
-        tms = [tm for tm in m.TestMatch.objects.filter(
+        tms = [(tm, tm.solution.student_name, tm.test.student_name) for tm in
+                m.TestMatch.objects.filter(
             type=m.TestType.SELF, coursework=cw
         ) if tm.solution.creator == request.user or tm.test.creator == request.user]
     else:
-        # todo get testing group
-        tm_group = [1, 2, 3]
-        tms = [tm for tm in m.TestMatch.objects.filter(
-            type=m.TestType.PEER, coursework=cw
-        ) if tm in tm_group]
+        tm_groups = h.get_feedback_groups_for_user_in_coursework(request.user, cw)
+        tms = h.get_all_test_matches_in_feedback_groups(request.user, tm_groups)
 
     easy_match_form = generate_easy_match_form(cw, request.user)
 
@@ -169,17 +167,25 @@ def generate_easy_match_form(cw, user, post=None):
     test match form.
     If the form is to be used in validating a @post request,
     this may also be passed in"""
-    tests = [t for t in m.Submission.objects.filter(
+    usable_tests = [(test.id, test.student_name) for test in m.Submission.objects.filter(
         coursework=cw, creator=user, type=m.SubmissionType.TEST_CASE)]
-    solution = [s for s in m.Submission.objects.filter(
-        coursework=cw, creator=user, type=m.SubmissionType.SOLUTION)]
-    usable_tests = [(test.id, test.student_name) for test in tests]
     usable_tests.append(('S', 'Signature Test'))
-    if cw.state == m.CourseworkState.UPLOAD:
-        testable_sols = [(sol.id, sol.student_name) for sol in solution]
-    else:
-        testable_sols = []
-        # todo the solutions for everyone in the testing group except mine
+    testable_sols = [(sol.id, sol.student_name) for sol in m.Submission.objects.filter(
+        coursework=cw, creator=user, type=m.SubmissionType.SOLUTION)]
+    if cw.state == m.CourseworkState.FEEDBACK:
+        test_groups_for_cw = h.get_feedback_groups_for_user_in_coursework(user, cw)
+        all_users_in_these_groups = h.get_all_users_in_feedback_groups(test_groups_for_cw)
+        for member in all_users_in_these_groups:
+            if member[0] == user:
+                continue
+            usable_tests.extend([(t.id, member[1] + t.peer_name) for t in
+                                 m.Submission.objects.filter(coursework=cw,
+                                                             creator=member[0],
+                                                             type=m.SubmissionType.TEST_CASE)])
+            testable_sols.extend([(t.id, member[1] + t.peer_name) for t in
+                                  m.Submission.objects.filter(coursework=cw,
+                                                              creator=member[0],
+                                                              type=m.SubmissionType.SOLUTION)])
     testable_sols.append(('O', 'Oracle Solution'))
     if post is None:
         return f.EasyMatchForm(usable_tests, testable_sols)
@@ -190,12 +196,13 @@ def generate_easy_match_form(cw, user, post=None):
 def create_new_test_match(request, cw):
     """Given a coursework id, @cw, this is an entry point into creating
     a new test match, which will then be run"""
+    user = request.user
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
     coursework = m.Coursework.objects.get(id=cw)
-    if not p.can_view_coursework(request.user, coursework):
+    if not p.can_view_coursework(user, coursework):
         return HttpResponseForbidden("You're not enrolled in this course")
-    tm_form = generate_easy_match_form(coursework, request.user, post=request.POST)
+    tm_form = generate_easy_match_form(coursework, user, post=request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     if coursework.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
@@ -207,9 +214,10 @@ def create_new_test_match(request, cw):
     ]
     if coursework.state == m.CourseworkState.UPLOAD:
         method = matcher.create_self_test
-        args.append(request.user)
+        args.append(user)
     else:
         method = matcher.create_peer_test
+        args.append(h.determine_feedback_group_for_new_tm(user, tm_form.cleaned_data, coursework))
     try:
         new_tm = method(*args)
         r.run_test_on_thread(new_tm, r.execute_python3_unit)
@@ -229,47 +237,24 @@ def feedback(request, test_match, teacher_view=None):
     if perm == p.UserFeedbackModes.WAIT:
         return redirect(request, "Please wait until the test has finished running",
                         reverse("cw", args=[test_match_instance.coursework.id]))
-    if request.POST:
-        if perm != p.UserFeedbackModes.WRITE:
-            return HttpResponseForbidden("You are not allowed to submit feedback")
-        feedback_upload(request, test_match_instance)
-        return redirect(request, "Your feedback has been recorded",
-                        reverse("feedback", args=[test_match_instance.id]))
     crumbs = [("Homepage", reverse("student_index")),
               ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
     if teacher_view is not None:
         crumbs = teacher_view
-    # feedback_files = h.get_files(test_match_instance.feedback)
+    names = h.get_name_for_test_match(request.user, test_match_instance)
     details = {
         "test_match": test_match_instance,
+        "solution_name": names[0],
+        "test_name": names[1],
         "can_submit": perm == p.UserFeedbackModes.WRITE,
         "test_files": h.get_files(test_match_instance.test),
         "result_files": h.get_files(test_match_instance.result),
         "solution_files": h.get_files(test_match_instance.solution),
         "user_owns_test": test_match_instance.test.creator == request.user,
         "user_owns_sol": test_match_instance.solution.creator == request.user,
-        # "feedback_files": feedback_files if len(feedback_files) > 0 else None,
-        # todo for now, assume only 1 files
         "crumbs": crumbs
     }
     return render(request, 'student/feedback.html', details)
-
-
-@transaction.atomic()
-def feedback_upload(request, test_match_instance):
-    """Once the user has uploaded their feedback, write it
-    to a file and update the database
-    feedback_text = request.POST["feedback"]
-    feedback_sub = m.Submission(id=m.new_random_slug(m.Submission),
-                                coursework=test_match_instance.coursework, creator=request.user,
-                                type=m.SubmissionType.FEEDBACK, private=False)
-    feedback_sub.save()
-    feedback_file = m.File(submission=feedback_sub)
-    feedback_file.file.save('feedback.txt', ContentFile(feedback_text))
-    feedback_file.save()
-    test_match_instance.feedback = feedback_sub
-    test_match_instance.save()"""
-    return
 
 
 @login_required()

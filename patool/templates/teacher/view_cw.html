@@ -1,4 +1,5 @@
 {% extends "teacher/base.html" %}
+{% load comments %}
 {% block title %}View Coursework{% endblock %}
 {% block content %}
 <h1>Coursework Details for {{ coursework.name }}:</h1>
@@ -84,7 +85,8 @@
         <td>{%  if f.solution %}
            {{ f.solution.teacher_name }}
         {% endif %}</td>
-        <td>--</td>
+        {% get_comment_count for f as comment_count %}
+        <td>{{ comment_count }} Comments</td>
         <td>{% if f.error_level == 0 %}Success{% elif f.error_level != None %}E: {{ f.error_level }}{% else %}Queued...{% endif %}</td>
         <td>{{ f.type }}</td>
         </tr>

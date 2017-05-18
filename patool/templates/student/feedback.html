@@ -1,4 +1,5 @@
 {% extends 'student/base.html' %}
+{% load comments %}
 {% load static %}
 {% block title %}Feedback{% endblock %}
 {% block content %}
@@ -9,17 +10,11 @@
             <div id="file_tabs">
                 {% for filename in test_files %}
                     <span class="test inactive" data-id="{{ test_match.test.id }}{{ filename }}">
-                        <span class="sub_name">[
-                            {% if user_owns_test %}{{ test_match.test.student_name }}
-                            {% else %}{{ test_match.test.peer_name }}
-                            {% endif %}]</span>{{ filename }}</span>
+                        <span class="sub_name">{{ test_name }}]</span>{{ filename }}</span>
                 {% endfor %}
                 {% for filename in solution_files %}
                     <span class="solution inactive" data-id="{{ test_match.solution.id }}{{ filename }}">
-                        <span class="sub_name">[
-                            {% if user_owns_sol %}{{ test_match.solution.student_name }}
-                            {% else %}{{ test_match.solution.peer_name }}
-                            {% endif %}]</span>{{ filename }}</span>
+                        <span class="sub_name">[{{ solution_name }}]</span>{{ filename }}</span>
                 {% endfor %}
                 {% for filename in result_files %}
                     <span class="result inactive" data-id="{{ test_match.result.id }}{{ filename }}">{{ filename }}</span>
@@ -39,17 +34,20 @@
             </div>
         </div>
         <div id="feedback_input">
+            {% render_comment_list for test_match %}
             {% if can_submit %}
-                <form method="POST" action="" id="feedback_form">
+                {% get_comment_form for test_match as form %}
+                <form action="{% comment_form_target %}" method="POST">
                     {% csrf_token %}
-                    <textarea name="feedback" placeholder="Please type some feedback here"></textarea>
-                    <input type="submit" value="Submit Feedback" />
+                    {{ form.comment }}
+                    {{ form.honeypot }}
+                    {{ form.content_type }}
+                    {{ form.object_pk }}
+                    {{ form.timestamp }}
+                    {{ form.security_hash }}
+                    <input type="hidden" name="next" value="{% url 'feedback' test_match.id %}" />
+                    <input type="submit" value="Add comment" id="id_submit" />
                 </form>
-            {% elif test_match.feedback %}
-                <p>Feedback</p>
-                {% for filename in feedback_files %}
-                <iframe src="{% url 'download_file' test_match.feedback.id filename %}?show=1"></iframe>
-                {% endfor %}
             {% endif %}
         </div>
     </div>

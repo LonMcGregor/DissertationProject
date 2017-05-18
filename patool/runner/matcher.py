@@ -1,21 +1,34 @@
 from django.db import transaction
 
 import student.models as m
+import feedback.models as fm
 
 
 @transaction.atomic()
-def create_peer_test(solution, test, cw, created_by_teacher=False):
+def create_peer_test(solution, test, cw, feedback_group):
     """Create a new test match with data specified by the IDs of @solution,
-    @test, @cw, @marker, @visible and the instance of @initiator user"""
+    @test, and the instance of @cw, @feedback_group test is done within"""
     solution = m.Submission.objects.get(id=solution)
     test_case = m.Submission.objects.get(id=test)
     if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
         raise Exception("Need 1 solution and 1 test")
-    cw = m.Coursework.objects.get(id=cw)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
                          solution=solution, coursework=cw,
-                         type=m.TestType.TEACHER if created_by_teacher else m.TestType.PEER)
-    # todo probably want to plug some sort of proxy in here for the feedback
+                         type=m.TestType.PEER)
+    new_tm.save()
+    fm.FeedbackForTestMatch(test_match=new_tm, group=feedback_group).save()
+    return new_tm
+
+
+@transaction.atomic()
+def create_teacher_test(solution, test, cw):
+    """Create a new test match with data specified by the IDs of @solution,
+    @test, and @cw instanceand create the teachers test"""
+    solution = m.Submission.objects.get(id=solution)
+    test_case = m.Submission.objects.get(id=test)
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
+                         solution=solution, coursework=cw,
+                         type=m.TestType.TEACHER)
     new_tm.save()
     return new_tm
 

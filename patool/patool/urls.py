@@ -10,6 +10,7 @@ urlpatterns = [
     url(r'^student/', include('student.urls')),
     url(r'^teacher/', include('teacher.urls')),
     url(r'^feedback/', include('feedback.urls')),
+    url(r'^comments/', include('django_comments.urls')),
     url(r'^prepdb', views.populate_database, name='prepdb'),
     url(r'^$', views.default_index, name='site_root'),
 ] + static(

@@ -98,10 +98,10 @@ def user_is_member_of_test_match_feedback_group(user, test_match_instance):
     """Return whether or not a user is a member of the
     feedback group for a givne test match"""
     feedback_group_filter = fm.FeedbackForTestMatch.objects.filter(test_match=test_match_instance)
-    feedback_group = h.first_model_item_or_none(feedback_group_filter)
-    if feedback_group is None:
+    feedback_tm = h.first_model_item_or_none(feedback_group_filter)
+    if feedback_tm is None:
         return False
-    return fm.FeedbackMembership.objects.filter(group=feedback_group, user=user).count() > 0
+    return fm.FeedbackMembership.objects.filter(group=feedback_tm.group, user=user).count() > 0
 
 
 def state_given_error_level(test_match_instance, specified_mode):

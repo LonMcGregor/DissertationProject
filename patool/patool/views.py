@@ -43,26 +43,26 @@ def populate_database(request):
 
         cu = User.objects.create_user
 
-        w = cu("winston", password="primalrage")
+        w = cu("winston", password="primalrage", email='winston@peer-testing.com')
         w.groups.add(t)
         w.save()
-        z = cu("zenyatta", password="transcendence")
+        z = cu("zenyatta", password="transcendence", email='zenyatta@peer-testing.com')
         z.groups.add(t)
         z.save()
-        sy = cu("symmetra", password="teleporter")
+        sy = cu("symmetra", password="teleporter", email='symmetra@peer-testing.com')
         sy.groups.add(t)
         sy.save()
 
-        a = cu("ana", password="nanoboost")
+        a = cu("ana", password="nanoboost", email='ana@peer-testing.com')
         a.groups.add(s)
         a.save()
-        tr = cu("tracer", password="pulsebomb")
+        tr = cu("tracer", password="pulsebomb", email='tracer@peer-testing.com')
         tr.groups.add(s)
         tr.save()
-        l = cu("lucio", password="soundbarrier")
+        l = cu("lucio", password="soundbarrier", email='lucio@peer-testing.com')
         l.groups.add(s)
         l.save()
-        sm = cu("sombra", password="electromagneticpulse")
+        sm = cu("sombra", password="electromagneticpulse", email='sombra@peer-testing.com')
         sm.groups.add(s)
         sm.save()
 

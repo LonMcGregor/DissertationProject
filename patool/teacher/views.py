@@ -321,11 +321,10 @@ def manual_test_match_update(request, coursework):
     if not tm_form.is_valid():
         return HttpResponseBadRequest("Invalid form data")
     try:
-        new_tm = matcher.create_peer_test(
+        new_tm = matcher.create_teacher_test(
             tm_form.cleaned_data['solution'],
             tm_form.cleaned_data['test'],
-            coursework.id,
-            True
+            coursework
         )
         runner.run_test_on_thread(new_tm, runner.execute_python3_unit)
     except Exception as e:

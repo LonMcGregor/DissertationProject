@@ -100,8 +100,7 @@
         <input type="submit" value="Run Test" />
     </form>
     <p>View results for running tests:</p>
-    <ul>{% for tm in tms %}
-        <li>[<a href="{% url 'feedback' tm.id %}">view</a>]
-            {{ tm.solution.student_name }} against {{ tm.test.student_name }}</li>
+    <ul>{% for tm, sol, test in tms %}
+        <li>[<a href="{% url 'feedback' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
     {% endfor %}</ul>
 {% endblock %}

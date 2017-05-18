@@ -39,8 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'student',
     'teacher',
-    'feedback'
+    'feedback',
+    'django.contrib.sites',
+    'django_comments'
 ]
+
+SITE_ID = 1
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
