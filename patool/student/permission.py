@@ -86,6 +86,41 @@ def is_owner_of_solution(user, test_match_instance):
     return test_match_instance.solution.creator == user
 
 
+def user_is_self_testing(user, test_match_instance):
+    """Check and return whether @user was involed in a
+    self-test for @test_match_instance"""
+    if test_match_instance.type != m.TestType.SELF:
+        return False
+    return test_match_instance.test.creator==user or test_match_instance.solution.creator == user
+
+
+def user_is_member_of_test_match_feedback_group(user, test_match_instance):
+    """Return whether or not a user is a member of the
+    feedback group for a givne test match"""
+    feedback_group_filter = fm.FeedbackForTestMatch.objects.filter(test_match=test_match_instance)
+    feedback_group = h.first_model_item_or_none(feedback_group_filter)
+    if feedback_group is None:
+        return False
+    return fm.FeedbackMembership.objects.filter(group=feedback_group, user=user).count() > 0
+
+
+def state_given_error_level(test_match_instance, specified_mode):
+    """Assuming a user is properly validated and
+    allowed to see a @test_match_instance, determine if
+    they should be in WAIT or @specified_mode"""
+    if test_match_instance.error_level is None:
+        return UserFeedbackModes.WAIT
+    return specified_mode
+
+
+def feedback_mode_given_coursework_state(test_match_instance):
+    """Based on the current state of the coursework, determine if
+    authorized users should be allowed to write feedback"""
+    if test_match_instance.coursework.state == m.CourseworkState.FEEDBACK:
+        return UserFeedbackModes.WRITE
+    return UserFeedbackModes.READ
+
+
 def user_feedback_mode(user, test_match_instance):
     """Return the status that the @user has in relation
     to a particular @test_match_instance wrt feedback"""
@@ -93,28 +128,63 @@ def user_feedback_mode(user, test_match_instance):
     if not can_view_coursework(user, cw):
         return UserFeedbackModes.DENY
     if is_teacher(user):
-        return UserFeedbackModes.WRITE if user in [0, 1, 2] else \
-            UserFeedbackModes.READ
-    feedback_group = fm.FeedbackForTestMatch.objects.get(test_match=test_match_instance)
-    if fm.FeedbackMembership.objects.filter(group=feedback_group, user=user).count() == 0:
-        return UserFeedbackModes.DENY
-    if is_owner_of_solution(user, test_match_instance) or \
-            (test_match_instance.test.creator == user and
-             test_match_instance.solution.type == m.SubmissionType.ORACLE_EXECUTABLE):
-        return UserFeedbackModes.WAIT if test_match_instance.error_level is None else \
-            UserFeedbackModes.READ
-    if test_match_instance.marker != user:
-        return UserFeedbackModes.DENY
-    if test_match_instance.error_level is None:
-        return UserFeedbackModes.WAIT
-    return UserFeedbackModes.WRITE if (test_match_instance.feedback is None and
-                                       test_match_instance.coursework.state ==
-                                       m.CourseworkState.FEEDBACK) else UserFeedbackModes.READ
+        return UserFeedbackModes.READ
+    if user_is_self_testing(user, test_match_instance):
+        return state_given_error_level(test_match_instance, UserFeedbackModes.READ)
+    if user_is_member_of_test_match_feedback_group(user, test_match_instance):
+        mode = feedback_mode_given_coursework_state(test_match_instance)
+        return state_given_error_level(test_match_instance, mode)
+    return UserFeedbackModes.DENY
 
 
 def can_view_file(user, file):
     """Determine if a @user should be allowed to view a given @file"""
     return can_view_submission(user, file.submission)
+
+
+def submission_is_descriptive(submission):
+    """Report if a @submission is a descriptive part of
+    a coursework"""
+    return submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.SIGNATURE_TEST]
+
+
+def submission_is_secret(submission):
+    """Report is a @submission is the kind that ought to be secret
+    to students taking part in coursework"""
+    return submission.type == m.SubmissionType.ORACLE_EXECUTABLE
+
+
+def user_owns_submission(user, submission):
+    """Return if @user is the owner of @submission,
+    for example if they are the creator"""
+    return user == submission.creator
+
+
+def is_submission_written_by_peer_in_testing_group(user, submission):
+    """Assuming there is a feedback group for the creator of @submission
+    that the @user is trying to view, determine if this group in the
+    coursework also includes @user"""
+    submission_groups = [member.group for member in
+                         fm.FeedbackMembership.objects.filter(user=submission.creator)]
+    user_groups = [member.group for member in fm.FeedbackMembership.objects.filter(user=user)]
+    common = list(set(submission_groups).intersection(user_groups))
+    for group in common:
+        if fm.FeedbackPlan.objects.filter(group=group,
+                                          coursework=submission.coursework).count() == 1:
+            return True
+    return False
+
+
+def is_visible_results_file(user, submission):
+    """If the @submisison that @user is trying to  view is a
+    results file, find the test it is from. If it is a self
+    test for @user, let them see it. If they are in the testing
+    group, let them see it"""
+    if submission.type!=m.SubmissionType.TEST_RESULT:
+        return False
+    test_used_in = h.test_match_for_results(submission)
+    return user_is_self_testing(user, test_used_in) or \
+        user_is_member_of_test_match_feedback_group(user, test_used_in)
 
 
 def can_view_submission(user, submission):
@@ -123,24 +193,14 @@ def can_view_submission(user, submission):
         return False
     if is_teacher(user):
         return True
-    if submission.type in [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.SIGNATURE_TEST]:
+    if submission_is_descriptive(submission):
         return True
-    if submission.type == m.SubmissionType.ORACLE_EXECUTABLE:
+    if submission_is_secret(submission):
         return False
-    if user == submission.creator:
+    if user_owns_submission(user, submission):
         return True
-    test_containing_file = h.get_test_match_with_associated_submission(submission)
-    if test_containing_file is None:
-        return False
-    submission_groups = [member.group for member in
-                         fm.FeedbackMembership.objects.filter(user=submission.creator)]
-    user_groups = [member.group for member in fm.FeedbackMembership.objects.filter(user=user)]
-    common = list(set(submission_groups).intersection(user_groups))
-    for group in common:
-        if fm.FeedbackPlan.objects.filter(group=group, coursework=submission.coursework).count() == 1:
-            return True
-    if (test_containing_file.test.type == m.SubmissionType.SIGNATURE_TEST and
-        submission.type == m.SubmissionType.TEST_RESULT and
-        test_containing_file.solution.creator == user):
+    if is_submission_written_by_peer_in_testing_group(user, submission):
+        return True
+    if is_visible_results_file(user, submission):
         return True
     return False

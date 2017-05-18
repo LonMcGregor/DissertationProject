@@ -20,19 +20,10 @@ def first_model_item_or_none(query):
     return None
 
 
-def get_test_match_with_associated_submission(submission):
-    """Given a certain @submission within the scope of a,
-    get the test data file that contains it. This assumes
-    that a file will only be used once"""
-    if submission.type in [m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE]:
-        return first_model_item_or_none(m.TestMatch.objects.filter(solution=submission))
-    if submission.type in [m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST]:
-        return first_model_item_or_none(m.TestMatch.objects.filter(test=submission))
-    if submission.type == m.SubmissionType.TEST_RESULT:
-        return first_model_item_or_none(m.TestMatch.objects.filter(result=submission))
-    if submission.type == m.SubmissionType.FEEDBACK:
-        return first_model_item_or_none(m.TestMatch.objects.filter(feedback=submission))
-    raise Exception("You shouldn't have reached here")
+def test_match_for_results(submission):
+    """Given that a results @submission only is ever attached to
+    a single test match, we can return it"""
+    return m.TestMatch.objects.get(result=submission)
 
 
 def get_files(submission):

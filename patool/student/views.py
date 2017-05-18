@@ -33,7 +33,6 @@ def upload_submission(request, cw=None):
     file_type = request.POST['file_type']
     if not p.user_can_upload_of_type(request.user, cw_instance, file_type):
         return HttpResponseForbidden("You can't upload submissions of this type")
-    # todo if submitting a new solution, clear the old one first
     if file_type == m.SubmissionType.SOLUTION:
         h.delete_old_solution(request.user, cw_instance)
         s_name = "My Solution"
@@ -214,9 +213,9 @@ def create_new_test_match(request, cw):
     try:
         new_tm = method(*args)
         r.run_test_on_thread(new_tm, r.execute_python3_unit)
+        return redirect(request, "Test Created", reverse("feedback", args=[new_tm.id]))
     except Exception as e:
         return HttpResponseForbidden(str(e))
-    return redirect(request, "Test Created", reverse("cw", args=[cw]))
 
 
 @login_required()
