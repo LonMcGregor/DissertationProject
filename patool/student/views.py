@@ -11,6 +11,7 @@ import student.helper as h
 import student.models as m
 import student.permission as p
 import runner.pipelines as pipe
+import django_comments.models as cm
 
 
 @login_required()
@@ -269,7 +270,8 @@ def create_new_test_match(request, cw):
 @login_required()
 def feedback(request, test_match, teacher_view=None):
     """Render the page that allows a user to give feedback to a certain
-    test data instance. Also handle the case of POST data upload."""
+    @test_match instance. accept a @teacher_view of what crumbs to give
+    teacher to allow reuse of method across both student and teacher"""
     test_match_instance = m.TestMatch.objects.get(id=test_match)
     perm = p.user_feedback_mode(request.user, test_match_instance)
     if perm == p.UserFeedbackModes.DENY:
@@ -279,8 +281,10 @@ def feedback(request, test_match, teacher_view=None):
                         reverse("cw", args=[test_match_instance.coursework.id]))
     crumbs = [("Homepage", reverse("student_index")),
               ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
-    if teacher_view is not None:
-        crumbs = teacher_view
+    is_teacher = teacher_view is not None
+    group = h.feedback_group_for_test_match(tm)
+    comment_list = [(c.submit_date, c.comment, h.nick_for_user_in_group(c.user, group, is_teacher))
+                    for c in cm.Comment.objects.filter(content_object=test_match)]
     names = h.get_name_for_test_match(request.user, test_match_instance)
     details = {
         "test_match": test_match_instance,
@@ -292,7 +296,8 @@ def feedback(request, test_match, teacher_view=None):
         "solution_files": h.get_files(test_match_instance.solution),
         "user_owns_test": test_match_instance.test.creator == request.user,
         "user_owns_sol": test_match_instance.solution.creator == request.user,
-        "crumbs": crumbs
+        "crumbs": crumbs if not is_teacher else teacher_view,
+        "comment_list": comment_list
     }
     return render(request, 'student/feedback.html', details)
 

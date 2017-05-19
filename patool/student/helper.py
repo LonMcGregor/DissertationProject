@@ -118,6 +118,12 @@ def get_name_for_test_match(user, tm):
         return triple[1], triple[2]
 
 
+def feedback_group_for_test_match(tm):
+    """Given a @tm, get the feedback group associated"""
+    model = first_model_item_or_none(fm.FeedbackForTestMatch.objects.filter(test_match=tm))
+    return model.group if model is not None else None
+
+
 def count_members_of_group(group):
     """Count the number of members of specified feedback @group"""
     return fm.FeedbackMembership.objects.filter(group=group).count()
@@ -127,3 +133,15 @@ def get_file_tuples(**args):
     """Get the submissions and file listings for args:
     created by @user for @coursework, filtering on specified @type"""
     return [(s, h.get_files(s)) for s in m.Submission.objects.filter(**args)]
+
+
+def nick_for_user_in_group(user, group, show_real_name):
+    """Find the nickname, and @show_real_name in brackets if
+    needed, for the specified @user in feedback @group"""
+    try:
+        nick = fm.FeedbackMembership.objects.get(group=group, user=user).nickname
+        if show_real_name:
+            return "%s (%s)" % nick, user.username
+        return nick
+    except Model.DoesNotExist:
+        return "Unknown User - %s, %s" % user.id, group.id

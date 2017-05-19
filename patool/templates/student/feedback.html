@@ -34,7 +34,12 @@
             </div>
         </div>
         <div id="feedback_input">
-            {% render_comment_list for test_match %}
+            {% for date, comment, user in comment_list %}
+                <div class="comment">
+                    <h4>{{ user }} on {{ date }}</h4>
+                    <p>{{ comment }}</p>
+                </div>
+            {% endfor %}
             {% if can_submit %}
                 {% get_comment_form for test_match as form %}
                 <form action="{% comment_form_target %}" method="POST">
