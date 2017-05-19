@@ -44,9 +44,9 @@ def upload_submission(request, cw=None):
               "results of this test to make sure that our solution is written correctly "
     else:
         current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
-        s_name = "My Test Case #%s" % str(current+1)
-        p_name = "Test Case #%s" % str(current+1)
-        t_name = str(request.user) + " Test #%s" % str(current+1)
+        s_name = "My Test Case #%s" % str(current + 1)
+        p_name = "Test Case #%s" % str(current + 1)
+        t_name = str(request.user) + " Test #%s" % str(current + 1)
         save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
         msg = "You can run your newly uploaded test against the oracle to make sure that you are " \
               "testing for the correct output "
@@ -130,41 +130,70 @@ def single_coursework(request, cwid):
     if not p.can_view_coursework(request.user, cw):
         return HttpResponseForbidden("You are not allowed to access this coursework")
 
-    descriptors = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-        type=m.SubmissionType.CW_DESCRIPTOR, coursework=cw)]
-    solution = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
-        coursework=cw, creator=request.user, type=m.SubmissionType.SOLUTION)]
-    tests = [(t, h.get_files(t), h.can_delete(t)) for t in m.Submission.objects.filter(
-        coursework=cw, creator=request.user, type=m.SubmissionType.TEST_CASE)]
+    descriptors = h.get_file_tuples(type=m.SubmissionType.CW_DESCRIPTOR, coursework=cw)
+    sols = h.get_file_tuples(coursework=cw, creator=request.user, type=m.SubmissionType.SOLUTION)
+    tests = h.get_file_tuples(coursework=cw, creator=request.user, type=m.SubmissionType.TEST_CASE)
 
     if cw.state == m.CourseworkState.UPLOAD:
-        tms = [(tm, tm.solution.student_name, tm.test.student_name) for tm in
-                m.TestMatch.objects.filter(
-            type=m.TestType.SELF, coursework=cw
-        ) if tm.solution.creator == request.user or tm.test.creator == request.user]
+        testing_data = detail_self_test_matches(user, cw)
     else:
-        tm_groups = h.get_feedback_groups_for_user_in_coursework(request.user, cw)
-        tms = h.get_all_test_matches_in_feedback_groups(request.user, tm_groups)
-
-    easy_match_form = generate_easy_match_form(cw, request.user)
+        testing_data = detail_peer_feedback_group(user, cw)
 
     details = {
         "cw": cw,
         "descriptors": descriptors,
-        "solution": solution,
+        "solution": sols,
         "tests": tests,
-        "tms": tms,
+        "testing_data": testing_data,
         "subs_open": cw.state == m.CourseworkState.UPLOAD,
         "feedback_open": cw.state == m.CourseworkState.FEEDBACK,
         "crumbs": [("Homepage", reverse("student_index"))],
-        "easy_match_form": easy_match_form
+
     }
     return render(request, 'student/detail_coursework.html', details)
 
 
-def generate_easy_match_form(cw, user, post=None):
+def detail_self_test_matches(user, coursework):
+    """For self testing for a @use rin a @coursework,
+    prepare the match form and list results"""
+    tms = [(tm, tm.solution.student_name, tm.test.student_name) for tm in
+           m.TestMatch.objects.filter(type=m.TestType.SELF, coursework=coursework) if
+           tm.solution.creator == request.user or tm.test.creator == user]
+    match_form = generate_self_match_form(coursework, user)
+    return [(match_form, tms, "Self-Testing", """
+        <ul>
+            <li>You can run your tests here to make sure that your solution is working correctly</li>
+            <li>You can also run your tests against the oracle to see what a correct solution does</li>
+        </ul>
+    """)]
+
+
+def detail_peer_feedback_group(user, coursework):
+    """For each feedback @group that @user is a member of,
+    in a given @coursework, collect the relevant files, 
+    generate the form and list the test match results"""
+    tm_groups = h.get_feedback_groups_for_user_in_coursework(user, coursework)
+    testing_data = []
+    section_title = "Peer-Testing Group %s"
+    section_description = """
+        <ul>
+            <li>You can test the solutions of your peers and use their tests on your own solution</li>
+            <li>You can then give and receive feedback for individual test results</li>
+            <li>As well as you, there are %s other peers in this feedback group</li>
+        </ul>
+    """
+    for group in tm_groups:
+        tms = h.get_all_test_matches_in_feedback_group(user, tm_group)
+        match_form = generate_peer_match_form(coursework, user, group)
+        members = h.count_members_of_group(group)
+        testing_data.append((match_form, tms, section_title % group.id,
+                             section_description % members))
+    return testing_data
+
+
+def generate_self_match_form(cw, user, post=None):
     """Given a @cw instance, an @user, generate the easy
-    test match form.
+    test match form for self testing purposes.
     If the form is to be used in validating a @post request,
     this may also be passed in"""
     usable_tests = [(test.id, test.student_name) for test in m.Submission.objects.filter(
@@ -172,21 +201,32 @@ def generate_easy_match_form(cw, user, post=None):
     usable_tests.append(('S', 'Signature Test'))
     testable_sols = [(sol.id, sol.student_name) for sol in m.Submission.objects.filter(
         coursework=cw, creator=user, type=m.SubmissionType.SOLUTION)]
-    if cw.state == m.CourseworkState.FEEDBACK:
-        test_groups_for_cw = h.get_feedback_groups_for_user_in_coursework(user, cw)
-        all_users_in_these_groups = h.get_all_users_in_feedback_groups(test_groups_for_cw)
-        for member in all_users_in_these_groups:
-            if member[0] == user:
-                continue
-            usable_tests.extend([(t.id, member[1] + t.peer_name) for t in
-                                 m.Submission.objects.filter(coursework=cw,
-                                                             creator=member[0],
-                                                             type=m.SubmissionType.TEST_CASE)])
-            testable_sols.extend([(t.id, member[1] + t.peer_name) for t in
-                                  m.Submission.objects.filter(coursework=cw,
-                                                              creator=member[0],
-                                                              type=m.SubmissionType.SOLUTION)])
     testable_sols.append(('O', 'Oracle Solution'))
+    if post is None:
+        return f.EasyMatchForm(usable_tests, testable_sols)
+    return f.EasyMatchForm(usable_tests, testable_sols, post)
+
+
+def generate_peer_match_form(cw, user, group, post=None):
+    """Given a @cw instance, an @user, generate the easy
+    test match form for peer testing purposes.
+    If the form is to be used in validating a @post request,
+    this may also be passed in"""
+    all_users = h.get_all_users_in_feedback_group(group)
+    user_objects = [item[0] for item in all_users]
+    all_tests = m.Submission.objects.filter(coursework=cw,
+                                            creator__in=user_objects,
+                                            type=m.SubmissionType.TEST_CASE)
+    all_sols = m.Submission.objects.filter(coursework=cw,
+                                           creator__in=user_objects,
+                                           type=m.SubmissionType.SOLUTION)
+    for member in all_users:
+        usable_tests.extend([(t.id, member[1] + t.peer_name if t.creator == user else
+                             t.student_name) for t in all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
+        testable_sols.extend([(t.id, member[1] + t.peer_name if t.creator == user else
+                              t.student_name) for t in all_sols.filter(creator=member[0], type=m.SubmissionType.SOLUTION)])
+    testable_sols.append(('O', 'Oracle Solution'))
+    usable_tests.append(('S', 'Signature Test'))
     if post is None:
         return f.EasyMatchForm(usable_tests, testable_sols)
     return f.EasyMatchForm(usable_tests, testable_sols, post)
@@ -217,7 +257,7 @@ def create_new_test_match(request, cw):
         args.append(user)
     else:
         method = matcher.create_peer_test
-        args.append(h.determine_feedback_group_for_new_tm(user, tm_form.cleaned_data, coursework))
+        args.append(tm_form.cleaned_data['feedback_group'])
     try:
         new_tm = method(*args)
         r.run_test_on_thread(new_tm, r.execute_python3_unit)

@@ -79,19 +79,18 @@ def get_feedback_groups_for_user_in_coursework(user, coursework):
     return list(set(all_groups_for_user).intersection(all_groups_in_cw))
 
 
-def get_all_users_in_feedback_groups(groups):
-    """Given a list of feedback @groups, determine all of the 
-    users that lie therein"""
+def get_all_users_in_feedback_group(group):
+    """Given a feedback @group, determine all of the member users"""
     return [(member.user, member.nickname) for member in
-            fm.FeedbackMembership.objects.filter(group__in=groups)]
+            fm.FeedbackMembership.objects.filter(group=group)]
 
 
-def get_all_test_matches_in_feedback_groups(user, groups):
-    """"Given a list of feedback @groups,
+def get_all_test_matches_in_feedback_group(user, group):
+    """"Given a feedback @group,
     get all of the associated test matches.
     personalise names for @user"""
-    return [ detail_test_match(user, item.test_match, item.group) for item in
-             fm.FeedbackForTestMatch.objects.filter(group__in=groups)]
+    return [detail_test_match(user, item.test_match, item.group) for item in
+            fm.FeedbackForTestMatch.objects.filter(group=group)]
 
 
 def detail_test_match(user, tm, group):
@@ -119,18 +118,12 @@ def get_name_for_test_match(user, tm):
         return triple[1], triple[2]
 
 
-def determine_feedback_group_for_new_tm(user, tm_data, coursework):
-    """Given an instance of a @user wanting to create
-     a ne wtest_match having posted cleaned form details
-     in @tm_data to @coursework, find the peer feedback 
-     group that is common to all elements of the new tm.
-    NOTE: THIS ASSUMES THAT THERE IS NO OVERLAP WITH
-    MANY PEOPLE IN MANY DIFFERENT FEEDBACK GROUPS"""
-    solution = m.Submission.objects.get(id=tm_data['solution'])
-    test_case = m.Submission.objects.get(id=tm_data['test'])
-    groups_for_user = get_feedback_groups_for_user_in_coursework(user, coursework)
-    groups_for_tester = get_feedback_groups_for_user_in_coursework(solution.creator, coursework)
-    groups_for_developer = get_feedback_groups_for_user_in_coursework(test_case.creator, coursework)
-    return list(set(groups_for_user)
-                .intersection(groups_for_tester)
-                .intersection(groups_for_developer))[0]
+def count_members_of_group(group):
+    """Count the number of members of specified feedback @group"""
+    return fm.FeedbackMembership.objects.filter(group=group).count()
+
+
+def get_file_tuples(**args):
+    """Get the submissions and file listings for args:
+    created by @user for @coursework, filtering on specified @type"""
+    return [(s, h.get_files(s)) for s in m.Submission.objects.filter(**args)]

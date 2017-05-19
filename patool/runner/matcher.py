@@ -7,16 +7,17 @@ import feedback.models as fm
 @transaction.atomic()
 def create_peer_test(solution, test, cw, feedback_group):
     """Create a new test match with data specified by the IDs of @solution,
-    @test, and the instance of @cw, @feedback_group test is done within"""
+    @test, @feedback_group and the instance of @cw test is done within"""
     solution = m.Submission.objects.get(id=solution)
     test_case = m.Submission.objects.get(id=test)
+    group = fm.FeedbackGroup.objects.get(id=feedback_group)
     if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
         raise Exception("Need 1 solution and 1 test")
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
                          solution=solution, coursework=cw,
                          type=m.TestType.PEER)
     new_tm.save()
-    fm.FeedbackForTestMatch(test_match=new_tm, group=feedback_group).save()
+    fm.FeedbackForTestMatch(test_match=new_tm, group=group).save()
     return new_tm
 
 

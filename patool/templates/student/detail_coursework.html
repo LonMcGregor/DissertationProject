@@ -81,26 +81,19 @@
     <a href="{% url 'test' cw.id %}">Submit Test Case</a>
     {% endif %}
 
-    {% if subs_open %}
+    {% for match_form, tms, name, message in testing_data %}
         <p></p>
-        <h2>Testing</h2>
-        <ul>
-            <li>You can run your tests here to make sure that your solution is working correctly</li>
-            <li>You can also run your tests against the oracle to see what a correct solution does</li>
-        </ul>
-    {% else %}
-        <p></p>
-        <h2>Peer-Testing</h2>
-        <p>As well as you, there are (n) peers in your testing group</p>
-    {% endif %}
-    <p></p>
-    <form action="{% url 'make_tm_student' cw.id %}" method="POST">
-        {% csrf_token %}
-        {{ easy_match_form }}
-        <input type="submit" value="Run Test" />
-    </form>
-    <p>View results for running tests:</p>
-    <ul>{% for tm, sol, test in tms %}
-        <li>[<a href="{% url 'feedback' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
-    {% endfor %}</ul>
+        <h2>{{ name }}</h2>
+        <p>{{ message | safe }}</p>
+        <form action="{% url 'make_tm_student' cw.id %}" method="POST">
+            {% csrf_token %}
+            {{ match_form }}
+            <input type="submit" value="Run Test" />
+        </form>
+        <p>View results for running tests:</p>
+        <ul>{% for tm, sol, test in tms %}
+            <li>[<a href="{% url 'feedback' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
+        {% endfor %}</ul>
+
+    {% endfor %}
 {% endblock %}
