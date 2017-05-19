@@ -1,9 +1,12 @@
 """A selection of methods that offer help to some other
 functionality of the program, but in and of themselves
 do not actually offer services to views, permissions etc."""
+from django.contrib.auth.models import Group
 
 import student.models as m
 import feedback.models as fm
+
+from django.core.exceptions import ObjectDoesNotExist
 
 
 def string_id(item):
@@ -97,11 +100,13 @@ def detail_test_match(user, tm, group):
     """Given a instance of a @user, a @tm and a
     feedback @group, get the details of names of
     the submission within the @tm as a triple"""
+    if is_teacher(user):
+        return tm, tm.solution.teacher_name, tm.test.teacher_name
     developer = fm.FeedbackMembership.objects.get(group=group, user=tm.solution.creator)
-    sol_name = tm.solution.student_name if developer.user == user else \
+    sol_name = tm.solution.student_name if tm.solution.creator == user else \
         developer.nickname+tm.solution.peer_name
     tester = fm.FeedbackMembership.objects.get(group=group, user=tm.solution.creator)
-    test_name = tm.test.student_name if tester.user == user else \
+    test_name = tm.test.student_name if tm.test.creator == user else \
         tester.nickname+tm.test.peer_name
     return tm, sol_name, test_name
 
@@ -129,19 +134,43 @@ def count_members_of_group(group):
     return fm.FeedbackMembership.objects.filter(group=group).count()
 
 
-def get_file_tuples(**args):
-    """Get the submissions and file listings for args:
-    created by @user for @coursework, filtering on specified @type"""
-    return [(s, h.get_files(s)) for s in m.Submission.objects.filter(**args)]
+def get_descriptor_tuples(coursework):
+    """Get the descriptors and files for @coursework"""
+    [(s, get_files(s)) for s in m.Submission.objects.filter(
+        type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)]
 
 
-def nick_for_user_in_group(user, group, show_real_name):
-    """Find the nickname, and @show_real_name in brackets if
+def get_solution_tuples(coursework, user):
+    """Get the solution submissions and files
+    for @coursework by @user"""
+    return [(s, get_files(s)) for s in
+            m.Submission.objects.filter(coursework=coursework, creator=user,
+                                        type=m.SubmissionType.SOLUTION)]
+
+
+def get_test_triples(coursework, user):
+    """Get the test submissions and files, and
+    ability to delete for @coursework by @user"""
+    return [(t, get_files(t), can_delete(t)) for t in m.Submission.objects.filter(
+        coursework=coursework, creator=user, type=m.SubmissionType.TEST_CASE)]
+
+
+def nick_for_user_in_group(user, group, requesting_user):
+    """Find the nickname, and real name in brackets if
+    @requesting_user is a teacher or the person being checked
     needed, for the specified @user in feedback @group"""
     try:
         nick = fm.FeedbackMembership.objects.get(group=group, user=user).nickname
-        if show_real_name:
-            return "%s (%s)" % nick, user.username
+        if requesting_user == user:
+            return "Me (%s)" % nick
+        if is_teacher(requesting_user):
+            return "%s (%s)" % (nick, user.username)
         return nick
-    except Model.DoesNotExist:
+    except ObjectDoesNotExist:
         return "Unknown User - %s, %s" % user.id, group.id
+
+
+def is_teacher(user):
+    """is @user a teacher?"""
+    teacher_group = Group.objects.get(name="teacher")
+    return teacher_group in user.groups.all()

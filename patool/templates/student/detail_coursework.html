@@ -85,11 +85,20 @@
         <p></p>
         <h2>{{ name }}</h2>
         <p>{{ message | safe }}</p>
-        <form action="{% url 'make_tm_student' cw.id %}" method="POST">
-            {% csrf_token %}
-            {{ match_form }}
-            <input type="submit" value="Run Test" />
-        </form>
+        {% if subs_open %}
+            <form action="{% url 'make_tm_student' cw.id %}" method="POST">
+                {% csrf_token %}
+                {{ match_form }}
+                <input type="submit" value="Run Test" />
+            </form>
+        {% endif %}
+        {% if feedback_open %}
+            <form action="{% url 'make_tm_student' cw.id %}" method="POST">
+                {% csrf_token %}
+                {{ match_form }}
+                <input type="submit" value="Run Test" />
+            </form>
+        {% endif %}
         <p>View results for running tests:</p>
         <ul>{% for tm, sol, test in tms %}
             <li>[<a href="{% url 'feedback' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>

@@ -131,14 +131,14 @@ def single_coursework(request, cwid):
     if not p.can_view_coursework(request.user, cw):
         return HttpResponseForbidden("You are not allowed to access this coursework")
 
-    descriptors = h.get_file_tuples(type=m.SubmissionType.CW_DESCRIPTOR, coursework=cw)
-    sols = h.get_file_tuples(coursework=cw, creator=request.user, type=m.SubmissionType.SOLUTION)
-    tests = h.get_file_tuples(coursework=cw, creator=request.user, type=m.SubmissionType.TEST_CASE)
+    descriptors = h.get_descriptor_tuples(cw)
+    sols = h.get_solution_tuples(cw, request.user)
+    tests = h.get_test_triples(cw, request.user)
 
     if cw.state == m.CourseworkState.UPLOAD:
-        testing_data = detail_self_test_matches(user, cw)
+        testing_data = detail_self_test_matches(request.user, cw)
     else:
-        testing_data = detail_peer_feedback_group(user, cw)
+        testing_data = detail_peer_feedback_group(request.user, cw)
 
     details = {
         "cw": cw,
@@ -159,13 +159,13 @@ def detail_self_test_matches(user, coursework):
     prepare the match form and list results"""
     tms = [(tm, tm.solution.student_name, tm.test.student_name) for tm in
            m.TestMatch.objects.filter(type=m.TestType.SELF, coursework=coursework) if
-           tm.solution.creator == request.user or tm.test.creator == user]
+           tm.solution.creator == user or tm.test.creator == user]
     match_form = generate_self_match_form(coursework, user)
     return [(match_form, tms, "Self-Testing", """
-        <ul>
-            <li>You can run your tests here to make sure that your solution is working correctly</li>
-            <li>You can also run your tests against the oracle to see what a correct solution does</li>
-        </ul>
+<ul>
+    <li>You can run your tests here to make sure that your solution is working correctly</li>
+    <li>You can also run your tests against the oracle to see what a correct solution does</li>
+</ul>
     """)]
 
 
@@ -177,14 +177,14 @@ def detail_peer_feedback_group(user, coursework):
     testing_data = []
     section_title = "Peer-Testing Group %s"
     section_description = """
-        <ul>
-            <li>You can test the solutions of your peers and use their tests on your own solution</li>
-            <li>You can then give and receive feedback for individual test results</li>
-            <li>As well as you, there are %s other peers in this feedback group</li>
-        </ul>
+<ul>
+<li>You can test the solutions of your peers and use their tests on your own solution</li>
+<li>You can then give and receive feedback for individual test results</li>
+<li>Including you, there are %s peers in this feedback group</li>
+</ul>
     """
     for group in tm_groups:
-        tms = h.get_all_test_matches_in_feedback_group(user, tm_group)
+        tms = h.get_all_test_matches_in_feedback_group(user, group)
         match_form = generate_peer_match_form(coursework, user, group)
         members = h.count_members_of_group(group)
         testing_data.append((match_form, tms, section_title % group.id,
@@ -221,16 +221,20 @@ def generate_peer_match_form(cw, user, group, post=None):
     all_sols = m.Submission.objects.filter(coursework=cw,
                                            creator__in=user_objects,
                                            type=m.SubmissionType.SOLUTION)
+    tests = []
+    sols = []
     for member in all_users:
-        usable_tests.extend([(t.id, member[1] + t.peer_name if t.creator == user else
-                             t.student_name) for t in all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
-        testable_sols.extend([(t.id, member[1] + t.peer_name if t.creator == user else
-                              t.student_name) for t in all_sols.filter(creator=member[0], type=m.SubmissionType.SOLUTION)])
-    testable_sols.append(('O', 'Oracle Solution'))
-    usable_tests.append(('S', 'Signature Test'))
+        tests.extend([(t.id, t.student_name if t.creator == user else
+                     member[1] + t.peer_name) for t in
+                     all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
+        sols.extend([(t.id, t.student_name if t.creator == user else
+                     member[1] + t.peer_name) for t in
+                     all_sols.filter(creator=member[0], type=m.SubmissionType.SOLUTION)])
+    tests.append(('S', 'Signature Test'))
+    sols.append(('O', 'Oracle Solution'))
     if post is None:
-        return f.EasyMatchForm(usable_tests, testable_sols)
-    return f.EasyMatchForm(usable_tests, testable_sols, post)
+        return f.EasyMatchForm(tests, sols, initial={"feedback_group": group.id})
+    return f.EasyMatchForm(tests, sols, post)
 
 
 @login_required()
@@ -243,7 +247,11 @@ def create_new_test_match(request, cw):
     coursework = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(user, coursework):
         return HttpResponseForbidden("You're not enrolled in this course")
-    tm_form = generate_easy_match_form(coursework, user, post=request.POST)
+    if coursework.state == m.CourseworkState.UPLOAD:
+        tm_form = generate_self_match_form(coursework, user, post=request.POST)
+    else:
+        tm_form = generate_peer_match_form(coursework, user,
+                                           request.POST['feedback_group'], post=request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
     if coursework.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
@@ -282,9 +290,10 @@ def feedback(request, test_match, teacher_view=None):
     crumbs = [("Homepage", reverse("student_index")),
               ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
     is_teacher = teacher_view is not None
-    group = h.feedback_group_for_test_match(tm)
-    comment_list = [(c.submit_date, c.comment, h.nick_for_user_in_group(c.user, group, is_teacher))
-                    for c in cm.Comment.objects.filter(content_object=test_match)]
+    group = h.feedback_group_for_test_match(test_match_instance)
+    comment_list = [(c.submit_date, c.comment,
+                     h.nick_for_user_in_group(c.user, group, request.user))
+                    for c in cm.Comment.objects.filter(object_pk=test_match)]
     names = h.get_name_for_test_match(request.user, test_match_instance)
     details = {
         "test_match": test_match_instance,

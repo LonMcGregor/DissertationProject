@@ -91,7 +91,7 @@ def user_is_self_testing(user, test_match_instance):
     self-test for @test_match_instance"""
     if test_match_instance.type != m.TestType.SELF:
         return False
-    return test_match_instance.test.creator==user or test_match_instance.solution.creator == user
+    return test_match_instance.test.creator == user or test_match_instance.solution.creator == user
 
 
 def user_is_member_of_test_match_feedback_group(user, test_match_instance):
@@ -180,7 +180,7 @@ def is_visible_results_file(user, submission):
     results file, find the test it is from. If it is a self
     test for @user, let them see it. If they are in the testing
     group, let them see it"""
-    if submission.type!=m.SubmissionType.TEST_RESULT:
+    if submission.type != m.SubmissionType.TEST_RESULT:
         return False
     test_used_in = h.test_match_for_results(submission)
     return user_is_self_testing(user, test_used_in) or \

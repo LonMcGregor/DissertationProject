@@ -292,9 +292,11 @@ def generate_teacher_easy_match_form(coursework, post=None):
     """Given an instance of @coursework, generate a
     relevant easymatchform"""
     tests = [(t.id, t.teacher_name) for t in m.Submission.objects.filter(
-        coursework=coursework, type__in=[m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST])]
+        coursework=coursework,
+        type__in=[m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST])]
     solutions = [(s.id, s.teacher_name) for s in m.Submission.objects.filter(
-        coursework=coursework, type__in=[m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE])]
+        coursework=coursework,
+        type__in=[m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE])]
     if post is None:
         return sf.EasyMatchForm(tests, solutions)
     return sf.EasyMatchForm(tests, solutions, post)
@@ -309,10 +311,7 @@ def create_test_match(request, c):
         return HttpResponseForbidden("You're supposed to POST a form here")
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You're not enrolled on this course")
-    if "algorithm" in request.POST:
-        return auto_test_match_update(request, coursework)
-    else:
-        return manual_test_match_update(request, coursework)
+    return manual_test_match_update(request, coursework)
 
 
 def manual_test_match_update(request, coursework):
@@ -331,26 +330,6 @@ def manual_test_match_update(request, coursework):
         return HttpResponseBadRequest(str(e))
     return redirect(request, "Test created",
                     reverse('view_cw', args=[coursework.id]))
-
-
-def auto_test_match_update(request, coursework):
-    """Given an @request, extract the form data and call an automatic
-    test match creation algorithm and run in @coursework
-    atm = f.AutoTestMatchForm(request.POST)
-    if not atm.is_valid():
-        return HttpResponseBadRequest("Invalid form data")
-    try:
-        matcher.first_available(
-            coursework.id,
-            request.user,
-            atm.cleaned_data['assign_markers'],
-            atm.cleaned_data['visible_to_developer']
-        )
-    except Exception as e:
-        return HttpResponseBadRequest(str(e))
-    return redirect(request, "Tests created",
-                    reverse('view_cw', args=[atm.cleaned_data['coursework']]))"""
-    return
 
 
 @login_required()
