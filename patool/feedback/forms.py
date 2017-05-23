@@ -2,6 +2,7 @@ import django.forms as f
 from . import models as m
 
 
+# noinspection PyClassHasNoInit
 class FeedbackGroupForm(f.Form):
     nickname = f.CharField(max_length=64, label="Nickname")
     students = f.CharField(widget=f.Textarea, label="Comma-Separated Users in this group")
@@ -15,7 +16,7 @@ def get_feedback_groups_as_iterable_forms(coursework):
     feedback groups that are associated with this coursework
     and return their contents as an iterable list of initial dicts
     so that forms may be generated"""
-    return [get_feedback_as_form(coursework, f.group) for f in
+    return [get_feedback_as_form(coursework, fp.group) for fp in
             m.FeedbackPlan.objects.filter(coursework=coursework)]
 
 
@@ -27,7 +28,4 @@ def get_feedback_as_form(coursework, feedback_group):
             "nickname": feedback_group.nickname,
             "students": ','.join([member.user.username for member in
                                   m.FeedbackMembership.objects.filter(group=feedback_group)]),
-            "groupid": feedback_group.id
-    }
-
-
+            "groupid": feedback_group.id}

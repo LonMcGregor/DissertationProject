@@ -11,7 +11,6 @@ urlpatterns = [
     url('create_cw/(?P<c>[0-9a-zA-Z\-_]*)', views.create_coursework, name='create_cw'),
     url('cw/(?P<c>[0-9a-zA-Z\-_]*)/edit', views.edit_coursework, name='edit_cw'),
     url('cw/(?P<c>[0-9a-zA-Z\-_]*)/view', views.view_coursework, name='view_cw'),
-    url('cw/(?P<c>[0-9a-zA-Z\-_]*)/tm/(?P<t>[0-9a-zA-Z\-_]*)', views.view_test, name='view_test'),
     url('updatecontent/', views.update_content, name='update_content'),
     url('test_all/(?P<c>[0-9a-zA-Z\-_]*)', views.run_all_test_in_cw, name='run_all_test_in_cw'),
     url('cw/(?P<c>[0-9a-zA-Z\-_]*)/make_tm', views.create_test_match, name='make_tm'),

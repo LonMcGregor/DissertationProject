@@ -1,30 +1,30 @@
 import os
+import re
 import shutil
 import subprocess
 import sys
 import threading
 
 from django.conf import settings
+from django.core.files.base import ContentFile
 from django.db import transaction
 
-import student.models as m
-import runner.pipelines as pipes
-
-"""This module implements the execution mechanism with
-respect to python3 unit testing."""
+import common.models as m
+from test_match import matcher as matcher
 
 
 @transaction.atomic
-def run_test(test_match_instance, exec_method):
+def run_test(test_match_instance, exec_method, results_method):
     """Go through the @test_data_instance and run the
     test case against the solution. Store the data setting
     the results to be created by the initiator (which will
      likely be the test creator). Then update the database.
-     Utilize the given @exec_method"""
+     Utilize the given @exec_method. clean up the results
+     of the test using the specified @results_method"""
     if test_match_instance.error_level is not None:
         return
     result, output = exec_method(test_match_instance.solution, test_match_instance.test)
-    result_submission = pipes.python_results(output, test_match_instance)
+    result_submission = results_method(output, test_match_instance)
     test_match_instance.result = result_submission
     test_match_instance.error_level = result
     test_match_instance.save()
@@ -74,7 +74,7 @@ def run_queued_tests(coursework):
         if tests.count() == 0:
             return
         for test in tests:
-            run_test(test, execute_python3_unit)
+            run_test(test, execute_python3_unit, python_results)
 
 
 def run_all_queued_on_thread(coursework):
@@ -82,8 +82,38 @@ def run_all_queued_on_thread(coursework):
     threading.Thread(target=run_queued_tests, args=(coursework,)).start()
 
 
-def run_test_on_thread(test_instance, exec_method):
+def run_test_on_thread(test_instance, exec_method, results_method):
     """Start a new thread and run the @test_instance,
-    and use the specified @exec_method"""
-    running = threading.Thread(target=run_test, args=(test_instance, exec_method))
+    and use the specified @exec_method and @results_method"""
+    running = threading.Thread(target=run_test, args=(test_instance, exec_method, results_method))
     running.start()
+
+
+def python_solution(solution):
+    """When a @solution instance is uploaded, save it
+    then process it accordingly """
+    tm = matcher.create_self_test(solution.id, "S", solution.coursework, solution.creator)
+    run_test_on_thread(tm, execute_python3_unit, python_results)
+
+
+@transaction.atomic()
+def python_results(content, tm):
+    """Take in the @content from running a
+    @tm test match instance, process this, and save it,
+    passing back a model reference"""
+
+    content2 = re.sub(r"(File [\"\']).+/(python[0-9.]+)/(.+[\"\'])", r"\1/\2/\3", content)
+    content3 = re.sub(r"(File [\"\']).+/var/tmp/(.+[\"\'])", r"\1/\2", content2)
+
+    result_sub = m.Submission(id=m.new_random_slug(m.Submission),
+                              coursework=tm.coursework,
+                              creator=tm.test.creator,
+                              type=m.SubmissionType.TEST_RESULT,
+                              student_name="Test Results",
+                              peer_name="Test Results",
+                              teacher_name="Results")
+    result_sub.save()
+    result_file = m.File(submission=result_sub)
+    result_file.file.save('results.txt', ContentFile(content3))
+    result_file.save()
+    return result_sub

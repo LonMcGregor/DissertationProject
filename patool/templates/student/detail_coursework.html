@@ -101,7 +101,7 @@
         {% endif %}
         <p>View results for running tests:</p>
         <ul>{% for tm, sol, test in tms %}
-            <li>[<a href="{% url 'feedback' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
+            <li>[<a href="{% url 'tm' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
         {% endfor %}</ul>
 
     {% endfor %}

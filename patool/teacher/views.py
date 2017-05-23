@@ -4,20 +4,20 @@ from django.http import HttpResponseForbidden, HttpResponseBadRequest
 from django.shortcuts import render
 from django.urls import reverse
 
-import runner.runner as r
-import student.helper as h
-import student.models as m
-import teacher.forms as f
-import student.forms as sf
+import common.forms as cf
+import common.helpers as h
+import common.models as m
+import common.permissions as p
 import feedback.forms as ff
-import teacher.permission as p
-import student.views as student_views
-from runner import matcher
-from runner import runner
+import teacher.forms as f
+from common.permissions import require_teacher
+from common.views import redirect
+from runner import runner as r
+from test_match import matcher
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def index(request):
     """Show all of the courses available for the
     logged in teacher as a list"""
@@ -30,7 +30,7 @@ def index(request):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def create_course(request):
     """Handle the creation of a course, or create the form to do so"""
     if request.method == "POST":
@@ -79,7 +79,7 @@ def create_course_update(request, new_details):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def edit_course(request, c):
     """Handle creation of form, or post request for editing a course"""
     cw = m.Course.objects.get(code=c)
@@ -144,7 +144,7 @@ def edit_course_render(request, requested_course_code):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def create_coursework(request, c):
     """Handle form for creating a coursework in course @[c]"""
     cw = m.Course.objects.get(code=c)
@@ -209,7 +209,7 @@ def create_coursework_update(user, request, course_code):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def edit_coursework(request, c):
     """Prepare a page to view and edit coursework @[c]"""
     coursework = m.Coursework.objects.get(id=c)
@@ -255,7 +255,7 @@ def edit_coursework_render(request, coursework):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def view_coursework(request, c):
     """A teacher has made a @request to view the view
     page for coursework with @[c]. display files, tests"""
@@ -298,12 +298,12 @@ def generate_teacher_easy_match_form(coursework, post=None):
         coursework=coursework,
         type__in=[m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE])]
     if post is None:
-        return sf.EasyMatchForm(tests, solutions)
-    return sf.EasyMatchForm(tests, solutions, post)
+        return cf.EasyMatchForm(tests, solutions)
+    return cf.EasyMatchForm(tests, solutions, post)
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def create_test_match(request, c):
     """Create a new test match, according to what is specified in the POST request"""
     coursework = m.Coursework.objects.get(id=c)
@@ -325,7 +325,7 @@ def manual_test_match_update(request, coursework):
             tm_form.cleaned_data['test'],
             coursework
         )
-        runner.run_test_on_thread(new_tm, runner.execute_python3_unit)
+        r.run_test_on_thread(new_tm, r.execute_python3_unit, r.python_results)
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return redirect(request, "Test created",
@@ -333,7 +333,7 @@ def manual_test_match_update(request, coursework):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 def run_all_test_in_cw(request, c):
     """Run all of the queued tests for coursework with id @c"""
     cw = m.Coursework.objects.get(id=c)
@@ -344,7 +344,7 @@ def run_all_test_in_cw(request, c):
 
 
 @login_required()
-@p.is_teacher
+@require_teacher
 @transaction.atomic()
 def update_content(request):
     if request.method != "POST":
@@ -364,24 +364,3 @@ def update_content(request):
         m.File(file=each, submission=new_sub).save()
 
     return redirect(request, "Content Updated", reverse('edit_cw', args=[new_sub.coursework.id]))
-
-
-def redirect(request, message, location):
-    """Render a view that does pretty auto-redirection
-    for  a given @request, showing @message and leading
-    to the specified @location"""
-    return render(request,
-                  'common/redirect.html',
-                  {"message": message,
-                   "redirect": location})
-
-
-@login_required
-def view_test(request, c, t):
-    """Render the view showing test details (feedback view)
-    from the student app, but add teacher specific links
-    given id for coursework @c and test @t"""
-    return student_views.feedback(request, t, [
-        ("Homepage", reverse("teacher_index")),
-        ("Coursework", reverse("view_cw", args=[c]))
-    ])

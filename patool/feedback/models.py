@@ -1,13 +1,15 @@
 from django.contrib.auth.models import User
 from django.db import models as m
 
-import student.models as sm
+import common.models as sm
 
 
+# noinspection PyClassHasNoInit
 class FeedbackGroup(m.Model):
     nickname = m.CharField(max_length=64)
 
 
+# noinspection PyClassHasNoInit
 class FeedbackMembership(m.Model):
     class Meta:
         unique_together = (('group', 'user'),)
@@ -17,6 +19,7 @@ class FeedbackMembership(m.Model):
     nickname = m.CharField(max_length=32)
 
 
+# noinspection PyClassHasNoInit
 class FeedbackPlan(m.Model):
     class Meta:
         unique_together = (('group', 'coursework'),)
@@ -25,6 +28,7 @@ class FeedbackPlan(m.Model):
     coursework = m.ForeignKey(sm.Coursework, on_delete=m.CASCADE)
 
 
+# noinspection PyClassHasNoInit
 class FeedbackForTestMatch(m.Model):
     class Meta:
         unique_together = (('group', 'test_match'),)

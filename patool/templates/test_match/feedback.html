@@ -3,8 +3,8 @@
 {% load static %}
 {% block title %}Feedback{% endblock %}
 {% block content %}
-    <link rel="stylesheet" type="text/css" href="{% static "student/css/feedback.css" %}" />
-    <script type="text/javascript" src="{% static 'student/js/feedback.js' %}" ></script>
+    <link rel="stylesheet" type="text/css" href="{% static "test_match/css/feedback.css" %}" />
+    <script type="text/javascript" src="{% static 'test_match/js/feedback.js' %}" ></script>
     <div id="feedback_container">
         <div id="file_view_container">
             <div id="file_tabs">
@@ -50,7 +50,7 @@
                     {{ form.object_pk }}
                     {{ form.timestamp }}
                     {{ form.security_hash }}
-                    <input type="hidden" name="next" value="{% url 'feedback' test_match.id %}" />
+                    <input type="hidden" name="next" value="{% url 'tm' test_match.id %}" />
                     <input type="submit" value="Add comment" id="id_submit" />
                 </form>
             {% endif %}

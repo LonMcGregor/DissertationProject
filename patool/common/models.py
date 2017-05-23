@@ -20,7 +20,8 @@ slug_characters = ['-', '_'] + list(string.ascii_letters) + list(string.digits)
 
 def new_random_slug(model, primary_key='id', length=8):
     """For a given @model, find a new random slug of @length
-    which is unique against the primary key of the model"""
+    which is unique against the primary key of the model. can
+    specify a @primary_key if it is different to 'id'"""
     exists = True
     new_slug = ""
     while exists:
@@ -31,11 +32,13 @@ def new_random_slug(model, primary_key='id', length=8):
     return new_slug
 
 
+# noinspection PyClassHasNoInit
 class Course(m.Model):
     name = m.CharField(max_length=128)
     code = m.SlugField(max_length=32, primary_key=True)
 
 
+# noinspection PyClassHasNoInit
 class EnrolledUser(m.Model):
     class Meta:
         unique_together = (('login', 'course'),)
@@ -57,6 +60,7 @@ class CourseworkState:
     )
 
 
+# noinspection PyClassHasNoInit
 class Coursework(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
     name = m.CharField(max_length=128)
@@ -68,6 +72,7 @@ class Coursework(m.Model):
     test_pipe = m.CharField(max_length=128)
 
     def is_visible(self):
+        """Show if the coursework state allows it to be visible"""
         return self.state != CourseworkState.INVISIBLE
 
 
@@ -90,6 +95,7 @@ class SubmissionType:
     )
 
 
+# noinspection PyClassHasNoInit
 class Submission(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE)
@@ -100,6 +106,7 @@ class Submission(m.Model):
     teacher_name = m.CharField(max_length=64, null=True)
 
 
+# noinspection PyClassHasNoInit
 class File(m.Model):
     file = m.FileField(upload_to=upload_directory_path)
     submission = m.ForeignKey(Submission, m.CASCADE, null=True)
@@ -116,6 +123,7 @@ class TestType:
     )
 
 
+# noinspection PyClassHasNoInit
 class TestMatch(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
     test = m.ForeignKey(Submission, m.CASCADE, related_name="tm_test_sub")

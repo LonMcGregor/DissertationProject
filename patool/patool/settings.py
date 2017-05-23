@@ -37,9 +37,12 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'common',
     'student',
     'teacher',
     'feedback',
+    'test_match',
+    'file_viewer',
     'django.contrib.sites',
     'django_comments'
 ]

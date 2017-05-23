@@ -78,7 +78,7 @@
     </thead>
     {% for f in results %}
         <tr>
-            <td><a href="{% url 'view_test' coursework.id f.id %}">{{ f.id }}</a></td>
+            <td><a href="{% url 'tm' f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
             {{ f.test.teacher_name }}
         {% endif %}</td>

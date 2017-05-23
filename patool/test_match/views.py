@@ -1,0 +1,50 @@
+import django_comments.models as cm
+from django.contrib.auth.decorators import login_required
+from django.http import HttpResponseForbidden, Http404
+from django.shortcuts import render
+from django.urls import reverse
+
+import common.helpers as ch
+import common.permissions as cp
+import test_match.permissions as p
+import feedback.helpers as fh
+from common.views import redirect
+
+
+@login_required()
+def test_match_view(request, test_match_id):
+    """Render the page that allows a user to give feedback to a certain
+    @test_match_id, and see all files associated with it"""
+    test_match = ch.get_test_match(test_match_id)
+    if test_match is None:
+        return Http404("No test match with that ID exists")
+    perm = p.user_feedback_mode(request.user, test_match)
+    if perm == p.TestMatchMode.DENY:
+        return HttpResponseForbidden("You are not allowed to see this test data")
+    redir_path = "view_cw" if cp.is_teacher(request.user) else "cw"
+    if perm == p.TestMatchMode.WAIT:
+        return redirect(request, "Please wait until the test has finished running",
+                        reverse(redir_path, args=[test_match.coursework.id]))
+    crumbs = [
+        ("Homepage", reverse("teacher_index")),
+        ("Coursework", reverse(redir_path, args=[test_match.coursework.id]))
+    ]
+    group = fh.feedback_group_for_test_match(test_match)
+    comment_list = [(c.submit_date, c.comment,
+                    fh.nick_for_user_in_group(c.user, group, request.user))
+                    for c in cm.Comment.objects.filter(object_pk=test_match_id)]
+    names = fh.get_name_for_test_match(request.user, test_match)
+    details = {
+        "test_match": test_match,
+        "solution_name": names[0],
+        "test_name": names[1],
+        "can_submit": perm == p.TestMatchMode.WRITE,
+        "test_files": ch.get_files(test_match.test),
+        "result_files": ch.get_files(test_match.result),
+        "solution_files": ch.get_files(test_match.solution),
+        "user_owns_test": test_match.test.creator == request.user,
+        "user_owns_sol": test_match.solution.creator == request.user,
+        "crumbs": crumbs,
+        "comment_list": comment_list
+    }
+    return render(request, 'test_match/feedback.html', details)

@@ -4,7 +4,7 @@ from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden
 from django.shortcuts import render
 
-from student import models as m
+from common import models as m
 
 
 def default_index(request):

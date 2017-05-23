@@ -4,14 +4,14 @@ from django.http import Http404, HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
 
-from runner import matcher
+import common.forms as f
+import common.models as m
+import common.permissions as p
+import feedback.helpers as fh
 import runner.runner as r
-import student.forms as f
 import student.helper as h
-import student.models as m
-import student.permission as p
-import runner.pipelines as pipe
-import django_comments.models as cm
+from common.views import redirect
+from test_match import matcher
 
 
 @login_required()
@@ -32,7 +32,7 @@ def upload_submission(request, cw=None):
     if not p.can_view_coursework(request.user, cw_instance):
         return HttpResponseForbidden("You are not allowed to see this coursework")
     file_type = request.POST['file_type']
-    if not p.user_can_upload_of_type(request.user, cw_instance, file_type):
+    if not h.user_can_upload_of_type(request.user, cw_instance, file_type):
         return HttpResponseForbidden("You can't upload submissions of this type")
     if file_type == m.SubmissionType.SOLUTION:
         h.delete_old_solution(request.user, cw_instance)
@@ -40,7 +40,7 @@ def upload_submission(request, cw=None):
         p_name = "Solution"
         t_name = str(request.user) + " Sol"
         sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        pipe.python_solution(sub)
+        r.python_solution(sub)
         msg = "Your solution has been tested using the signature test. You should check the " \
               "results of this test to make sure that our solution is written correctly "
     else:
@@ -80,10 +80,9 @@ def upload_test(request, cw=None):
     cw_instance = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(request.user, cw_instance):
         return HttpResponseForbidden("You are not allowed to see this coursework")
-    state = p.state_of_user_in_coursework(request.user, cw_instance)
     detail = {
         "msg": "Upload Test Case for coursework",
-        "allow_upload": state in [p.UserCourseworkState.UPLOADS, p.UserCourseworkState.FEEDBACK],
+        "allow_upload": cw_instance.state in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK],
         "file_type": "c",
         "cw": cw,
         "crumbs": [("Homepage", reverse("student_index")),
@@ -102,10 +101,9 @@ def upload_solution(request, cw=None):
     cw_instance = m.Coursework.objects.get(id=cw)
     if not p.can_view_coursework(request.user, cw_instance):
         return HttpResponseForbidden("You are not allowed to see this coursework")
-    state = p.state_of_user_in_coursework(request.user, cw_instance)
     detail = {
         "msg": "(Re-)Upload Solution for coursework",
-        "allow_upload": state == p.UserCourseworkState.UPLOADS,
+        "allow_upload": cw_instance.state == m.CourseworkState.UPLOAD,
         "file_type": "s",
         "cw": cw,
         "crumbs": [("Homepage", reverse("student_index")),
@@ -120,7 +118,7 @@ def detail_coursework(request, cw=None):
     otherwise return a listing of all currently available tasks. """
     if cw is None or cw == "":
         return render(request, 'student/choose_coursework.html',
-                      {'courseworks': p.coursework_available_for_user(request.user)})
+                      {'courseworks': h.coursework_available_for_user(request.user)})
     return single_coursework(request, cw)
 
 
@@ -173,7 +171,7 @@ def detail_peer_feedback_group(user, coursework):
     """For each feedback @group that @user is a member of,
     in a given @coursework, collect the relevant files, 
     generate the form and list the test match results"""
-    tm_groups = h.get_feedback_groups_for_user_in_coursework(user, coursework)
+    tm_groups = fh.get_feedback_groups_for_user_in_coursework(user, coursework)
     testing_data = []
     section_title = "Peer-Testing Group %s"
     section_description = """
@@ -184,9 +182,9 @@ def detail_peer_feedback_group(user, coursework):
 </ul>
     """
     for group in tm_groups:
-        tms = h.get_all_test_matches_in_feedback_group(user, group)
+        tms = fh.get_all_test_matches_in_feedback_group(user, group)
         match_form = generate_peer_match_form(coursework, user, group)
-        members = h.count_members_of_group(group)
+        members = fh.count_members_of_group(group)
         testing_data.append((match_form, tms, section_title % group.id,
                              section_description % members))
     return testing_data
@@ -213,7 +211,7 @@ def generate_peer_match_form(cw, user, group, post=None):
     test match form for peer testing purposes.
     If the form is to be used in validating a @post request,
     this may also be passed in"""
-    all_users = h.get_all_users_in_feedback_group(group)
+    all_users = fh.get_all_users_in_feedback_group(group)
     user_objects = [item[0] for item in all_users]
     all_tests = m.Submission.objects.filter(coursework=cw,
                                             creator__in=user_objects,
@@ -225,8 +223,8 @@ def generate_peer_match_form(cw, user, group, post=None):
     sols = []
     for member in all_users:
         tests.extend([(t.id, t.student_name if t.creator == user else
-                     member[1] + t.peer_name) for t in
-                     all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
+                      member[1] + t.peer_name) for t in
+                      all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
         sols.extend([(t.id, t.student_name if t.creator == user else
                      member[1] + t.peer_name) for t in
                      all_sols.filter(creator=member[0], type=m.SubmissionType.SOLUTION)])
@@ -269,46 +267,10 @@ def create_new_test_match(request, cw):
         args.append(tm_form.cleaned_data['feedback_group'])
     try:
         new_tm = method(*args)
-        r.run_test_on_thread(new_tm, r.execute_python3_unit)
-        return redirect(request, "Test Created", reverse("feedback", args=[new_tm.id]))
+        r.run_test_on_thread(new_tm, r.execute_python3_unit, r.python_results)
+        return redirect(request, "Test Created", reverse("tm", args=[new_tm.id]))
     except Exception as e:
         return HttpResponseForbidden(str(e))
-
-
-@login_required()
-def feedback(request, test_match, teacher_view=None):
-    """Render the page that allows a user to give feedback to a certain
-    @test_match instance. accept a @teacher_view of what crumbs to give
-    teacher to allow reuse of method across both student and teacher"""
-    test_match_instance = m.TestMatch.objects.get(id=test_match)
-    perm = p.user_feedback_mode(request.user, test_match_instance)
-    if perm == p.UserFeedbackModes.DENY:
-        return HttpResponseForbidden("You are not allowed to see this test data")
-    if perm == p.UserFeedbackModes.WAIT:
-        return redirect(request, "Please wait until the test has finished running",
-                        reverse("cw", args=[test_match_instance.coursework.id]))
-    crumbs = [("Homepage", reverse("student_index")),
-              ("Coursework", reverse("cw", args=[test_match_instance.coursework.id]))]
-    is_teacher = teacher_view is not None
-    group = h.feedback_group_for_test_match(test_match_instance)
-    comment_list = [(c.submit_date, c.comment,
-                     h.nick_for_user_in_group(c.user, group, request.user))
-                    for c in cm.Comment.objects.filter(object_pk=test_match)]
-    names = h.get_name_for_test_match(request.user, test_match_instance)
-    details = {
-        "test_match": test_match_instance,
-        "solution_name": names[0],
-        "test_name": names[1],
-        "can_submit": perm == p.UserFeedbackModes.WRITE,
-        "test_files": h.get_files(test_match_instance.test),
-        "result_files": h.get_files(test_match_instance.result),
-        "solution_files": h.get_files(test_match_instance.solution),
-        "user_owns_test": test_match_instance.test.creator == request.user,
-        "user_owns_sol": test_match_instance.solution.creator == request.user,
-        "crumbs": crumbs if not is_teacher else teacher_view,
-        "comment_list": comment_list
-    }
-    return render(request, 'student/feedback.html', details)
 
 
 @login_required()
@@ -321,13 +283,3 @@ def delete_submission(request):
     if status:
         return redirect(request, "Submission Deleted", reverse("cw", args=[cw.id]))
     return redirect(request, "Failed to delete file", reverse("cw", args=[cw.id]))
-
-
-def redirect(request, message, location):
-    """Render a view that does pretty auto-redirection
-    for  a given @request, showing @message and leading
-    to the specified @location"""
-    return render(request,
-                  'common/redirect.html',
-                  {"message": message,
-                   "redirect": location})

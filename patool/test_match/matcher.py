@@ -1,6 +1,6 @@
 from django.db import transaction
 
-import student.models as m
+import common.models as m
 import feedback.models as fm
 
 
