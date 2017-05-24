@@ -37,6 +37,9 @@ class Course(m.Model):
     name = m.CharField(max_length=128)
     code = m.SlugField(max_length=32, primary_key=True)
 
+    def __str__(self):
+        return self.name
+
 
 # noinspection PyClassHasNoInit
 class EnrolledUser(m.Model):
@@ -45,6 +48,9 @@ class EnrolledUser(m.Model):
 
     login = m.ForeignKey(User, m.CASCADE)
     course = m.ForeignKey(Course, m.CASCADE)
+
+    def __str__(self):
+        return str(self.course) + ", " + str(self.login)
 
 
 class CourseworkState:
@@ -74,6 +80,9 @@ class Coursework(m.Model):
     def is_visible(self):
         """Show if the coursework state allows it to be visible"""
         return self.state != CourseworkState.INVISIBLE
+
+    def __str__(self):
+        return self.name
 
 
 class SubmissionType:
@@ -105,11 +114,17 @@ class Submission(m.Model):
     peer_name = m.CharField(max_length=64, null=True)
     teacher_name = m.CharField(max_length=64, null=True)
 
+    def __str__(self):
+        return str(self.coursework) + " - " + self.teacher_name
+
 
 # noinspection PyClassHasNoInit
 class File(m.Model):
     file = m.FileField(upload_to=upload_directory_path)
     submission = m.ForeignKey(Submission, m.CASCADE, null=True)
+
+    def __str__(self):
+        return str(self.file)
 
 
 class TestType:
@@ -132,3 +147,6 @@ class TestMatch(m.Model):
     error_level = m.IntegerField(null=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE, related_name="tm_cw")
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
+
+    def __str__(self):
+        return str(self.coursework) + " - " + self.id

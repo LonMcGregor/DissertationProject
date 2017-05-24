@@ -12,10 +12,8 @@ def require_teacher(f):
         if is_teacher(request.user):
             if not args:
                 return f(request)
-            else:
-                return f(request, **args)
-        else:
-            return HttpResponseForbidden("You must be a teacher to view this page")
+            return f(request, **args)
+        return HttpResponseForbidden("You must be a teacher to view this page")
 
     return is_teacher_internal
 

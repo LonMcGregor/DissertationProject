@@ -8,6 +8,9 @@ import common.models as sm
 class FeedbackGroup(m.Model):
     nickname = m.CharField(max_length=64)
 
+    def __str__(self):
+        return self.nickname
+
 
 # noinspection PyClassHasNoInit
 class FeedbackMembership(m.Model):
@@ -18,6 +21,9 @@ class FeedbackMembership(m.Model):
     user = m.ForeignKey(User, on_delete=m.CASCADE)
     nickname = m.CharField(max_length=32)
 
+    def __str__(self):
+        return "%s, %s - %s" % (self.group, self.user, self.nickname)
+
 
 # noinspection PyClassHasNoInit
 class FeedbackPlan(m.Model):
@@ -27,6 +33,9 @@ class FeedbackPlan(m.Model):
     group = m.ForeignKey(FeedbackGroup, on_delete=m.CASCADE)
     coursework = m.ForeignKey(sm.Coursework, on_delete=m.CASCADE)
 
+    def __str__(self):
+        return "%s, %s" % (self.group, self.coursework)
+
 
 # noinspection PyClassHasNoInit
 class FeedbackForTestMatch(m.Model):
@@ -35,3 +44,6 @@ class FeedbackForTestMatch(m.Model):
 
     test_match = m.ForeignKey(sm.TestMatch, on_delete=m.CASCADE)
     group = m.ForeignKey(FeedbackGroup, on_delete=m.CASCADE)
+
+    def __str__(self):
+        return "%s, %s" % (self.group, self.test_match)
