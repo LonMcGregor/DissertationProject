@@ -13,7 +13,6 @@ urlpatterns = [
     url(r'^feedback/', include('feedback.urls')),
     url(r'^file/', include('file_viewer.urls')),
     url(r'^comments/', include('django_comments.urls')),
-    url(r'^prepdb', views.populate_database, name='prepdb'),
     url(r'^$', views.default_index, name='site_root'),
 ] + static(
         settings.STATIC_URL, document_root=settings.STATIC_ROOT

@@ -1,7 +1,6 @@
 
 import common.permissions as p
 import feedback.permissions as fp
-import common.helpers as h
 import common.models as m
 
 
@@ -36,6 +35,6 @@ def is_visible_results_file(user, submission):
     group, let them see it"""
     if submission.type != m.SubmissionType.TEST_RESULT:
         return False
-    test_used_in = h.test_match_for_results(submission)
+    test_used_in = m.TestMatch.test_match_for_results(submission)
     return p.user_is_self_testing(user, test_used_in) or \
         fp.user_is_member_of_test_match_feedback_group(user, test_used_in)

@@ -4,7 +4,6 @@ do not actually offer services to views, permissions etc."""
 
 import common.models as m
 import common.permissions as p
-import common.helpers as h
 
 
 def coursework_available_for_user(user):
@@ -66,14 +65,14 @@ def can_delete(submission):
 
 def get_descriptor_tuples(coursework):
     """Get the descriptors and files for @coursework"""
-    return [(s, h.get_files(s)) for s in m.Submission.objects.filter(
+    return [(s, s.get_files()) for s in m.Submission.objects.filter(
         type=m.SubmissionType.CW_DESCRIPTOR, coursework=coursework)]
 
 
 def get_solution_tuples(coursework, user):
     """Get the solution submissions and files
     for @coursework by @user"""
-    return [(s, h.get_files(s)) for s in
+    return [(s, s.get_files()) for s in
             m.Submission.objects.filter(coursework=coursework, creator=user,
                                         type=m.SubmissionType.SOLUTION)]
 
@@ -81,5 +80,5 @@ def get_solution_tuples(coursework, user):
 def get_test_triples(coursework, user):
     """Get the test submissions and files, and
     ability to delete for @coursework by @user"""
-    return [(t, h.get_files(t), can_delete(t)) for t in m.Submission.objects.filter(
+    return [(t, t.get_files(), can_delete(t)) for t in m.Submission.objects.filter(
         coursework=coursework, creator=user, type=m.SubmissionType.TEST_CASE)]

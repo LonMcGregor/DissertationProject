@@ -1,69 +1,42 @@
 import os
-import re
-import shutil
-import subprocess
-import sys
 import threading
 
 from django.conf import settings
-from django.core.files.base import ContentFile
 from django.db import transaction
 
+
 import common.models as m
-from test_match import matcher as matcher
+import test_match.matcher as matcher
+import runner.pyunit
+import runner.junit
+
+TMP_DIR = os.path.join(settings.BASE_DIR, settings.MEDIA_TMP_TEST)
 
 
-@transaction.atomic
-def run_test(test_match_instance, exec_method, results_method):
-    """Go through the @test_data_instance and run the
-    test case against the solution. Store the data setting
-    the results to be created by the initiator (which will
-     likely be the test creator). Then update the database.
-     Utilize the given @exec_method. clean up the results
-     of the test using the specified @results_method"""
-    if test_match_instance.error_level is not None:
-        return
-    result, output = exec_method(test_match_instance.solution, test_match_instance.test)
-    result_submission = results_method(output, test_match_instance)
-    test_match_instance.result = result_submission
-    test_match_instance.error_level = result
-    test_match_instance.save()
+def get_correct_module(filename):
+    if filename.split('.')[-1] == "py":
+        return runner.pyunit
+    if filename.split('.')[-1] in ["class", "jar", "java"]:
+        return runner.junit
+    raise Exception("unknown test type")
 
 
-def execute_python3_unit(solution, test):
-    """Given specific argument as to how to run the test,
-    move all of the files into the correct directories and
-    execute the unit test. Note that care needs to be taken
-    with regards to which operating system filepaths used.
-    @solution - point to the solution to test
-    @test - the test case to use"""
-    script = 'python' if sys.platform == "win32" else 'python3'
-    tmp_dir = os.path.join(settings.BASE_DIR, settings.MEDIA_TMP_TEST)
-    init_dir = os.path.join(tmp_dir, '__init__.py')
-    if sys.platform == "win32":
-        tmp_dir = tmp_dir.replace('/', '\\')
-        init_dir = init_dir.replace('/', '\\')
-    if not os.path.exists(tmp_dir):
-        os.makedirs(tmp_dir)
-    else:
-        shutil.rmtree(tmp_dir)
-        os.makedirs(tmp_dir)
-    for submission in solution, test:
-        for file in m.File.objects.filter(submission=submission):
-            full_path = os.path.join(settings.BASE_DIR, settings.MEDIA_ROOT, file.file.name)
-            if sys.platform == "win32":
-                full_path = full_path.replace('/', '\\')
-            shutil.copy(full_path, tmp_dir)
-    with open(init_dir, 'w+') as f:
-        f.write('')
-    args = " ".join([script, '-m', 'unittest', 'discover', '-p', '"*.py"'])
-    proc = subprocess.Popen(args, cwd=tmp_dir, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
-                            shell=True)
-    outb, errb = proc.communicate()
-    outs = "" if outb is None else outb.decode('utf-8')
-    errs = "" if errb is None else errb.decode('utf-8')
-    output = outs + errs
-    return proc.returncode, output
+def run_test_in_thread(test_match):
+    """Look at the specified @test_match, acquire the relevant files for
+    the testing to happen, and then determine which execution / testing
+    module should be used ot test it and execute appropriately"""
+    solutions = test_match.solution.get_files()
+    tests = test_match.solution.get_files()
+    solution_dir = test_match.solution.path()
+    test_dir = test_match.test.path()
+    mod = get_correct_module(solutions[0])
+
+
+def run_test_on_thread(test_instance):
+    """Start a new thread and run the @test_instance,
+    if it hasnt already been run"""
+    running = threading.Thread(target=run_test_in_thread, args=(test_instance,))
+    running.start()
 
 
 def run_queued_tests(coursework):
@@ -74,7 +47,7 @@ def run_queued_tests(coursework):
         if tests.count() == 0:
             return
         for test in tests:
-            run_test(test, execute_python3_unit, python_results)
+            run_test_on_thread(test)
 
 
 def run_all_queued_on_thread(coursework):
@@ -82,29 +55,29 @@ def run_all_queued_on_thread(coursework):
     threading.Thread(target=run_queued_tests, args=(coursework,)).start()
 
 
-def run_test_on_thread(test_instance, exec_method, results_method):
-    """Start a new thread and run the @test_instance,
-    and use the specified @exec_method and @results_method"""
-    running = threading.Thread(target=run_test, args=(test_instance, exec_method, results_method))
-    running.start()
-
-
-def python_solution(solution):
-    """When a @solution instance is uploaded, save it
-    then process it accordingly """
+def run_signature_test(solution):
+    """A new @solution submission has been created
+    and we wish to run it against the appropriate
+    signature test for that coursework"""
     tm = matcher.create_self_test(solution.id, "S", solution.coursework, solution.creator)
-    run_test_on_thread(tm, execute_python3_unit, python_results)
+    run_test_on_thread(tm)
+
+
+@transaction.atomic
+def update_test_match(error_level, results, test_match):
+    """update @test_match with the @results and
+    the @error_level of running the tests"""
+    result_submission = store_results(results, test_match)
+    test_match.result = result_submission
+    test_match.error_level = error_level
+    test_match.save()
 
 
 @transaction.atomic()
-def python_results(content, tm):
+def store_results(content, tm):
     """Take in the @content from running a
-    @tm test match instance, process this, and save it,
-    passing back a model reference"""
-
-    content2 = re.sub(r"(File [\"\']).+/(python[0-9.]+)/(.+[\"\'])", r"\1/\2/\3", content)
-    content3 = re.sub(r"(File [\"\']).+/var/tmp/(.+[\"\'])", r"\1/\2", content2)
-
+    @tm test match instance, and save it,
+    passing back a reference to submission"""
     result_sub = m.Submission(id=m.new_random_slug(m.Submission),
                               coursework=tm.coursework,
                               creator=tm.test.creator,
@@ -113,7 +86,5 @@ def python_results(content, tm):
                               peer_name="Test Results",
                               teacher_name="Results")
     result_sub.save()
-    result_file = m.File(submission=result_sub)
-    result_file.file.save('results.txt', ContentFile(content3))
-    result_file.save()
+    result_sub.save_content_file(content, "results.txt")
     return result_sub

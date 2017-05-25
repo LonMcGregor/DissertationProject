@@ -4,7 +4,7 @@ from django.http import HttpResponseForbidden, Http404
 from django.shortcuts import render
 from django.urls import reverse
 
-import common.helpers as ch
+import common.models as m
 import common.permissions as cp
 import test_match.permissions as p
 import feedback.helpers as fh
@@ -15,7 +15,7 @@ from common.views import redirect
 def test_match_view(request, test_match_id):
     """Render the page that allows a user to give feedback to a certain
     @test_match_id, and see all files associated with it"""
-    test_match = ch.get_test_match(test_match_id)
+    test_match = m.TestMatch.objects.filter(id=test_match_id).first()
     if test_match is None:
         return Http404("No test match with that ID exists")
     perm = p.user_feedback_mode(request.user, test_match)
@@ -39,9 +39,9 @@ def test_match_view(request, test_match_id):
         "solution_name": names[0],
         "test_name": names[1],
         "can_submit": perm == p.TestMatchMode.WRITE,
-        "test_files": ch.get_files(test_match.test),
-        "result_files": ch.get_files(test_match.result),
-        "solution_files": ch.get_files(test_match.solution),
+        "test_files": test_match.test.get_files(),
+        "result_files": test_match.result.get_files(),
+        "solution_files": test_match.solution.get_files(),
         "user_owns_test": test_match.test.creator == request.user,
         "user_owns_sol": test_match.solution.creator == request.user,
         "crumbs": crumbs,

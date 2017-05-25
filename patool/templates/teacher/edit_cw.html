@@ -26,9 +26,8 @@
     <p></p>
     {% for sub, files in submissions %}
     <form method="POST" action="{% url 'update_content' %}" enctype="multipart/form-data">
-	{% csrf_token %}
+        {% csrf_token %}
         <h3>{{ sub.teacher_name }}</h3>
-        <a>Delete</a>
         <input id="id_new_content" multiple="multiple" name="new_content" type="file" required="" />
         <input type="hidden" required="" value="{{ sub.id }}" name="old_id" />
         <input type="submit" value="Submit new files to replace current" />

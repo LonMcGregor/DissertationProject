@@ -5,7 +5,6 @@ from django.shortcuts import render
 from django.urls import reverse
 
 import common.forms as cf
-import common.helpers as h
 import common.models as m
 import common.permissions as p
 import feedback.forms as ff
@@ -185,7 +184,7 @@ def create_coursework_update(user, request, course_code):
                               teacher_name="Descriptor")
     descriptor.save()
     for each in request.FILES.getlist('descriptor'):
-        m.File(file=each, submission=descriptor).save()
+        descriptor.save_uploaded_file(each)
 
     oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                                creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE,
@@ -194,7 +193,7 @@ def create_coursework_update(user, request, course_code):
                                teacher_name="Oracle")
     oracle_exec.save()
     for each in request.FILES.getlist('oracle_exec'):
-        m.File(file=each, submission=oracle_exec).save()
+        oracle_exec.save_uploaded_file(each)
 
     sig = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                        creator=user, type=m.SubmissionType.SIGNATURE_TEST,
@@ -203,7 +202,7 @@ def create_coursework_update(user, request, course_code):
                        teacher_name="Signature")
     sig.save()
     for each in request.FILES.getlist('signature'):
-        m.File(file=each, submission=sig).save()
+        sig.save_uploaded_file(each)
 
     return redirect(request, "Coursework created", reverse('edit_cw', args=[coursework.id]))
 
@@ -239,7 +238,7 @@ def edit_coursework_render(request, coursework):
     of course the metadata about the coursework itself"""
     desc_types = [m.SubmissionType.CW_DESCRIPTOR, m.SubmissionType.ORACLE_EXECUTABLE,
                   m.SubmissionType.SIGNATURE_TEST]
-    submissions = [(s, h.get_files(s)) for s in m.Submission.objects.filter(
+    submissions = [(s, s.get_files()) for s in m.Submission.objects.filter(
         coursework=coursework, type__in=desc_types)]
     initial = {"name": coursework.name,
                "state": coursework.state}
@@ -262,7 +261,7 @@ def view_coursework(request, c):
     coursework = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You are not enrolled on this course")
-    submissions = [(s, h.get_files(s)) for s in
+    submissions = [(s, s.get_files()) for s in
                    m.Submission.objects.filter(coursework=coursework)
                    .exclude(type=m.SubmissionType.FEEDBACK)
                    .exclude(type=m.SubmissionType.TEST_RESULT)]
@@ -325,7 +324,7 @@ def manual_test_match_update(request, coursework):
             tm_form.cleaned_data['test'],
             coursework
         )
-        r.run_test_on_thread(new_tm, r.execute_python3_unit, r.python_results)
+        r.run_test_on_thread(new_tm)
     except Exception as e:
         return HttpResponseBadRequest(str(e))
     return redirect(request, "Test created",
@@ -359,8 +358,8 @@ def update_content(request):
                            peer_name=old_sub.peer_name,
                            teacher_name=old_sub.teacher_name)
     new_sub.save()
-    old_sub.delete()
     for each in request.FILES.getlist('new_content'):
-        m.File(file=each, submission=new_sub).save()
+        new_sub.save_uploaded_file(each)
+    old_sub.delete()
 
     return redirect(request, "Content Updated", reverse('edit_cw', args=[new_sub.coursework.id]))

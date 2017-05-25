@@ -1,18 +1,11 @@
+import os
 import random
+import shutil
 import string
 
 from django.contrib.auth.models import User
 from django.db import models as m
-
-
-def upload_directory_path(instance, filename):
-    """For a given @instance of File, and a client-side @filename,
-    generate a path where the file should be stored on the system
-    This will be appended to the settings BASE_DIR and MEDIA_ROOT"""
-    return '%s/%s/%s/originals/%s' % (instance.submission.coursework.id,
-                                      instance.submission.creator.id,
-                                      instance.submission.id,
-                                      filename)
+from django.conf import settings
 
 
 slug_characters = ['-', '_'] + list(string.ascii_letters) + list(string.digits)
@@ -117,14 +110,49 @@ class Submission(m.Model):
     def __str__(self):
         return str(self.coursework) + " - " + self.teacher_name
 
+    def path(self):
+        """Give path where submission is stored"""
+        return os.path.join(settings.BASE_DIR,
+                            settings.MEDIA_ROOT,
+                            self.coursework.id,
+                            str(self.creator.id),
+                            self.id)
 
-# noinspection PyClassHasNoInit
-class File(m.Model):
-    file = m.FileField(upload_to=upload_directory_path)
-    submission = m.ForeignKey(Submission, m.CASCADE, null=True)
+    def originals_path(self):
+        """Give the path where the original files
+        (unprocessed) that were uploaded are stored"""
+        return os.path.join(self.path(),
+                            "originals")
 
-    def __str__(self):
-        return str(self.file)
+    def get_files(self):
+        """Get the names of original files for
+        this submission, without full path"""
+        return [file for file in os.listdir(self.originals_path())]
+
+    def save_content_file(self, content, name):
+        """Given the @content string for a new file
+        with @name, store it in the current submission"""
+        path = os.path.join(self.originals_path(),
+                            name)
+        os.makedirs(self.originals_path(), exist_ok=True)
+        with open(path, "x") as file:
+            file.write(content)
+
+    def save_uploaded_file(self, file):
+        """Given a @file a user has uploaded, store
+        it in the current submission with @name"""
+        path = os.path.join(self.originals_path(),
+                            file.name)
+        os.makedirs(self.originals_path(), exist_ok=True)
+        with open(path, "xb") as destination:
+            for chunk in file.chunks():
+                destination.write(chunk)
+
+    def delete(self, *args, **kargs):
+        """Delete all of the files associated with this
+        submission, by rm-ing the directory"""
+        shutil.rmtree(self.originals_path())
+        super(Submission, self).delete(*args, **kargs)
 
 
 class TestType:
@@ -150,3 +178,14 @@ class TestMatch(m.Model):
 
     def __str__(self):
         return str(self.coursework) + " - " + self.id
+
+    def has_been_run(self):
+        """return bool as to whether or not this test
+        match has been run (successfully or not)"""
+        return self.error_level is not None
+
+    @staticmethod
+    def test_match_for_results(results_submission):
+        """Given that a @results_submission only is ever 
+        attached to a single test match, retrieve it"""
+        return TestMatch.objects.get(result=results_submission)

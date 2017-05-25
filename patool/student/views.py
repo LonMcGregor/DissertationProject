@@ -40,7 +40,8 @@ def upload_submission(request, cw=None):
         p_name = "Solution"
         t_name = str(request.user) + " Sol"
         sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        r.python_solution(sub)
+        # r.python_solution(sub)
+        # TODO fill in generic solution_uploaded bit
         msg = "Your solution has been tested using the signature test. You should check the " \
               "results of this test to make sure that our solution is written correctly "
     else:
@@ -66,7 +67,7 @@ def save_submission(cw_instance, request, file_type, s_name, p_name, t_name):
                               teacher_name=t_name)
     submission.save()
     for each in request.FILES.getlist('chosen_files'):
-        m.File(file=each, submission=submission).save()
+        submission.save_uploaded_file(each)
     return submission
 
 
@@ -267,7 +268,7 @@ def create_new_test_match(request, cw):
         args.append(tm_form.cleaned_data['feedback_group'])
     try:
         new_tm = method(*args)
-        r.run_test_on_thread(new_tm, r.execute_python3_unit, r.python_results)
+        r.run_test_on_thread(new_tm)
         return redirect(request, "Test Created", reverse("tm", args=[new_tm.id]))
     except Exception as e:
         return HttpResponseForbidden(str(e))
