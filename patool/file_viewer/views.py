@@ -7,7 +7,7 @@ from django.http.response import FileResponse
 from django.shortcuts import render
 from pygments import highlight as pyghi
 from pygments.formatters import html as pygform
-from pygments.lexers import python as pyglex
+import pygments.lexers
 
 import file_viewer.permissions as p
 import common.models as m
@@ -37,8 +37,9 @@ def render_file(request, file, filename):
         return show_file(file, filename)
     with open(file, "r") as open_file:
         content = open_file.read()
+    lexer = pygments.lexers.get_lexer_for_mimetype(mime[0])
     detail = {
-        "content": pyghi(content, pyglex.PythonLexer(), pygform.HtmlFormatter(linenos='table'))
+        "content": pyghi(content, lexer, pygform.HtmlFormatter(linenos='table'))
     }
     return render(request, 'file_viewer/pretty_file.html', detail)
 
