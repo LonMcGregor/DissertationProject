@@ -40,8 +40,7 @@ def upload_submission(request, cw=None):
         p_name = "Solution"
         t_name = str(request.user) + " Sol"
         sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        # r.python_solution(sub)
-        # TODO fill in generic solution_uploaded bit
+        r.run_signature_test(sub)
         msg = "Your solution has been tested using the signature test. You should check the " \
               "results of this test to make sure that our solution is written correctly "
     else:

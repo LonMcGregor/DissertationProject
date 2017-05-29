@@ -338,7 +338,7 @@ def run_all_test_in_cw(request, c):
     cw = m.Coursework.objects.get(id=c)
     if not p.is_enrolled_on_course(request.user, cw.course):
         return HttpResponseForbidden("you're not enrolled on this course")
-    r.run_all_queued_on_thread(cw)
+    r.run_queued_tests_on_thread(cw)
     return redirect(request, "Starting to run queued tests", reverse('view_cw', args=[cw.id]))
 
 

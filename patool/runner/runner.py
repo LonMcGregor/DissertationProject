@@ -1,16 +1,9 @@
-import os
 import threading
-
-from django.conf import settings
 from django.db import transaction
-
-
 import common.models as m
 import test_match.matcher as matcher
 import runner.pyunit
 import runner.junit
-
-TMP_DIR = os.path.join(settings.BASE_DIR, settings.MEDIA_TMP_TEST)
 
 
 def get_correct_module(filename):
@@ -26,10 +19,11 @@ def run_test_in_thread(test_match):
     the testing to happen, and then determine which execution / testing
     module should be used ot test it and execute appropriately"""
     solutions = test_match.solution.get_files()
-    tests = test_match.solution.get_files()
-    solution_dir = test_match.solution.path()
-    test_dir = test_match.test.path()
+    sols_dir = test_match.solution.originals_path()
+    test_dir = test_match.test.originals_path()
     mod = get_correct_module(solutions[0])
+    error_level, result = mod.execute_test(sols_dir, test_dir)
+    update_test_match(error_level, result, test_match)
 
 
 def run_test_on_thread(test_instance):
@@ -39,7 +33,7 @@ def run_test_on_thread(test_instance):
     running.start()
 
 
-def run_queued_tests(coursework):
+def run_queued_tests_in_thread(coursework):
     """go through all of the test data instances that are
     tagged as waiting to run for @coursework, and run them"""
     while True:
@@ -47,18 +41,20 @@ def run_queued_tests(coursework):
         if tests.count() == 0:
             return
         for test in tests:
-            run_test_on_thread(test)
+            run_test_in_thread(test)
 
 
-def run_all_queued_on_thread(coursework):
-    """Start a new thread to run queued tests on within @coursework"""
-    threading.Thread(target=run_queued_tests, args=(coursework,)).start()
+def run_queued_tests_on_thread(coursework):
+    """Run all queued test sin @coursework, but on a new thread"""
+    running = threading.Thread(target=run_queued_tests_in_thread, args=(coursework,))
+    running.start()
 
 
 def run_signature_test(solution):
     """A new @solution submission has been created
     and we wish to run it against the appropriate
     signature test for that coursework"""
+    # TODO may want separate method for testing compilation results?
     tm = matcher.create_self_test(solution.id, "S", solution.coursework, solution.creator)
     run_test_on_thread(tm)
 
