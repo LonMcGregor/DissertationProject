@@ -32,13 +32,13 @@ def copy_all(paths, tmp_dir):
             shutil.copy(full_src_path, full_dst_path)
 
 
-def execute_test(path_solutions, path_tests):
+def execute_test(path_solutions, path_tests, libs):
     """Given specific argument as to how to run the test,
     move all of the files into the correct directories and
     execute the test. 
-    @tmp_dir - a tmp dir to run test in
     @path_solutions - path to where solution files located
-    @path_tests - path to where testing files located"""
+    @path_tests - path to where testing files located
+    @libs - unused for python"""
     tmp_dir = prepare_temp_directory()
     copy_all(path_solutions, tmp_dir)
     copy_all(path_tests, tmp_dir)

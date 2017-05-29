@@ -4,13 +4,15 @@ import common.models as m
 import test_match.matcher as matcher
 import runner.pyunit
 import runner.junit
+import os
+from django.conf import settings
 
 
 def get_correct_module(filename):
     if filename.split('.')[-1] == "py":
-        return runner.pyunit
+        return runner.pyunit, ""
     if filename.split('.')[-1] in ["class", "jar", "java"]:
-        return runner.junit
+        return runner.junit, os.path.join(settings.BASE_DIR, "libs", "junit")
     raise Exception("unknown test type")
 
 
@@ -21,8 +23,8 @@ def run_test_in_thread(test_match):
     solutions = test_match.solution.get_files()
     sols_dir = test_match.solution.originals_path()
     test_dir = test_match.test.originals_path()
-    mod = get_correct_module(solutions[0])
-    error_level, result = mod.execute_test(sols_dir, test_dir)
+    mod, libs = get_correct_module(solutions[0])
+    error_level, result = mod.execute_test(sols_dir, test_dir, libs)
     update_test_match(error_level, result, test_match)
 
 

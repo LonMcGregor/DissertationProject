@@ -1,8 +1,65 @@
-def execute_test(tmp_dir, path_solutions, solutions, path_tests, tests):
-    pass
-    # todo determine test classname
-    # todo java -cp .:junit.jar:hamcrest-core.jar org.junit.runner.JUnitCore test_classname
-    return -1, "no test run"
+import os
+import re
+import shutil
+import subprocess
+import tempfile
+
+
+def execute_test(path_solutions, path_tests, libs):
+    """Given specific argument as to how to run the test,
+    move all of the files into the correct directories and
+    execute the test. 
+    @path_solutions - path to where solution files located
+    @path_tests - path to where testing files located
+    @libs - location of libraries relevant to execution"""
+    tmp_dir = tempfile.mkdtemp()
+    copy_all(path_solutions, tmp_dir)
+    copy_all(path_tests, tmp_dir)
+    copy_all(libs, tmp_dir)
+    comp_args = "javac -cp .:junit.jar *.java"
+    compilation = subprocess.Popen(comp_args, cwd=tmp_dir,
+                                   stdout=subprocess.PIPE,
+                                   stderr=subprocess.PIPE,
+                                   shell=True)
+    outb, errb = compilation.communicate()
+    if compilation.returncode != 0:
+        outs = "" if outb is None else outb.decode('utf-8')
+        errs = "" if errb is None else errb.decode('utf-8')
+        output = "Failed to compile: \n" + outs + errs
+        shutil.rmtree(tmp_dir)
+        return compilation.returncode, output
+    test_args = "java -cp .:junit.jar:hamcrest.jar org.junit.runner.JUnitCore" + \
+                determine_test_name(tmp_dir)
+    test = subprocess.Popen(test_args, cwd=tmp_dir,
+                            stdout=subprocess.PIPE,
+                            stderr=subprocess.PIPE,
+                            shell=True)
+    outb, errb = test.communicate()
+    outs = "" if outb is None else outb.decode('utf-8')
+    errs = "" if errb is None else errb.decode('utf-8')
+    output = outs + errs
+    shutil.rmtree(tmp_dir)
+    return test.returncode, output
+
+
+def determine_test_name(tmp_dir):
+    """determine test name by investigating filename
+    within specified @tnp_dir"""
+    files = os.listdir(tmp_dir)
+    for f in files:
+        if "Test" in "f":
+            return f
+    return "????"
+
+
+def copy_all(paths, tmp_dir):
+    """for list of at @path,
+    copy them to @tmp_dir"""
+    for file in os.listdir(paths):
+        full_src_path = os.path.join(paths, file)
+        if os.path.isfile(full_src_path):
+            full_dst_path = os.path.join(tmp_dir, file)
+            shutil.copy(full_src_path, full_dst_path)
 
 
 def solution_uploaded(solution):
