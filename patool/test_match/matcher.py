@@ -13,8 +13,12 @@ def create_peer_test(solution, test, cw, feedback_group):
     group = fm.FeedbackGroup.objects.get(id=feedback_group)
     if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
         raise Exception("Need 1 solution and 1 test")
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
-                         solution=solution, coursework=cw,
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
+                         test=test_case,
+                         test_version=test_case.version,
+                         solution=solution,
+                         solution_version=solution.version,
+                         coursework=cw,
                          type=m.TestType.PEER)
     new_tm.save()
     fm.FeedbackForTestMatch(test_match=new_tm, group=group).save()
@@ -27,8 +31,12 @@ def create_teacher_test(solution, test, cw):
     @test, and @cw instanceand create the teachers test"""
     solution = m.Submission.objects.get(id=solution)
     test_case = m.Submission.objects.get(id=test)
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case,
-                         solution=solution, coursework=cw,
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
+                         test=test_case,
+                         test_version=test_case.version,
+                         solution=solution,
+                         solution_version=solution.version,
+                         coursework=cw,
                          type=m.TestType.TEACHER)
     new_tm.save()
     return new_tm
@@ -52,7 +60,12 @@ def create_self_test(solution_id, test_id, coursework, user):
     else:
         test_case = m.Submission.objects.get(coursework=coursework,
                                              type=m.SubmissionType.SIGNATURE_TEST)
-    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch), test=test_case, solution=solution,
-                         coursework=coursework, type=m.TestType.SELF)
+    new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
+                         test=test_case,
+                         test_version=test_case.version,
+                         solution=solution,
+                         solution_version=solution.version,
+                         coursework=coursework,
+                         type=m.TestType.SELF)
     new_tm.save()
     return new_tm

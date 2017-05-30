@@ -54,13 +54,9 @@ def delete_submission(user, submission):
 def can_delete(submission):
     """Assuming that the owner of the @submission is verified,
     check that it can actually be deleted safely"""
-    cw = submission.coursework
-    if cw.state == m.CourseworkState.UPLOAD and submission.type == m.SubmissionType.TEST_CASE:
-        return True
-    if cw.state == m.CourseworkState.FEEDBACK and submission.type == m.SubmissionType.TEST_CASE \
-            and m.TestMatch.objects.filter(test=submission).count == 0:
-            return True
-    return False
+    return (submission.coursework.state in [m.CourseworkState.FEEDBACK, m.CourseworkState.UPLOAD]
+            and submission.type == m.SubmissionType.TEST_CASE
+            and m.TestMatch.objects.filter(test=submission).count() == 0)
 
 
 def get_descriptor_tuples(coursework):

@@ -1,6 +1,6 @@
 
 import common.models as m
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, Http404
 
 
 def require_teacher(f):
@@ -16,6 +16,21 @@ def require_teacher(f):
         return HttpResponseForbidden("You must be a teacher to view this page")
 
     return is_teacher_internal
+
+
+def coursework_access(f):
+    """Mixin to ensure a coursework defined by id @cw exists,
+    and that the user in @request has the rights to see it"""
+
+    def coursework_access_internal(request, cw, **args):
+        cw_instance = m.Coursework.objects.filter(id=cw).first()
+        if cw_instance is None:
+            return Http404("No coursework has been specified, or coursework does not exist")
+        if not can_view_coursework(request.user, cw_instance):
+            return HttpResponseForbidden("You are not allowed to see this coursework")
+        return f(request, cw_instance, **args)
+
+    return coursework_access_internal
 
 
 def is_teacher(user):

@@ -82,7 +82,6 @@ class SubmissionType:
     SOLUTION = 's'
     TEST_CASE = 'c'
     TEST_RESULT = 'r'
-    FEEDBACK = 'f'
     CW_DESCRIPTOR = 'd'
     ORACLE_EXECUTABLE = 'e'
     SIGNATURE_TEST = 'i'
@@ -90,7 +89,6 @@ class SubmissionType:
         (SOLUTION, 'Solution to Coursework'),
         (TEST_CASE, 'Test Case for Solution'),
         (TEST_RESULT, 'Results of Running Test Case'),
-        (FEEDBACK, 'Feedback for a Solution'),
         (CW_DESCRIPTOR, 'Coursework Task Descriptor, sample files'),
         (ORACLE_EXECUTABLE, 'Executable that tests run against that gives expected output'),
         (SIGNATURE_TEST, 'Test solution matches signature, interface, compiles, etc.'),
@@ -106,28 +104,54 @@ class Submission(m.Model):
     student_name = m.CharField(max_length=64, null=True)
     peer_name = m.CharField(max_length=64, null=True)
     teacher_name = m.CharField(max_length=64, null=True)
+    latest_version = m.IntegerField(default=0)
 
     def __str__(self):
         return str(self.coursework) + " - " + self.teacher_name
 
     def path(self):
         """Give path where submission is stored"""
+        if self.type in [SubmissionType.CW_DESCRIPTOR, SubmissionType.ORACLE_EXECUTABLE,
+                         SubmissionType.SIGNATURE_TEST]:
+            return os.path.join(settings.BASE_DIR,
+                                settings.MEDIA_ROOT,
+                                str(self.coursework.course.name),
+                                str(self.coursework.name),
+                                "descriptors",
+                                "%s_%s" % (self.type, self.id))
+        if self.type == SubmissionType.TEST_RESULT:
+            return os.path.join(settings.BASE_DIR,
+                                settings.MEDIA_ROOT,
+                                str(self.coursework.course.name),
+                                str(self.coursework.name),
+                                "runs",
+                                "%s_%s" % (self.type, self.id))
         return os.path.join(settings.BASE_DIR,
                             settings.MEDIA_ROOT,
-                            self.coursework.id,
-                            str(self.creator.id),
-                            self.id)
+                            str(self.coursework.course.name),
+                            str(self.coursework.name),
+                            "students",
+                            str(self.creator),
+                            "%s_%s" % (self.type, self.id))
 
-    def originals_path(self):
+    def originals_path(self, version=None):
         """Give the path where the original files
         (unprocessed) that were uploaded are stored"""
-        return os.path.join(self.path(),
-                            "originals")
+        if version is None:
+            version = self.latest_version
+        return os.path.join(self.path(), str(version))
 
-    def get_files(self):
+    def get_files(self, version=None):
         """Get the names of original files for
         this submission, without full path"""
-        return [file for file in os.listdir(self.originals_path())]
+        if version is None:
+            version = self.latest_version
+        return [file for file in os.listdir(self.originals_path(version))]
+
+    def increment_version(self):
+        """before any new versions of files are
+        added, this method should be called"""
+        self.latest_version += 1
 
     def save_content_file(self, content, name):
         """Given the @content string for a new file
@@ -151,7 +175,7 @@ class Submission(m.Model):
     def delete(self, *args, **kargs):
         """Delete all of the files associated with this
         submission, by rm-ing the directory"""
-        shutil.rmtree(self.originals_path())
+        shutil.rmtree(self.path())
         super(Submission, self).delete(*args, **kargs)
 
 
@@ -170,7 +194,9 @@ class TestType:
 class TestMatch(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
     test = m.ForeignKey(Submission, m.CASCADE, related_name="tm_test_sub")
+    test_version = m.IntegerField()
     solution = m.ForeignKey(Submission, m.CASCADE, related_name="tm_sol_sub")
+    solution_version = m.IntegerField()
     result = m.ForeignKey(Submission, m.CASCADE, null=True, related_name="tm_res_sub")
     error_level = m.IntegerField(null=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE, related_name="tm_cw")

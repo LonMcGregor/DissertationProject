@@ -6,12 +6,12 @@ from django.urls import reverse
 
 import common.forms as f
 import common.models as m
-import common.permissions as p
 import feedback.helpers as fh
 import runner.runner as r
 import student.helper as h
 from common.views import redirect
 from test_match import matcher
+from common.permissions import coursework_access
 
 
 @login_required()
@@ -20,45 +20,67 @@ def index(request):
 
 
 @login_required()
-def upload_submission(request, cw=None):
+@coursework_access
+def upload_submission(request, cw):
     """Given a @request, handle a POST upload form
     for the specified coursework @cw."""
     if request.method != "POST":
         return HttpResponseForbidden("You can only POST a form here")
-    no_cws = m.Coursework.objects.filter(id=cw).count() != 1
-    if cw is None or cw == "" or no_cws:
-        return Http404("No coursework has been specified")
-    cw_instance = m.Coursework.objects.get(id=cw)
-    if not p.can_view_coursework(request.user, cw_instance):
-        return HttpResponseForbidden("You are not allowed to see this coursework")
     file_type = request.POST['file_type']
-    if not h.user_can_upload_of_type(request.user, cw_instance, file_type):
+    if not h.user_can_upload_of_type(request.user, cw, file_type):
         return HttpResponseForbidden("You can't upload submissions of this type")
-    if file_type == m.SubmissionType.SOLUTION:
-        h.delete_old_solution(request.user, cw_instance)
-        s_name = "My Solution"
-        p_name = "Solution"
-        t_name = str(request.user) + " Sol"
-        sub = save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        r.run_signature_test(sub)
-        msg = "Your solution has been tested using the signature test. You should check the " \
-              "results of this test to make sure that our solution is written correctly "
+    old_sub = m.Submission.objects.filter(id=request.POST['re_version']).first()
+    if old_sub is not None:
+        if old_sub.creator != request.user:
+            return HttpResponseForbidden("You can't modify that submission")
+        msg = re_version_submission(old_sub, request.FILES.getlist('chosen_files'))
     else:
-        current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
-        s_name = "My Test Case #%s" % str(current + 1)
-        p_name = "Test Case #%s" % str(current + 1)
-        t_name = str(request.user) + " Test #%s" % str(current + 1)
-        save_submission(cw_instance, request, file_type, s_name, p_name, t_name)
-        msg = "You can run your newly uploaded test against the oracle to make sure that you are " \
-              "testing for the correct output "
-        # todo note this counting will end up being incorrect if user deletes something
-        # todo it may end up being better to dynamically generate names
+        if file_type == m.SubmissionType.SOLUTION:
+            msg = save_new_solution(request, cw)
+        else:
+            msg = save_new_test(request, cw)
     return redirect(request, "Upload completed." + msg, reverse("cw", args=[cw]))
 
 
 @transaction.atomic
-def save_submission(cw_instance, request, file_type, s_name, p_name, t_name):
+def re_version_submission(submission, new_files):
+    submission.increment_version()
+    for each in new_files:
+        submission.save_uploaded_file(each)
+    return "New version of files for '%s' has been uploaded. You should re-run any tests again to " \
+           "use the new version." % submission.student_name
+
+
+def save_new_solution(request, cw_instance):
+    s_name = "My Solution"
+    p_name = "Solution"
+    t_name = str(request.user) + " Sol"
+    sub = save_new_submission(cw_instance, request, m.SubmissionType.SOLUTION, s_name, p_name,
+                              t_name)
+    r.run_signature_test(sub)
+    return "Your solution has been tested using the signature test. You should check the " \
+           "results of this test to make sure that our solution is written correctly "
+
+
+def save_new_test(request, cw_instance):
+    current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
+    # todo note this counting will end up being incorrect if user deletes something
+    # todo it may end up being better to dynamically generate names
+    s_name = "My Test Case #%s" % str(current + 1)
+    p_name = "Test Case #%s" % str(current + 1)
+    t_name = str(request.user) + " Test #%s" % str(current + 1)
+    save_new_submission(cw_instance, request, m.SubmissionType.TEST_CASE, s_name, p_name, t_name)
+    return "You can run your newly uploaded test against the oracle to make sure that you are " \
+           "testing for the correct output "
+
+
+@transaction.atomic
+def save_new_submission(cw_instance, request, file_type, s_name, p_name, t_name):
     """Do the atomic database actions required to save the new files"""
+    solution = m.Submission.objects.filter(creator=request.user, coursework=cw_instance,
+                                           type=m.SubmissionType.SOLUTION)
+    if solution.exists():
+        solution.first().delete()
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
                               creator=request.user, type=file_type,
                               student_name=s_name,
@@ -71,20 +93,21 @@ def save_submission(cw_instance, request, file_type, s_name, p_name, t_name):
 
 
 @login_required()
-def upload_test(request, cw=None):
+@coursework_access
+def upload_test(request, cw, tid=None):
     """Given a @request to upload a test to @cw
     render the submission form for test cases"""
-    no_cws = m.Coursework.objects.filter(id=cw).count() != 1
-    if cw is None or cw == "" or no_cws:
-        return Http404("No coursework has been specified")
-    cw_instance = m.Coursework.objects.get(id=cw)
-    if not p.can_view_coursework(request.user, cw_instance):
-        return HttpResponseForbidden("You are not allowed to see this coursework")
+    old_test = m.Submission.objects.filter(id=tid).first()
+    if old_test is not None:
+        msg = "Upload Test Case for coursework"
+    else:
+        msg = "Upload new version for " + old_test.student_name
     detail = {
-        "msg": "Upload Test Case for coursework",
-        "allow_upload": cw_instance.state in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK],
+        "msg": msg,
+        "allow_upload": cw.state in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK],
         "file_type": "c",
         "cw": cw,
+        "old_id": tid,
         "crumbs": [("Homepage", reverse("student_index")),
                    ("Coursework", reverse("cw", args=[cw]))]
     }
@@ -92,20 +115,22 @@ def upload_test(request, cw=None):
 
 
 @login_required()
-def upload_solution(request, cw=None):
+@coursework_access
+def upload_solution(request, cw):
     """Given a @request to upload a solution to @cw
     render the submission form for solutions"""
-    no_cws = m.Coursework.objects.filter(id=cw).count() != 1
-    if cw is None or cw == "" or no_cws:
-        return Http404("No coursework has been specified")
-    cw_instance = m.Coursework.objects.get(id=cw)
-    if not p.can_view_coursework(request.user, cw_instance):
-        return HttpResponseForbidden("You are not allowed to see this coursework")
+    exists = m.Submission.objects.filter(coursework=cw, creator=request.user,
+                                         type=m.SubmissionType.SOLUTION).first
+    if exists is None:
+        msg = "Upload Solution for coursework"
+    else:
+        msg = "Upload new version for solution"
     detail = {
-        "msg": "(Re-)Upload Solution for coursework",
-        "allow_upload": cw_instance.state == m.CourseworkState.UPLOAD,
+        "msg": msg,
+        "allow_upload": cw.state == m.CourseworkState.UPLOAD,
         "file_type": "s",
         "cw": cw,
+        "old_id": exists.id if exists is not None else "",
         "crumbs": [("Homepage", reverse("student_index")),
                    ("Coursework", reverse("cw", args=[cw]))]
     }
@@ -122,13 +147,10 @@ def detail_coursework(request, cw=None):
     return single_coursework(request, cw)
 
 
-def single_coursework(request, cwid):
+@coursework_access
+def single_coursework(request, cw):
     """Given a @request for the details for
     coursework @cwid, generate the page"""
-    cw = m.Coursework.objects.get(id=cwid)
-    if not p.can_view_coursework(request.user, cw):
-        return HttpResponseForbidden("You are not allowed to access this coursework")
-
     descriptors = h.get_descriptor_tuples(cw)
     sols = h.get_solution_tuples(cw, request.user)
     tests = h.get_test_triples(cw, request.user)
@@ -236,30 +258,28 @@ def generate_peer_match_form(cw, user, group, post=None):
 
 
 @login_required()
+@coursework_access
 def create_new_test_match(request, cw):
     """Given a coursework id, @cw, this is an entry point into creating
     a new test match, which will then be run"""
     user = request.user
     if not request.POST:
         return HttpResponseForbidden("You're supposed to POST a form here")
-    coursework = m.Coursework.objects.get(id=cw)
-    if not p.can_view_coursework(user, coursework):
-        return HttpResponseForbidden("You're not enrolled in this course")
-    if coursework.state == m.CourseworkState.UPLOAD:
-        tm_form = generate_self_match_form(coursework, user, post=request.POST)
+    if cw.state == m.CourseworkState.UPLOAD:
+        tm_form = generate_self_match_form(cw, user, post=request.POST)
     else:
-        tm_form = generate_peer_match_form(coursework, user,
+        tm_form = generate_peer_match_form(cw, user,
                                            request.POST['feedback_group'], post=request.POST)
     if not tm_form.is_valid():
         return HttpResponseForbidden("Invalid form data")
-    if coursework.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
+    if cw.state not in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK]:
         return HttpResponseForbidden("This coursework isn't accepting new test matches")
     args = [
         tm_form.cleaned_data['solution'],
         tm_form.cleaned_data['test'],
-        coursework
+        cw
     ]
-    if coursework.state == m.CourseworkState.UPLOAD:
+    if cw.state == m.CourseworkState.UPLOAD:
         method = matcher.create_self_test
         args.append(user)
     else:

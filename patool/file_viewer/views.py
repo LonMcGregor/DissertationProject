@@ -17,9 +17,16 @@ import common.models as m
 def download_file(request, sub_id, filename):
     """This is the main public entry point for getting and
     reading a file from the web browser. It looks for the given
-    @sub_id and @filename"""
+    @sub_id and @filename. assume version 'none' to get latest"""
+    return download_versioned_file(request, sub_id, None, filename)
+
+
+@login_required()
+def download_versioned_file(request, sub_id, version, filename):
+    """This is the main entry point for when a specific
+    @version number of @filename in @sub_id is requested"""
     submisison = m.Submission.objects.get(id=sub_id)
-    file = os.path.join(submisison.originals_path(), filename)
+    file = os.path.join(submisison.originals_path(version), filename)
     if not p.can_view_submission(request.user, submisison):
         return HttpResponseForbidden("You are not allowed to see this file")
     if 'pretty' in request.GET:
