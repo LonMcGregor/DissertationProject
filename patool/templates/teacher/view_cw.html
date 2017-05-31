@@ -20,7 +20,7 @@
     {% for s, files in submissions %}
     {% for f in files %}
         <tr>
-        <td>{{ s.id }}</td>
+        <td>{{ s.id }} (v.{{ s.version }})</td>
         <td>{{ s.type }}</td>
         <td>{{ s.creator }}</td>
         <td>{{ s.teacher_name }}</td>
@@ -80,10 +80,10 @@
         <tr>
             <td><a href="{% url 'tm' f.id %}">{{ f.id }}</a></td>
         <td>{%  if f.test %}
-            {{ f.test.teacher_name }}
+            {{ f.test.teacher_name }} (v.{{ f.test_version }})
         {% endif %}</td>
         <td>{%  if f.solution %}
-           {{ f.solution.teacher_name }}
+           {{ f.solution.teacher_name }} (v.{{ f.solution_version }})
         {% endif %}</td>
         {% get_comment_count for f as comment_count %}
         <td>{{ comment_count }} Comments</td>

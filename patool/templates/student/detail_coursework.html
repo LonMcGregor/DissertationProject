@@ -68,6 +68,7 @@
         </form>
         {% endif %}
         <ul>
+        <a href="{% url 'test' cw.id sub.id%}">Replace test with new Version</a>
         {% for f in files%}
             <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
         {% endfor %}
@@ -75,10 +76,10 @@
     </div>
     {% endfor %}
     {% if subs_open %}
-    <a href="{% url 'test' cw.id %}">Submit Test Case</a>
+    <a href="{% url 'test' cw.id ''%}">Submit New Test Case</a>
     {% endif %}
     {% if feedback_open %}
-    <a href="{% url 'test' cw.id %}">Submit Test Case</a>
+    <a href="{% url 'test' cw.id ''%}">Submit New Test Case</a>
     {% endif %}
 
     {% for match_form, tms, name, message in testing_data %}

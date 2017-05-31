@@ -263,7 +263,6 @@ def view_coursework(request, c):
         return HttpResponseForbidden("You are not enrolled on this course")
     submissions = [(s, s.get_files()) for s in
                    m.Submission.objects.filter(coursework=coursework)
-                   .exclude(type=m.SubmissionType.FEEDBACK)
                    .exclude(type=m.SubmissionType.TEST_RESULT)]
     tm_initial = {"coursework": coursework.id}
     tm_form = generate_teacher_easy_match_form(coursework)
@@ -352,14 +351,8 @@ def update_content(request):
     if not p.is_enrolled_on_course(request.user, old_sub.coursework.course):
         return HttpResponseForbidden("you're not enrolled on this course")
 
-    new_sub = m.Submission(id=m.new_random_slug(m.Submission), coursework=old_sub.coursework,
-                           creator=request.user, type=old_sub.type,
-                           student_name=old_sub.student_name,
-                           peer_name=old_sub.peer_name,
-                           teacher_name=old_sub.teacher_name)
-    new_sub.save()
+    old_sub.increment_version()
     for each in request.FILES.getlist('new_content'):
-        new_sub.save_uploaded_file(each)
-    old_sub.delete()
+        old_sub.save_uploaded_file(each)
 
-    return redirect(request, "Content Updated", reverse('edit_cw', args=[new_sub.coursework.id]))
+    return redirect(request, "Content Updated", reverse('edit_cw', args=[old_sub.coursework.id]))

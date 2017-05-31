@@ -28,7 +28,7 @@ def execute_test(path_solutions, path_tests, libs):
         output = "Failed to compile: \n" + outs + errs
         shutil.rmtree(tmp_dir)
         return compilation.returncode, output
-    test_args = "java -cp .:junit.jar:hamcrest.jar org.junit.runner.JUnitCore" + \
+    test_args = "java -cp .:junit.jar:hamcrest.jar org.junit.runner.JUnitCore " + \
                 determine_test_name(tmp_dir)
     test = subprocess.Popen(test_args, cwd=tmp_dir,
                             stdout=subprocess.PIPE,
@@ -47,8 +47,9 @@ def determine_test_name(tmp_dir):
     within specified @tnp_dir"""
     files = os.listdir(tmp_dir)
     for f in files:
-        if "Test" in "f":
-            return f
+        if "Test" in f and ".class" in f:
+            return f[:-6]
+        # TODO this is an unsafe operation, and allows for code injection to shell
     return "????"
 
 

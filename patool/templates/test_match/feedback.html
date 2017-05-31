@@ -22,13 +22,16 @@
             </div>
             <div id="file_view">
                 {% for filename in test_files %}
-                    <iframe src="{% url 'download_file' test_match.test.id filename%}?pretty=1" data-id="{{ test_match.test.id }}{{ filename }}" class="test inactive"></iframe>
+                    <iframe src="{% url 'download_versioned_file' test_match.test.id test_match.test_version filename%}?pretty=1"
+                            data-id="{{ test_match.test.id }}{{ filename }}" class="test inactive"></iframe>
                 {% endfor %}
                 {% for filename in solution_files %}
-                    <iframe src="{% url 'download_file' test_match.solution.id filename%}?pretty=1" data-id="{{ test_match.solution.id }}{{ filename }}" class="solution inactive"></iframe>
+                    <iframe src="{% url 'download_versioned_file' test_match.solution.id test_match.solution_version filename%}?pretty=1"
+                            data-id="{{ test_match.solution.id }}{{ filename }}" class="solution inactive"></iframe>
                 {% endfor %}
                 {% for filename in result_files %}
-                    <iframe src="{% url 'download_file' test_match.result.id filename%}?pretty=1" data-id="{{ test_match.result.id }}{{ filename }}" class="result inactive"></iframe>
+                    <iframe src="{% url 'download_file' test_match.result.id filename%}?pretty=1"
+                            data-id="{{ test_match.result.id }}{{ filename }}" class="result inactive"></iframe>
                 {% endfor %}
                 <p class="active">Select a file on the left to view it</p>
             </div>
