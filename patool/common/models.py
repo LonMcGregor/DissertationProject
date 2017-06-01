@@ -152,6 +152,7 @@ class Submission(m.Model):
         """before any new versions of files are
         added, this method should be called"""
         self.latest_version += 1
+        self.save()
 
     def save_content_file(self, content, name):
         """Given the @content string for a new file

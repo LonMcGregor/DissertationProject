@@ -20,7 +20,7 @@
     {% for s, files in submissions %}
     {% for f in files %}
         <tr>
-        <td>{{ s.id }} (v.{{ s.version }})</td>
+        <td>{{ s.id }} (v.{{ s.latest_version }})</td>
         <td>{{ s.type }}</td>
         <td>{{ s.creator }}</td>
         <td>{{ s.teacher_name }}</td>

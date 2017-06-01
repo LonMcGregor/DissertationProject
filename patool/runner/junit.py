@@ -1,5 +1,4 @@
 import os
-import re
 import shutil
 import subprocess
 import tempfile
@@ -45,12 +44,13 @@ def execute_test(path_solutions, path_tests, libs):
 def determine_test_name(tmp_dir):
     """determine test name by investigating filename
     within specified @tnp_dir"""
-    files = os.listdir(tmp_dir)
-    for f in files:
-        if "Test" in f and ".class" in f:
-            return f[:-6]
-        # TODO this is an unsafe operation, and allows for code injection to shell
-    return "????"
+    return "TestTree"
+    # files = os.listdir(tmp_dir)
+    # for f in files:
+    #     if "Test" in f and ".class" in f:
+    #         return f[:-6]
+    #     # TODO this is an unsafe operation, and allows for code injection to shell
+    # return "????"
 
 
 def copy_all(paths, tmp_dir):

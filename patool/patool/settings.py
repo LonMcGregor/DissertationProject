@@ -145,8 +145,8 @@ MEDIA_TMP_TEST = 'var/tmp/test'
 
 
 # Auth URLconf
-LOGIN_URL = '/student/login'
-LOGOUT_REDIRECT_URL = '/student/'
+LOGIN_URL = '/login'
+LOGOUT_REDIRECT_URL = '/'
 
 # at most 20 1mb files per upload
 MAX_FILES_PER_SUBMISSION = 20

@@ -15,9 +15,9 @@ def create_peer_test(solution, test, cw, feedback_group):
         raise Exception("Need 1 solution and 1 test")
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
                          test=test_case,
-                         test_version=test_case.version,
+                         test_version=test_case.latest_version,
                          solution=solution,
-                         solution_version=solution.version,
+                         solution_version=solution.latest_version,
                          coursework=cw,
                          type=m.TestType.PEER)
     new_tm.save()
@@ -33,9 +33,9 @@ def create_teacher_test(solution, test, cw):
     test_case = m.Submission.objects.get(id=test)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
                          test=test_case,
-                         test_version=test_case.version,
+                         test_version=test_case.latest_version,
                          solution=solution,
-                         solution_version=solution.version,
+                         solution_version=solution.latest_version,
                          coursework=cw,
                          type=m.TestType.TEACHER)
     new_tm.save()
@@ -62,9 +62,9 @@ def create_self_test(solution_id, test_id, coursework, user):
                                              type=m.SubmissionType.SIGNATURE_TEST)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
                          test=test_case,
-                         test_version=test_case.version,
+                         test_version=test_case.latest_version,
                          solution=solution,
-                         solution_version=solution.version,
+                         solution_version=solution.latest_version,
                          coursework=coursework,
                          type=m.TestType.SELF)
     new_tm.save()

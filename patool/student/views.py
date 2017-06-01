@@ -1,6 +1,6 @@
 from django.contrib.auth.decorators import login_required
 from django.db import transaction
-from django.http import Http404, HttpResponseForbidden
+from django.http import HttpResponseForbidden
 from django.shortcuts import render
 from django.urls import reverse
 
@@ -39,7 +39,7 @@ def upload_submission(request, cw):
             msg = save_new_solution(request, cw)
         else:
             msg = save_new_test(request, cw)
-    return redirect(request, "Upload completed." + msg, reverse("cw", args=[cw]))
+    return redirect(request, "Upload completed." + msg, reverse("cw", args=[cw.id]))
 
 
 @transaction.atomic
@@ -47,8 +47,8 @@ def re_version_submission(submission, new_files):
     submission.increment_version()
     for each in new_files:
         submission.save_uploaded_file(each)
-    return "New version of files for '%s' has been uploaded. You should re-run any tests again to " \
-           "use the new version." % submission.student_name
+    return "New version of files for '%s' has been uploaded. You should re-run " \
+           "any tests again to use the new version." % submission.student_name
 
 
 def save_new_solution(request, cw_instance):
@@ -77,10 +77,6 @@ def save_new_test(request, cw_instance):
 @transaction.atomic
 def save_new_submission(cw_instance, request, file_type, s_name, p_name, t_name):
     """Do the atomic database actions required to save the new files"""
-    solution = m.Submission.objects.filter(creator=request.user, coursework=cw_instance,
-                                           type=m.SubmissionType.SOLUTION)
-    if solution.exists():
-        solution.first().delete()
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
                               creator=request.user, type=file_type,
                               student_name=s_name,
@@ -98,18 +94,18 @@ def upload_test(request, cw, tid=None):
     """Given a @request to upload a test to @cw
     render the submission form for test cases"""
     old_test = m.Submission.objects.filter(id=tid).first()
-    if old_test is not None:
+    if old_test is None:
         msg = "Upload Test Case for coursework"
     else:
         msg = "Upload new version for " + old_test.student_name
     detail = {
         "msg": msg,
         "allow_upload": cw.state in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK],
-        "file_type": "c",
+        "file_type": m.SubmissionType.TEST_CASE,
         "cw": cw,
         "old_id": tid,
         "crumbs": [("Homepage", reverse("student_index")),
-                   ("Coursework", reverse("cw", args=[cw]))]
+                   ("Coursework", reverse("cw", args=[cw.id]))]
     }
     return render(request, 'student/upload_solution.html', detail)
 
@@ -120,19 +116,21 @@ def upload_solution(request, cw):
     """Given a @request to upload a solution to @cw
     render the submission form for solutions"""
     exists = m.Submission.objects.filter(coursework=cw, creator=request.user,
-                                         type=m.SubmissionType.SOLUTION).first
+                                         type=m.SubmissionType.SOLUTION).first()
     if exists is None:
         msg = "Upload Solution for coursework"
+        old_id = ""
     else:
         msg = "Upload new version for solution"
+        old_id = exists.id
     detail = {
         "msg": msg,
         "allow_upload": cw.state == m.CourseworkState.UPLOAD,
-        "file_type": "s",
+        "file_type": m.SubmissionType.SOLUTION,
         "cw": cw,
-        "old_id": exists.id if exists is not None else "",
+        "old_id": old_id,
         "crumbs": [("Homepage", reverse("student_index")),
-                   ("Coursework", reverse("cw", args=[cw]))]
+                   ("Coursework", reverse("cw", args=[cw.id]))]
     }
     return render(request, 'student/upload_solution.html', detail)
 
