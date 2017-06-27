@@ -159,19 +159,31 @@ class Submission(m.Model):
         with @name, store it in the current submission"""
         path = os.path.join(self.originals_path(),
                             name)
+#        os.setegid(settings.OWNER_GID)
+#        os.seteuid(settings.OWNER_UID)
         os.makedirs(self.originals_path(), exist_ok=True)
+#        os.lchown(self.originals_path(), settings.OWNER_UID, settings.OWNER_GID)
         with open(path, "x") as file:
             file.write(content)
+#        os.lchown(path, settings.OWNER_UID, settings.OWNER_GID)
+#        os.seteuid(os.getuid())
+#        os.setegid(os.getgid())
 
     def save_uploaded_file(self, file):
         """Given a @file a user has uploaded, store
         it in the current submission with @name"""
         path = os.path.join(self.originals_path(),
                             file.name)
+#        os.setegid(settings.OWNER_GID)
+#        os.seteuid(settings.OWNER_UID)
         os.makedirs(self.originals_path(), exist_ok=True)
+#        os.lchown(self.originals_path(), settings.OWNER_UID, settings.OWNER_GID)
         with open(path, "xb") as destination:
             for chunk in file.chunks():
                 destination.write(chunk)
+#        os.lchown(path, settings.OWNER_UID, settings.OWNER_GID)
+#        os.seteuid(os.getuid())
+#        os.setegid(os.getgid())
 
     def delete(self, *args, **kargs):
         """Delete all of the files associated with this

@@ -18,5 +18,5 @@ urlpatterns = [
     url(r'^comments/', include('django_comments.urls')),
     url(r'^$', views.default_index, name='site_root'),
 ] + static(
-        settings.STATIC_URL, document_root=settings.STATIC_ROOT
+        settings.STATIC_URL_REDIRECT, document_root=settings.STATIC_ROOT
     )

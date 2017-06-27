@@ -13,9 +13,9 @@ def prepare_database():
         print("Can only prepare test database when in debug mode")
         return
 
-    User.objects.create_superuser(username='admin',
-                                  email='admin@local.host',
-                                  password='overwatch')
+    User.objects.create_superuser(username='admin@pt.macs.hw.ac.uk',
+                                  email='admin@pt.macs.hw.ac.uk',
+                                  password='Lancelot')
 
     t = Group()
     t.name = "teacher"
@@ -38,41 +38,14 @@ def prepare_database():
 
     cu = User.objects.create_user
 
-    w = cu("winston", password="primalrage", email='winston@peer-testing.com')
-    w.groups.add(t)
-    w.save()
-    z = cu("zenyatta", password="transcendence", email='zenyatta@peer-testing.com')
-    z.groups.add(t)
-    z.save()
-    sy = cu("symmetra", password="teleporter", email='symmetra@peer-testing.com')
-    sy.groups.add(t)
-    sy.save()
+    l = cu("lm356@pt.macs.hw.ac.uk", email="lm356@pt.macs.hw.ac.uk", password="Sutherland")
+    l.groups.add(t)
+    l.save()
 
-    a = cu("ana", password="nanoboost", email='ana@peer-testing.com')
+    a = cu("alex@pt.macs.hw.ac.uk", email="alex@pt.macs.hw.ac.uk", password="Glasgow")
     a.groups.add(s)
     a.save()
-    tr = cu("tracer", password="pulsebomb", email='tracer@peer-testing.com')
-    tr.groups.add(s)
-    tr.save()
-    l = cu("lucio", password="soundbarrier", email='lucio@peer-testing.com')
-    l.groups.add(s)
-    l.save()
-    sm = cu("sombra", password="electromagneticpulse", email='sombra@peer-testing.com')
-    sm.groups.add(s)
-    sm.save()
 
-    aa = m.Course(code="F20AA-2016_17", name="Advanced Algorithms")
-    aa.save()
-    bb = m.Course(code="F20BB-2016_17", name="Building Blocks")
-    bb.save()
-    cc = m.Course(code="F20CC-2016_17", name="Code Classes")
-    cc.save()
-
-    m.EnrolledUser(login=w, course=aa).save()
-    m.EnrolledUser(login=z, course=bb).save()
-    m.EnrolledUser(login=sy, course=cc).save()
-
-    m.EnrolledUser(login=a, course=aa).save()
-    m.EnrolledUser(login=tr, course=aa).save()
-    m.EnrolledUser(login=l, course=aa).save()
-    m.EnrolledUser(login=sm, course=aa).save()
+    c = cu("connie@pt.macs.hw.ac.uk", email="connie@pt.macs.hw.ac.uk", password="Ganymede")
+    c.groups.add(s)
+    c.save()
