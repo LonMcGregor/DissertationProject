@@ -10,6 +10,7 @@ mkdir var/uploads
 setfacl -Rm u:apache:r-x common feedback patool runner teacher file_viewer libs notify student templates test_match var/static
 setfacl -m u:apache:rwx var
 setfacl -Rm u:apache:rwx var/test var/uploads
+setfacl -Rdm u:lm356:rwx var/test var/uploads
 touch db.sqlite3
 setfacl -m u:apache:rw- db.sqlite3
 ./manage.py shell -c "

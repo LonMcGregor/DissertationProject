@@ -136,13 +136,13 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-STATIC_URL = '/peer-testing/stat_files'
+STATIC_URL = '/peer-testing/static_files/'
 # this is the url that is used in the templates
-# this is absolute so should have prepended paths
-STATIC_URL_REDIRECT = 'stat_files'
+#  this is absolute so should have prepended paths
+STATIC_URL_REDIRECT = 'static_files/'
 # this is the bit that is looked for in the url config
 # this should not include any prepended paths
-STATIC_ROOT = os.path.join(BASE_DIR, 'var/')
+STATIC_ROOT = os.path.join(BASE_DIR, 'var/static/')
 # this is the place on the disk where the static files are looked for
 # everything after the static url is appened to this path
 
