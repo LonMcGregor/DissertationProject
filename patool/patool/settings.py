@@ -11,16 +11,16 @@ https://docs.djangoproject.com/en/1.10/ref/settings/
 """
 
 import os
+from . import local
 
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
-BASE_DIR = "/home/lonm/dissertationproject/patool"
-
+BASE_DIR = local.LOCAL_BASE_DIR
 
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/1.10/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = '$cn(%o3r-mdc8ku_$0xnyo4bf+g!gxt4%0!i^hi%3)odr_4%!w'
+SECRET_KEY = local.SECRET
 
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
@@ -136,10 +136,7 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/1.10/howto/static-files/
 
-HTTP_PREFIX = ''
-# if this is beign served as a sub-site of another, specify
-# the prefix with leading slash and NO trailing slash
-STATIC_URL = HTTP_PREFIX + '/static_files/'
+STATIC_URL = local.HTTP_PREFIX + '/static_files/'
 # this is the url that is used in the templates
 #  this is absolute so should have prepended paths
 STATIC_URL_REDIRECT = 'static_files/'
@@ -149,14 +146,14 @@ STATIC_ROOT = os.path.join(BASE_DIR, 'var/static/')
 # this is the place on the disk where the static files are looked for
 # everything after the static url is appened to this path
 
-MEDIA_URL = HTTP_PREFIX + '/'
+MEDIA_URL = local.HTTP_PREFIX + '/'
 MEDIA_ROOT = os.path.join(BASE_DIR, 'var/uploads')
 MEDIA_TMP_TEST = os.path.join(BASE_DIR, 'var/tmp/test')
 
 
 # Auth URLconf
-LOGIN_URL = HTTP_PREFIX + '/student/login'
-LOGOUT_REDIRECT_URL = HTTP_PREFIX + '/student/'
+LOGIN_URL = local.HTTP_PREFIX + '/student/login'
+LOGOUT_REDIRECT_URL = local.HTTP_PREFIX + '/student/'
 
 # dont run dangerous actions as apache
 owner = os.stat(BASE_DIR)

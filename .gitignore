@@ -1,4 +1,5 @@
 patool/.idea/dataSources/*
+patool/patool/local.py
 
 #tex
 *.aux
