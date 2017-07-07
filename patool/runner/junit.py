@@ -4,12 +4,14 @@ import subprocess
 import tempfile
 
 
-def execute_test(path_solutions, path_tests, libs):
+def execute_test(path_solutions, path_tests, test_class, libs):
     """Given specific argument as to how to run the test,
     move all of the files into the correct directories and
     execute the test. 
     @path_solutions - path to where solution files located
     @path_tests - path to where testing files located
+    @test_class - set by teacher, required by java,
+       must be command-line safe (no cmd chars etc)
     @libs - location of libraries relevant to execution"""
     tmp_dir = tempfile.mkdtemp()
     copy_all(path_solutions, tmp_dir)
@@ -27,8 +29,7 @@ def execute_test(path_solutions, path_tests, libs):
         output = "Failed to compile: \n" + outs + errs
         shutil.rmtree(tmp_dir)
         return compilation.returncode, output
-    test_args = "java -cp .:junit.jar:hamcrest.jar org.junit.runner.JUnitCore " + \
-                determine_test_name(tmp_dir)
+    test_args = "java -cp .:junit.jar:hamcrest.jar org.junit.runner.JUnitCore " + test_class
     test = subprocess.Popen(test_args, cwd=tmp_dir,
                             stdout=subprocess.PIPE,
                             stderr=subprocess.PIPE,
@@ -39,18 +40,6 @@ def execute_test(path_solutions, path_tests, libs):
     output = outs + errs
     shutil.rmtree(tmp_dir)
     return test.returncode, output
-
-
-def determine_test_name(tmp_dir):
-    """determine test name by investigating filename
-    within specified @tnp_dir"""
-    return "TestTree"
-    # files = os.listdir(tmp_dir)
-    # for f in files:
-    #     if "Test" in f and ".class" in f:
-    #         return f[:-6]
-    #     # TODO this is an unsafe operation, and allows for code injection to shell
-    # return "????"
 
 
 def copy_all(paths, tmp_dir):

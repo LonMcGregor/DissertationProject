@@ -59,6 +59,17 @@ class CourseworkState:
     )
 
 
+class CourseworkRuntimes:
+    NOEXEC = ''
+    PYTHON3 = 'p3'
+    JAVA8 = 'j8'
+    POSSIBLE_RUNTIMES = (
+        (NOEXEC, 'No Execution'),
+        (PYTHON3, 'Python 3'),
+        (JAVA8, 'Java 8')
+    )
+
+
 # noinspection PyClassHasNoInit
 class Coursework(m.Model):
     id = m.SlugField(max_length=4, primary_key=True)
@@ -67,8 +78,10 @@ class Coursework(m.Model):
     state = m.CharField(max_length=1,
                         choices=CourseworkState.POSSIBLE_STATES,
                         default=CourseworkState.INVISIBLE)
-    file_pipe = m.CharField(max_length=128)
-    test_pipe = m.CharField(max_length=128)
+    runtime = m.CharField(max_length=8,
+                          choices=CourseworkRuntimes.POSSIBLE_RUNTIMES,
+                          default=CourseworkRuntimes.NOEXEC)
+    test_class = m.CharField(max_length=128)
 
     def is_visible(self):
         """Show if the coursework state allows it to be visible"""

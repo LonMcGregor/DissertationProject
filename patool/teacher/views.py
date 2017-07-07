@@ -158,7 +158,8 @@ def create_coursework_render(request, code):
     """Generate an empty form for creating a coursework for course @code"""
     detail = {
         "courseworks": {"name": "New Coursework"},
-        "cw_form": False,
+        "cw_form": f.CourseworkForm(),
+        "creating": True,
         "crumbs": [("Homepage", reverse("teacher_index")),
                    ("Course", reverse("edit_course", args=[code]))]
     }
@@ -169,12 +170,16 @@ def create_coursework_render(request, code):
 def create_coursework_update(user, request, course_code):
     """@user - Given the @request for a coursework, and
     the @course_code we want to add it to, update the db"""
-    new_name = request.POST['name']
-    new_state = request.POST['state']
+    cw_form = f.CourseworkForm(request.POST)
+    if not cw_form.is_valid():
+        return HttpResponseBadRequest("Form contained invalid data. Please try again")
     course = m.Course.objects.get(code=course_code)
-    coursework = m.Coursework(id=m.new_random_slug(m.Coursework), name=new_name,
-                              course=course, state=new_state, file_pipe="runner.py",
-                              test_pipe="runner.py")
+    coursework = m.Coursework(id=m.new_random_slug(m.Coursework),
+                              course=course,
+                              name=cw_form.cleaned_data['name'],
+                              state=cw_form.cleaned_data['state'],
+                              runtime=cw_form.cleaned_data['runtime'],
+                              test_class=cw_form.cleaned_data['test_class'])
     coursework.save()
 
     descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
@@ -228,6 +233,8 @@ def edit_coursework_update(new_details, old_coursework):
         raise Exception("validity problem")
     old_coursework.name = updated_form.cleaned_data['name']
     old_coursework.state = updated_form.cleaned_data['state']
+    old_coursework.runtime = updated_form.cleaned_data['runtime']
+    old_coursework.test_class = updated_form.cleaned_data['test_class']
     old_coursework.save()
 
 
@@ -241,11 +248,14 @@ def edit_coursework_render(request, coursework):
     submissions = [(s, s.get_files()) for s in m.Submission.objects.filter(
         coursework=coursework, type__in=desc_types)]
     initial = {"name": coursework.name,
-               "state": coursework.state}
+               "state": coursework.state,
+               "runtime": coursework.runtime,
+               "test_class": coursework.test_class}
     cw_form = f.CourseworkForm(initial)
     detail = {
         "coursework": coursework,
         "cw_form": cw_form,
+        "creating": False,
         "submissions": submissions,
         "crumbs": [("Homepage", reverse("teacher_index")),
                    ("Course", reverse("edit_course", args=[coursework.course.code]))]

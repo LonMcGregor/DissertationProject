@@ -1,7 +1,7 @@
 import static org.junit.Assert.fail;
 import org.junit.Test;
 
-public class TestTreeSignature {
+public class TestTree {
 
     @Test
     public void signature_check() {

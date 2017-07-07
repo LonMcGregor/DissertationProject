@@ -14,6 +14,8 @@ class CourseForm(f.Form):
 class CourseworkForm(f.Form):
     name = f.CharField(label="Coursework Name", max_length=128)
     state = f.ChoiceField(label="Coursework State", choices=m.CourseworkState.POSSIBLE_STATES)
+    test_class = f.CharField(label="Test Class Name", max_length=128)
+    runtime = f.ChoiceField(label="Runtime", choices=m.CourseworkRuntimes.POSSIBLE_RUNTIMES)
 
 
 # noinspection PyClassHasNoInit
