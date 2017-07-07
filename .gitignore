@@ -1,5 +1,7 @@
 patool/.idea/dataSources/*
 patool/patool/local.py
+patool/common/migrations/*
+patool/feedback/migrations/*
 
 #tex
 *.aux
