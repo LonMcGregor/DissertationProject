@@ -29,10 +29,8 @@ def download_versioned_file(request, sub_id, version, filename):
     file = os.path.join(submisison.originals_path(version), filename)
     if not p.can_view_submission(request.user, submisison):
         return HttpResponseForbidden("You are not allowed to see this file")
-    if 'pretty' in request.GET:
-        return render_file(request, file, filename)
     if 'show' in request.GET:
-        return show_file(file, filename)
+        return render_file(request, file, filename)
     return attachment_file(file, filename)
 
 
@@ -41,22 +39,17 @@ def render_file(request, file, filename):
     of the file as an HTML page using pygments"""
     mime = guess_type(filename, True)
     if mime[0] is None or mime[0].split('/')[0] != 'text':
-        return show_file(file, filename)
+        response = FileResponse(open(file, "rb"))
+        response['Content-Type'] = str(guess_type(filename, False)[0])
+        return response
     with open(file, "r") as open_file:
         content = open_file.read()
     lexer = pygments.lexers.get_lexer_for_mimetype(mime[0])
     detail = {
-        "content": pyghi(content, lexer, pygform.HtmlFormatter(linenos='table'))
+        "content": pyghi(content, lexer, pygform.HtmlFormatter(linenos='table')),
+        "filename": filename
     }
     return render(request, 'file_viewer/pretty_file.html', detail)
-
-
-def show_file(file, filename):
-    """For a given @filepath and @filename, 
-    display this in-browser"""
-    response = FileResponse(open(file, "rb"))
-    response['Content-Type'] = str(guess_type(filename, False)[0])
-    return response
 
 
 def attachment_file(file, filename):

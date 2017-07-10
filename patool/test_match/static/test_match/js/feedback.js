@@ -1,39 +1,16 @@
 /*
- Javascript to be used in conjunction with the feedback view
- */
-
-/*
-TODO rewrite using iquery so that it is actually readable
+Manage tab selection in feedback view
  */
 
 document.addEventListener('DOMContentLoaded', function() {
-
-var tabs = document.getElementById("file_tabs").getElementsByTagName("span");
-
-for(var i = 0; i < tabs.length; i++){
-    tabs[i].addEventListener("click", function(){
+$(".file_tab").on("click", function(){
         var dataid = this.attributes['data-id'].value;
-        var actives = [].slice.call(document.getElementsByClassName("active"));
-        actives.forEach(function(item){
-            if(item.classList.contains("active")){
-                item.classList.add("inactive");
-                item.classList.remove("active");
-            }
-        });
-        var tabs = [].slice.call(document.getElementById("file_tabs").getElementsByTagName("span"));
-        tabs.forEach(function(item){
-            if(item.attributes['data-id'] && item.attributes['data-id'].value===dataid){
-                item.classList.add("active");
-                item.classList.remove("inactive");
-            }
-        });
-        var frames = [].slice.call(document.getElementsByTagName("iframe"));
-        frames.forEach(function(item){
-            if(item.attributes['data-id'] && item.attributes['data-id'].value===dataid){
-                item.classList.add("active");
-                item.classList.remove("inactive");
-            }
-        });
-    })
-}
+        var active = $(".active");
+        active.removeClass("active");
+        active.addClass("inactive");
+        var selector = ".inactive[data-id='" + dataid +"']";
+        var selected = $(selector)
+        selected.removeClass("inactive")
+        selected.addClass("active")
+})
 });

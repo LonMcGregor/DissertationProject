@@ -51,7 +51,7 @@
         <h3>{{ sub.student_name }}</h3>
         <ul>
         {% for f in files%}
-            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
+            <li><a href="{% url 'download_file' sub.id f %}?show=1">{{ f }}</a></li>
         {% endfor %}
         </ul>
     {% endfor %}
@@ -70,7 +70,7 @@
         <ul>
         <a href="{% url 'test' cw.id sub.id%}">Replace test with new Version</a>
         {% for f in files%}
-            <li><a href="{% url 'download_file' sub.id f %}?pretty=1">{{ f }}</a></li>
+            <li><a href="{% url 'download_file' sub.id f %}?show=1">{{ f }}</a></li>
         {% endfor %}
         </ul>
     </div>

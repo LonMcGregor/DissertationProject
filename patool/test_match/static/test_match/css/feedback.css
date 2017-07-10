@@ -26,13 +26,13 @@ Styles relating to the panelled feedback page
     background: #cccccc;
 }
 
-#file_tabs span {
-    margin: 4px 0;
+.file_tab {
+    padding: 4px 0;
     max-width: 180px;
     overflow: hidden;
 }
 
-#file_tabs span.active {
+.file_tab.active {
     background-color: #79aec8;
 }
 
@@ -48,11 +48,11 @@ iframe{
     border: 0;
 }
 
-#file_view .inactive {
+.file_view.inactive {
     display: none;
 }
 
-#file_view .active {
+.file_view.active {
     display: block;
 }
 

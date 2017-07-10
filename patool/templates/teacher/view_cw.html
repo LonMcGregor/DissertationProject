@@ -25,7 +25,7 @@
         <td>{{ s.creator }}</td>
         <td>{{ s.teacher_name }}</td>
         <td>{{ f }}</td>
-        <td><a href="{% url 'download_file' s.id f %}?pretty=1">Html</a> <a href="{% url 'download_file' s.id f %}?show=1">Raw</a></td>
+        <td><a href="{% url 'download_file' s.id f %}?show=1">View</a></td>
         </tr>
     {% endfor %}
     {% endfor %}
