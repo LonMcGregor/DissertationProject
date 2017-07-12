@@ -48,6 +48,17 @@
         <button onclick="if(confirm('Delete This Group?')){
             $.post('{% url 'delete_feedback_group' %}', $(this).parent().serialize())}" >Delete</button>
     </form>
+    <form action="{% url 'export_feedback_groups' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="coursework_id" value="{{coursework.id}}">
+        <label for="sub_export">Click to Export Groups: </label><input id="sub_export" type="submit" value="Export">
+    </form>
+    <form action="{% url 'import_feedback_groups' %}" method="post">
+        {% csrf_token %}
+        <input type="hidden" name="coursework_id" value="{{coursework.id}}">
+        <label for="txt_json">Paste JSON Data: </label><input id="txt_json" type="text" name="json_data" required="true">
+        <label for="sub_import">Click to Import Groups: </label><input id="sub_import" type="submit" value="Import">
+    </form>
     <div id="feedback_group_forms">
     {% for form in feedback_forms %}
         <form action="" method="post" >

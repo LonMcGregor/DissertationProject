@@ -72,7 +72,7 @@ class CourseworkRuntimes:
 
 # noinspection PyClassHasNoInit
 class Coursework(m.Model):
-    id = m.SlugField(max_length=4, primary_key=True)
+    id = m.SlugField(max_length=8, primary_key=True)
     name = m.CharField(max_length=128)
     course = m.ForeignKey(Course, m.CASCADE)
     state = m.CharField(max_length=1,
@@ -110,7 +110,7 @@ class SubmissionType:
 
 # noinspection PyClassHasNoInit
 class Submission(m.Model):
-    id = m.SlugField(max_length=4, primary_key=True)
+    id = m.SlugField(max_length=8, primary_key=True)
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
@@ -131,21 +131,23 @@ class Submission(m.Model):
                                 str(self.coursework.course.name),
                                 str(self.coursework.name),
                                 "descriptors",
-                                "%s_%s" % (self.type, self.id))
+                                self.type,
+                                self.id)
         if self.type == SubmissionType.TEST_RESULT:
             return os.path.join(settings.BASE_DIR,
                                 settings.MEDIA_ROOT,
                                 str(self.coursework.course.name),
                                 str(self.coursework.name),
                                 "runs",
-                                "%s_%s" % (self.type, self.id))
+                                self.id)
         return os.path.join(settings.BASE_DIR,
                             settings.MEDIA_ROOT,
                             str(self.coursework.course.name),
                             str(self.coursework.name),
                             "students",
                             str(self.creator),
-                            "%s_%s" % (self.type, self.id))
+                            self.type,
+                            self.id)
 
     def originals_path(self, version=None):
         """Give the path where the original files
@@ -170,33 +172,19 @@ class Submission(m.Model):
     def save_content_file(self, content, name):
         """Given the @content string for a new file
         with @name, store it in the current submission"""
-        path = os.path.join(self.originals_path(),
-                            name)
-#        os.setegid(settings.OWNER_GID)
-#        os.seteuid(settings.OWNER_UID)
+        path = os.path.join(self.originals_path(), name)
         os.makedirs(self.originals_path(), exist_ok=True)
-#        os.lchown(self.originals_path(), settings.OWNER_UID, settings.OWNER_GID)
         with open(path, "x") as file:
             file.write(content)
-#        os.lchown(path, settings.OWNER_UID, settings.OWNER_GID)
-#        os.seteuid(os.getuid())
-#        os.setegid(os.getgid())
 
     def save_uploaded_file(self, file):
         """Given a @file a user has uploaded, store
         it in the current submission with @name"""
-        path = os.path.join(self.originals_path(),
-                            file.name)
-#        os.setegid(settings.OWNER_GID)
-#        os.seteuid(settings.OWNER_UID)
+        path = os.path.join(self.originals_path(), file.name)
         os.makedirs(self.originals_path(), exist_ok=True)
-#        os.lchown(self.originals_path(), settings.OWNER_UID, settings.OWNER_GID)
         with open(path, "xb") as destination:
             for chunk in file.chunks():
                 destination.write(chunk)
-#        os.lchown(path, settings.OWNER_UID, settings.OWNER_GID)
-#        os.seteuid(os.getuid())
-#        os.setegid(os.getgid())
 
     def delete(self, *args, **kargs):
         """Delete all of the files associated with this
@@ -218,7 +206,7 @@ class TestType:
 
 # noinspection PyClassHasNoInit
 class TestMatch(m.Model):
-    id = m.SlugField(max_length=4, primary_key=True)
+    id = m.SlugField(max_length=8, primary_key=True)
     test = m.ForeignKey(Submission, m.CASCADE, related_name="tm_test_sub")
     test_version = m.IntegerField()
     solution = m.ForeignKey(Submission, m.CASCADE, related_name="tm_sol_sub")

@@ -3,13 +3,13 @@ from django.contrib.auth.models import User
 from django.db import transaction
 from django.http import HttpResponse, HttpResponseForbidden, HttpResponseBadRequest
 
+import json
+
 import common.models as cm
 from . import forms as f
 from . import models as m
 from common.permissions import require_teacher
 import common.permissions as p
-
-# TODO this stuff should really be a part of teacher...
 
 
 @login_required()
@@ -24,26 +24,25 @@ def modify(request):
     if not p.is_enrolled_on_course(request.user, coursework.course):
         return HttpResponseForbidden("You're not enrolled on the course")
     if form.cleaned_data['groupid'] == '':
-        group = save_new_feedback_group(form.cleaned_data)
-        associate_with_coursework(group, coursework)
+        group = save_new_feedback_group(form.cleaned_data["students"], coursework)
         return HttpResponse("Group Added: " + str(group.id))
     else:
         group = m.FeedbackGroup.objects.get(id=form.cleaned_data['groupid'])
-        modify_existing_feedback_group(group, form.cleaned_data)
+        modify_existing_feedback_group(group, form.cleaned_data["students"])
         return HttpResponse("Group Modified: " + str(group.id))
 
 
 @transaction.atomic()
-def save_new_feedback_group(new_data):
+def save_new_feedback_group(students, coursework):
     """save and return a new instance of a feedback group model
-    and populate with the @new_data dictionary. Note:
+    and populate with the @students and @coursework. Note:
     This method does no validation of if a user is enrolled on
     a course, as we may wish to be able to re-use these
     groups across courses"""
-    group = m.FeedbackGroup(nickname=new_data["nickname"])
+    group = m.FeedbackGroup(coursework=coursework)
     group.save()
     count = 1
-    new_students = new_data['students'].strip().strip(',').split(',')
+    new_students = students.strip().strip(',').split(',')
     new_students_list = list(map(lambda w: w.strip(), new_students))
     for student in new_students_list:
         m.FeedbackMembership(group=group,
@@ -52,25 +51,16 @@ def save_new_feedback_group(new_data):
         count += 1
     return group
 
-
 @transaction.atomic()
-def associate_with_coursework(feedback_group, coursework):
-    """Associate @feedback_group with @coursework"""
-    m.FeedbackPlan(group=feedback_group, coursework=coursework).save()
-
-
-@transaction.atomic()
-def modify_existing_feedback_group(feedback_group, new_data):
+def modify_existing_feedback_group(feedback_group, new_students):
     """Given an already existing @feedback_group, and some
-    @new_data, go through this and update accordingly"""
-    feedback_group.nickname = new_data['nickname']
-    feedback_group.save()
+    @new_students, go through this and update accordingly"""
 
-    new_students = new_data['student'].strip().strip(',').split(',')
+    new_students = new_students.strip().strip(',').split(',')
     new_students_list = list(map(lambda w: w.strip(), new_students))
 
     members = m.FeedbackMembership.objects.filter(group=feedback_group)
-    count = members.count()
+    count = get_member_count_for_naming(members)
     for member in members:
         if str(member.login) not in new_students_list:
             member.delete()
@@ -79,9 +69,15 @@ def modify_existing_feedback_group(feedback_group, new_data):
         exists = m.FeedbackMembership.objects.filter(user=current_user, group=feedback_group)
         if exists.count() != 1:
             m.FeedbackMembership(user=current_user,
-                                 group=feedback_group,
-                                 nickname="Peer #%s" % str(count)).save()
-            count += 1
+                                 group=feedback_group).save()
+
+
+def get_member_count_for_naming(existing_members):
+    """Determine the highest number assigned to a peer's nickname
+    in @existing_members in order to name more without collision"""
+    ids = [m.nickname[6:] for m in existing_members]
+    ids.sort()
+    return int(ids[-1]) + 1
 
 
 @login_required()
@@ -100,3 +96,33 @@ def delete(request):
         return HttpResponse("Group Doesn't Exist - No Action Taken")
     m.FeedbackGroup.objects.get(id=form.cleaned_data['groupid']).delete()
     return HttpResponse("Group Deleted")
+
+
+@login_required()
+@require_teacher
+@transaction.atomic()
+def export_data(request):
+    if request.method != "POST":
+        return HttpResponseForbidden("You're only allowed to post stuff here")
+    coursework = cm.Coursework.objects.get(id=request.POST["coursework_id"])
+    if not p.is_enrolled_on_course(request.user, coursework.course):
+        return HttpResponseForbidden("You're not enrolled on the course")
+    data = [','.join([member.user.username for member in
+                m.FeedbackMembership.objects.filter(group=feedback_group)])
+                for feedback_group in m.FeedbackGroup.objects.filter(coursework=coursework)]
+    return HttpResponse(json.dumps(data))
+
+
+@login_required()
+@require_teacher
+@transaction.atomic()
+def import_data(request):
+    if request.method != "POST":
+        return HttpResponseForbidden("You're only allowed to post stuff here")
+    coursework = cm.Coursework.objects.get(id=request.POST["coursework_id"])
+    if not p.is_enrolled_on_course(request.user, coursework.course):
+        return HttpResponseForbidden("You're not enrolled on the course")
+    data = json.loads(request.POST["json_data"])
+    for students in data:
+        save_new_feedback_group(students, coursework)
+    return HttpResponse("Groups Created")

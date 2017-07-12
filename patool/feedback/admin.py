@@ -3,5 +3,4 @@ import feedback.models as m
 
 admin.site.register(m.FeedbackGroup)
 admin.site.register(m.FeedbackMembership)
-admin.site.register(m.FeedbackPlan)
-admin.site.register(m.FeedbackForTestMatch)
+admin.site.register(m.TestAccessControl)

@@ -1,7 +1,7 @@
 
 from enum import Enum
 import common.permissions as p
-import feedback.permissions as fp
+from feedback.models import TestAccessControl as tac
 from common.models import CourseworkState
 
 
@@ -24,7 +24,7 @@ def user_feedback_mode(user, test_match_instance):
         return TestMatchMode.READ
     if p.user_is_self_testing(user, test_match_instance):
         return state_given_error_level(test_match_instance, TestMatchMode.READ)
-    if fp.user_is_member_of_test_match_feedback_group(user, test_match_instance):
+    if tac.user_has_test_access(user, test_match_instance):
         mode = feedback_mode_given_coursework_state(test_match_instance)
         return state_given_error_level(test_match_instance, mode)
     return TestMatchMode.DENY

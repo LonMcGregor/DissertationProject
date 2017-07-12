@@ -48,7 +48,7 @@ iframe{
     border: 0;
 }
 
-.file_view.inactive {
+#file_view .inactive {
     display: none;
 }
 

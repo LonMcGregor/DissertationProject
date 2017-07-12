@@ -27,7 +27,10 @@ def download_versioned_file(request, sub_id, version, filename):
     @version number of @filename in @sub_id is requested"""
     submisison = m.Submission.objects.get(id=sub_id)
     file = os.path.join(submisison.originals_path(version), filename)
-    if not p.can_view_submission(request.user, submisison):
+    context_tag = request.GET["context"] if "context" in request.GET else None
+    version_tag = int(version) if version is not None else None
+    context = (context_tag, version_tag) if context_tag is not None else None
+    if not p.can_view_submission(request.user, submisison, context):
         return HttpResponseForbidden("You are not allowed to see this file")
     if 'show' in request.GET:
         return render_file(request, file, filename)

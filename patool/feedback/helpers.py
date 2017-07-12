@@ -11,7 +11,7 @@ def nick_for_user_in_group(user, group, requesting_user):
     try:
         nick = m.FeedbackMembership.objects.get(group=group, user=user).nickname
         if requesting_user == user:
-            return "Me (%s)" % nick
+            return "Me"
         if is_teacher(requesting_user):
             return "%s (%s)" % (nick, user.username)
         return nick
@@ -22,9 +22,8 @@ def nick_for_user_in_group(user, group, requesting_user):
 def get_feedback_groups_for_user_in_coursework(user, coursework):
     """Given @user trying to give feedback for @coursework
     get all of the groups they are assigned to as a list"""
-    all_groups_in_cw = [fp.group for fp in m.FeedbackPlan.objects.filter(coursework=coursework)]
-    all_groups_for_user = [mb.group for mb in m.FeedbackMembership.objects.filter(user=user)]
-    return list(set(all_groups_for_user).intersection(all_groups_in_cw))
+    return [mb.group for mb in m.FeedbackMembership.objects.filter(user=user)
+            if mb.group.coursework == coursework]
 
 
 def get_all_users_in_feedback_group(group):
@@ -35,10 +34,11 @@ def get_all_users_in_feedback_group(group):
 
 def get_all_test_matches_in_feedback_group(user, group):
     """"Given a feedback @group,
-    get all of the associated test matches.
-    personalise names for @user"""
-    return [detail_test_match(user, item.test_match, item.group) for item in
-            m.FeedbackForTestMatch.objects.filter(group=group)]
+    get all of the associated test matches
+    that @user should be able to access"""
+    return [detail_test_match(user, tac.test, tac.group) for tac in
+            m.TestAccessControl.objects.filter(group=group) if
+            tac.initiator == user or tac.test.solution.creator == user]
 
 
 def detail_test_match(user, tm, group):
@@ -47,19 +47,25 @@ def detail_test_match(user, tm, group):
     the submission within the @tm as a triple"""
     if is_teacher(user):
         return tm, tm.solution.teacher_name, tm.test.teacher_name
-    developer = m.FeedbackMembership.objects.get(group=group, user=tm.solution.creator)
-    sol_name = tm.solution.student_name if tm.solution.creator == user else \
-        developer.nickname+tm.solution.peer_name
-    tester = m.FeedbackMembership.objects.get(group=group, user=tm.solution.creator)
-    test_name = tm.test.student_name if tm.test.creator == user else \
-        tester.nickname+tm.test.peer_name
+    if is_teacher(tm.solution.creator):
+        sol_name = tm.solution.student_name
+    else:
+        developer = m.FeedbackMembership.objects.get(group=group, user=tm.solution.creator)
+        sol_name = tm.solution.student_name if tm.solution.creator == user else \
+            developer.nickname+tm.solution.peer_name
+    if is_teacher(tm.test.creator):
+        test_name = tm.test.student_name
+    else:
+        tester = m.FeedbackMembership.objects.get(group=group, user=tm.test.creator)
+        test_name = tm.test.student_name if tm.test.creator == user else \
+            tester.nickname+tm.test.peer_name
     return tm, sol_name, test_name
 
 
 def get_name_for_test_match(user, tm):
-    """Get the names a a tuple for the submissions in a
+    """Get the names as a tuple for the submissions in a
     @tm instance, customised for @user"""
-    group_query = m.FeedbackForTestMatch.objects.filter(test_match=tm)
+    group_query = m.TestAccessControl.objects.filter(test=tm)
     if not group_query.exists():
         return tm.solution.student_name, tm.test.student_name
     else:
@@ -74,5 +80,10 @@ def count_members_of_group(group):
 
 def feedback_group_for_test_match(tm):
     """Given a @tm, get the feedback group associated"""
-    grouping = m.FeedbackForTestMatch.objects.filter(test_match=tm).first()
-    return grouping.group if grouping is not None else None
+    grouping = m.TestAccessControl.objects.filter(test=tm)
+    return grouping.first().group if grouping.exists() else None
+
+def user_is_member_of_group(user, group_id):
+    """Given a @user and a @group_id, determine if membership exists"""
+    group = m.FeedbackGroup.objects.get(id=group_id)
+    return m.FeedbackMembership.objects.filter(group=group, user=user).exists()

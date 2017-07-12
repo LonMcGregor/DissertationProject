@@ -5,14 +5,26 @@ import feedback.models as fm
 
 
 @transaction.atomic()
-def create_peer_test(solution, test, cw, feedback_group):
+def create_peer_test(solution, test, cw, feedback_group, initiator):
     """Create a new test match with data specified by the IDs of @solution,
-    @test, @feedback_group and the instance of @cw test is done within"""
-    solution = m.Submission.objects.get(id=solution)
-    test_case = m.Submission.objects.get(id=test)
+    @test, @feedback_group and the instance of @cw, @initiator"""
+    if solution == 'O' and test == 'S':
+        raise Exception("Either test, solution or both need to be a student upload")
     group = fm.FeedbackGroup.objects.get(id=feedback_group)
-    if solution.type != m.SubmissionType.SOLUTION or test_case.type != m.SubmissionType.TEST_CASE:
-        raise Exception("Need 1 solution and 1 test")
+    if solution != 'O':
+        solution = m.Submission.objects.get(id=solution, coursework=cw,
+                                             type=m.SubmissionType.SOLUTION)
+        if not fm.FeedbackMembership.objects.filter(group=group, user=solution.creator).exists():
+            raise Exception("That solution is not included in your feedback group")
+    else:
+        solution = m.Submission.objects.get(coursework=cw,
+                                            type=m.SubmissionType.ORACLE_EXECUTABLE)
+    if test != 'S':
+        test_case = m.Submission.objects.get(id=test, creator=initiator, coursework=cw,
+                                             type=m.SubmissionType.TEST_CASE)
+    else:
+        test_case = m.Submission.objects.get(coursework=cw,
+                                             type=m.SubmissionType.SIGNATURE_TEST)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
                          test=test_case,
                          test_version=test_case.latest_version,
@@ -21,7 +33,7 @@ def create_peer_test(solution, test, cw, feedback_group):
                          coursework=cw,
                          type=m.TestType.PEER)
     new_tm.save()
-    fm.FeedbackForTestMatch(test_match=new_tm, group=group).save()
+    fm.TestAccessControl(test=new_tm, group=group, initiator=initiator).save()
     return new_tm
 
 
@@ -29,8 +41,8 @@ def create_peer_test(solution, test, cw, feedback_group):
 def create_teacher_test(solution, test, cw):
     """Create a new test match with data specified by the IDs of @solution,
     @test, and @cw instanceand create the teachers test"""
-    solution = m.Submission.objects.get(id=solution)
-    test_case = m.Submission.objects.get(id=test)
+    solution = m.Submission.objects.get(id=solution, coursework=cw)
+    test_case = m.Submission.objects.get(id=test, coursework=cw)
     new_tm = m.TestMatch(id=m.new_random_slug(m.TestMatch),
                          test=test_case,
                          test_version=test_case.latest_version,

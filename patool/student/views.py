@@ -233,21 +233,17 @@ def generate_peer_match_form(cw, user, group, post=None):
     this may also be passed in"""
     all_users = fh.get_all_users_in_feedback_group(group)
     user_objects = [item[0] for item in all_users]
-    all_tests = m.Submission.objects.filter(coursework=cw,
-                                            creator__in=user_objects,
-                                            type=m.SubmissionType.TEST_CASE)
     all_sols = m.Submission.objects.filter(coursework=cw,
                                            creator__in=user_objects,
                                            type=m.SubmissionType.SOLUTION)
-    tests = []
+    tests = [(t.id, t.student_name) for t in
+             m.Submission.objects.filter(coursework=cw, creator=user,
+                                         type=m.SubmissionType.TEST_CASE)]
     sols = []
-    for member in all_users:
-        tests.extend([(t.id, t.student_name if t.creator == user else
-                      member[1] + t.peer_name) for t in
-                      all_tests.filter(creator=member[0], type=m.SubmissionType.TEST_CASE)])
-        sols.extend([(t.id, t.student_name if t.creator == user else
-                     member[1] + t.peer_name) for t in
-                     all_sols.filter(creator=member[0], type=m.SubmissionType.SOLUTION)])
+    for member, nickname in all_users:
+        sols.extend([(item.id, item.student_name if item.creator == user else
+                      nickname + item.peer_name) for item in
+                     all_sols.filter(creator=member, type=m.SubmissionType.SOLUTION)])
     tests.append(('S', 'Signature Test'))
     sols.append(('O', 'Oracle Solution'))
     if post is None:
@@ -279,10 +275,12 @@ def create_new_test_match(request, cw):
     ]
     if cw.state == m.CourseworkState.UPLOAD:
         method = matcher.create_self_test
-        args.append(user)
     else:
         method = matcher.create_peer_test
         args.append(tm_form.cleaned_data['feedback_group'])
+        if not fh.user_is_member_of_group(user, tm_form.cleaned_data['feedback_group']):
+            return HttpResponseForbidden("You're not a member of that feedback group")
+    args.append(user)
     try:
         new_tm = method(*args)
         r.run_test_on_thread(new_tm)

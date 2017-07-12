@@ -1,16 +1,17 @@
 
 import common.permissions as p
-import feedback.permissions as fp
+from feedback.models import TestAccessControl
 import common.models as m
 
 
-def can_view_file(user, file):
+def can_view_file(user, file, context=None):
     """Determine if a @user should be allowed to view a given @file"""
-    return can_view_submission(user, file.submission)
+    return can_view_submission(user, file.submission, context)
 
 
-def can_view_submission(user, submission):
-    """Determine is a @user is allowed to see a given submission"""
+def can_view_submission(user, submission, context=None):
+    """Determine is a @user is allowed to see a given @submission
+    Optionally specify a @context ID (e.g. test match)"""
     if not p.can_view_coursework(user, submission.coursework):
         return False
     if p.is_teacher(user):
@@ -21,7 +22,7 @@ def can_view_submission(user, submission):
         return False
     if p.user_owns_submission(user, submission):
         return True
-    if fp.is_submission_written_by_peer_in_testing_group(user, submission):
+    if TestAccessControl.user_has_submission_access(user, submission, context):
         return True
     if is_visible_results_file(user, submission):
         return True
@@ -37,4 +38,4 @@ def is_visible_results_file(user, submission):
         return False
     test_used_in = m.TestMatch.test_match_for_results(submission)
     return p.user_is_self_testing(user, test_used_in) or \
-        fp.user_is_member_of_test_match_feedback_group(user, test_used_in)
+        TestAccessControl.user_has_test_access(user, test_used_in)

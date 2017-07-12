@@ -20,7 +20,13 @@ $("#highlight").on("click", function(){
 });
 $("#download").on("click", function(){
     var gets = window.location.href.indexOf("?");
-    var dlurl = window.location.href.substring(0, gets);
+    var contexts = window.location.href.indexOf("context=");
+    var contextinfo = window.location.href.substring(contexts);
+    var contexte = contextinfo.indexOf("&");
+    if (contexte > -1){
+        contextinfo = contextinfo.substring(0, contexte);
+    }
+    var dlurl = window.location.href.substring(0, gets) + "?" + contextinfo;
     window.location.assign(dlurl);
 });
 });
