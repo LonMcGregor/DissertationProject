@@ -2,6 +2,10 @@ patool/.idea/dataSources/*
 patool/patool/local.py
 patool/common/migrations/*
 patool/feedback/migrations/*
+patool/.idea/workspace.xml
+patool/var/
+*.sqlite3
+!Pub*.pdf
 
 #tex
 *.aux
@@ -163,6 +167,3 @@ ENV/
 
 # Rope project settings
 .ropeproject
-patool/.idea/workspace.xml
-patool/var/
-*.sqlite3
