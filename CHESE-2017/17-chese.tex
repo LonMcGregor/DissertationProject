@@ -1,0 +1,884 @@
+%% For double-blind review submission
+\documentclass[sigplan,10pt,review]{acmart}\settopmatter{printfolios=true}
+%% For single-blind review submission
+%\documentclass[acmsmall,10pt,review]{acmart}\settopmatter{printfolios=true}
+%% For final camera-ready submission
+%\documentclass[acmsmall,10pt]{acmart}\settopmatter{}
+
+%% Note: Authors migrating a paper from PACMPL format to traditional
+%% SIGPLAN proceedings format should change 'acmsmall' to
+%% 'sigplan'.
+
+
+%% Some recommended packages.
+\usepackage{booktabs}   %% For formal tables:
+                        %% http://ctan.org/pkg/booktabs
+\usepackage{subcaption} %% For complex figures with subfigures/subcaptions
+                        %% http://ctan.org/pkg/subcaption
+
+
+\makeatletter\if@ACM@journal\makeatother
+%% Journal information (used by PACMPL format)
+%% Supplied to authors by publisher for camera-ready submission
+\acmJournal{PACMPL}
+\acmVolume{1}
+\acmNumber{1}
+\acmArticle{1}
+\acmYear{2017}
+\acmMonth{1}
+\acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+\else\makeatother
+%% Conference information (used by SIGPLAN proceedings format)
+%% Supplied to authors by publisher for camera-ready submission
+\acmConference[CHESE'17]{CHESE'17}{October 24, 2017}{Vancouver, Canada}
+\acmYear{2017}
+\acmISBN{978-x-xxxx-xxxx-x/YY/MM}
+\acmDOI{10.1145/nnnnnnn.nnnnnnn}
+\startPage{1}
+\fi
+
+
+%% Copyright information
+%% Supplied to authors (based on authors' rights management selection;
+%% see authors.acm.org) by publisher for camera-ready submission
+\setcopyright{none}             %% For review submission
+%\setcopyright{acmcopyright}
+%\setcopyright{acmlicensed}
+%\setcopyright{rightsretained}
+%\copyrightyear{2017}           %% If different from \acmYear
+
+
+%% Bibliography style
+\bibliographystyle{ACM-Reference-Format}
+%% Citation style
+%% Note: author/year citations are required for papers published as an
+%% issue of PACMPL.
+\citestyle{acmauthoryear}   %% For author/year citations
+
+
+\usepackage[T1]{fontenc}
+\usepackage[utf8]{inputenc}
+
+\usepackage{pifont}
+\def\Deliverables{\noindent\ding{229} \textbf{Deliverables}}
+\def\MembersExperience{\noindent\ding{251} \textbf{Members' experience}}
+\def\Challenge#1{\noindent\ding{237} \textit{#1}}
+\def\Check{\ding{51}}
+\def\NoCheck{\ding{55}}
+
+\usepackage{tabularx}
+\newcolumntype{C}{>{\centering\arraybackslash}X}
+\newcolumntype{L}{>{\raggedright\arraybackslash}X}
+\newcolumntype{R}{>{\raggedleft\arraybackslash}X}
+\newcommand*\rot{\rotatebox[origin=B]{90}}
+\usepackage{booktabs}
+
+\usepackage[nohyperlinks,nolist]{acronym} % options: nolist printonlyused
+
+
+
+\begin{document}
+
+%% Title information
+\title[Peer-Testing]{Development of a Web Platform for Code Peer-Testing}         %% [Short Title] is optional;
+                                        %% when present, will be used in
+                                        %% header instead of Full Title.
+%\titlenote{with title note}             %% \titlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+%\subtitle{Subtitle}                     %% \subtitle is optional
+%\subtitlenote{with subtitle note}       %% \subtitlenote is optional;
+                                        %% can be repeated if necessary;
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Author information
+%% Contents and number of authors suppressed with 'anonymous'.
+%% Each author should be introduced by \author, followed by
+%% \authornote (optional), \orcid (optional), \affiliation, and
+%% \email.
+%% An author may have multiple affiliations and/or emails; repeat the
+%% appropriate command.
+%% Many elements are not rendered, but should be provided for metadata
+%% extraction tools.
+
+%% Author with single affiliation.
+\author{Manuel Maarek}
+%\authornote{with author1 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+\orcid{0000-0001-6233-6341} % Maarek             %% \orcid is optional
+\affiliation{
+%  \position{Assistant Professor}
+  \department{School of MACS}              %% \department is recommended
+  \institution{Heriot-Watt University}            %% \institution is required
+%  \streetaddress{Riccarton}
+  \city{Edinburgh}
+  \state{Scotland}
+%  \postcode{EH14 4AS}
+  \country{UK}
+}
+\email{M.Maarek@hw.ac.uk}          %% \email is recommended
+
+%% Author with two affiliations and emails.
+\author{Léon McGregor}
+%\authornote{with author2 note}          %% \authornote is optional;
+                                        %% can be repeated if necessary
+%\orcid{nnnn-nnnn-nnnn-nnnn}             %% \orcid is optional
+\affiliation{
+%  \position{Student}
+  \department{School of MACS}              %% \department is recommended
+  \institution{Heriot-Watt University}            %% \institution is required
+%  \streetaddress{Riccarton}
+  \city{Edinburgh}
+  \state{Scotland}
+%  \postcode{EH14 4AS}
+  \country{UK}
+}
+%\email{first2.last2@inst2a.com}         %% \email is recommended
+
+
+%% Paper note
+%% The \thanks command may be used to create a "paper note" ---
+%% similar to a title note or an author note, but not explicitly
+%% associated with a particular element.  It will appear immediately
+%% above the permission/copyright statement.
+%\thanks{QAA Heriot-Watt}                %% \thanks is optional
+                                        %% can be repeated if necesary
+                                        %% contents suppressed with 'anonymous'
+
+
+%% Abstract
+%% Note: \begin{abstract}...\end{abstract} environment must come
+%% before \maketitle command
+\begin{abstract}
+  As part of formative and summative assessments in programming
+  courses, students work on developing programming artifacts following
+  a given specification. These artifacts are evaluated by the
+  teachers. As the end of the evaluation, the students receive
+  feedback and marks. Providing feedback on programming artifacts is
+  time demanding and could make the feedback to arrive late for it to
+  be effective for the student's learning. Peer-feedback has been
+  praised for offering a timely and effective learning activity.
+
+  In this paper we report on the development of a Web platform for
+  peer-feedback on programming artifacts through program testing. We
+  discuss the development process of our peer-testing platform
+  informed by teachers' and students perspectives.
+\end{abstract}
+
+%% 2012 ACM Computing Classification System (CSS) concepts
+%% Generate at 'http://dl.acm.org/ccs/ccs.cfm'.
+\begin{CCSXML}
+<ccs2012>
+<concept>
+<concept_id>10003456.10003457.10003527.10003531.10003751</concept_id>
+<concept_desc>Social and professional topics~Software engineering education</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10003456.10003457.10003527.10003531.10003533</concept_id>
+<concept_desc>Social and professional topics~Computer science education</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+<concept>
+<concept_id>10011007.10011074.10011099.10011102.10011103</concept_id>
+<concept_desc>Software and its engineering~Software testing and debugging</concept_desc>
+<concept_significance>500</concept_significance>
+</concept>
+<concept>
+<concept_id>10010405.10010489.10010492</concept_id>
+<concept_desc>Applied computing~Collaborative learning</concept_desc>
+<concept_significance>300</concept_significance>
+</concept>
+</ccs2012>
+\end{CCSXML}
+
+\ccsdesc[500]{Social and professional topics~Software engineering education}
+\ccsdesc[300]{Social and professional topics~Computer science education}
+\ccsdesc[500]{Software and its engineering~Software testing and debugging}
+\ccsdesc[300]{Applied computing~Collaborative learning}
+%% End of generated code
+
+
+%% Keywords
+%% comma separated list
+\keywords{peer-testing, peer-feedback, software testing}  %% \keywords is optional
+
+
+%% \maketitle
+%% Note: \maketitle command must come after title commands, author
+%% commands, abstract environment, Computing Classification System
+%% environment and commands, and keywords command.
+\maketitle
+
+
+\section{Introduction}
+
+
+
+
+
+\cite{GroHamKumMaaMcGrShaWelZan_STEM-HE-2017}
+\cite{McGregor_BSc-2017}
+
+
+\subsection{Peer-Feedback and Peer-Assessment}
+
+
+\paragraph{What is it?}
+
+Peer assessment is a process in which students assess each other. This
+opposes the more traditional stance where a teacher performs the
+assessment. As defined by \citet{topping_peer_2009},
+\begin{quote}
+  ``Peer assessment is an arrangement for learners to consider and
+  specify the level, value, or quality of a product or performance of
+  other equal-status learners.''
+\end{quote}
+That is to say, students with a similar level of education assessing
+the work of each other to give critical feedback and discussion. This
+could be done in many ways, such as between pairs or in groups, and
+can be performed on any number of different activities from
+programming exercises to oral reports.
+
+\paragraph{Why use it?}
+Peer assessment is a process with many benefits to participants in
+education. \citet{sadler_impact_2006} have suggested the
+following concepts that peer assessment can help with
+\begin{itemize}
+\item Peer assessment is more immediate, so students can get more
+  feedback, and sooner;
+\item Students performing marking can reduce the workload for
+  teachers;
+\item The process of checking and thinking about another students
+  answer can improve a students own understanding;
+\item Peer assessment can help students better understand testing and
+  can become aware of their own strengths and weaknesses;
+\item Following peer assessment students can gain an improved attitude
+  towards the process of learning as a whole.
+\end{itemize}
+
+Peer assessment can offer much help towards education of students, but
+it would be worthwhile to know just which aspects are the most
+useful. A study conducted by \citet{li_assessor_2010}
+investigated the peer assessment process with the aim of discovering
+which part of it is most useful to the students involved: being an
+assessor or being assessed. To study this, undergraduate student teachers
+were given the task of creating a \textit{WebQuest project}\footnote{In this
+  context, a \textit{WebQuest} project is an activity created by the
+  student teachers that would be given to their students. Following
+  the \textit{WebQuest} instructions, students are guided through
+  Internet resources, and offered ``scaffolding activities'' to help
+  them learn.}. This was then marked by independent assessors,
+and the student teachers were given a chance to provide feedback on
+other student teachers' \textit{WebQuest}s. Following this, the
+feedback was returned and students teachers were given another chance
+to improve their project, and it was marked again. The quality of the
+peer feedback itself was also checked by the independent markers. The
+study found that
+
+\begin{quote}
+  ``there was a significant relationship between the quality of the
+  peer feed-back the students provided for others and the quality of
+  the students' own final projects''
+\end{quote}
+
+The findings of the investigation would suggest that the actual
+exercise of providing feedback to others (acting as an assessor) is a
+worthwhile process for learning from. This study also concluded that
+there was no reasonable link between the feedback itself as a learning
+tool, suggesting that the act of giving feedback itself is more
+valuable and that low quality feedback does not harm the learning
+experience.
+
+\paragraph{How to do it?}
+
+With the knowledge that peer assessment can be useful, it is important
+to know how a peer assessment should be conducted. A study performed
+in a classroom environment by \citet{smith_using_2012}
+focused more on the use of peer assessment as a tool for teaching
+testing of code, in addition to the existing course.
+
+Over the course of this study, which took place using coursework from
+a 12-week university course, the following was completed for each
+coursework: submitting solutions, then submitting peer reviews (which
+includes a description of the testing that they performed on another
+solution, and the results of this), and then a review of the peer
+assessment (including what was learnt, an evaluation of feedback on
+their own solution, and optionally a corrected solution).
+
+One particularly noteworthy aspect of this use of peer assessment was
+the double-blind nature, ensuring anonymity. Students would not be
+aware of who they were marking, or were marked by. To enforce this
+completely, submitted code was obfuscated (Java sources into Byte
+code). One advantage of this is that it strips out identifying
+variable names and comments, which could identify other
+students. However, a downside of using byte code is that it can make
+it difficult to do in-depth analysis of the source structure which may
+make it harder to write complete test cases.
+
+The study identified two key features that assignments for peer
+assessment need to have: a well-defined interfaces, and freedom for
+implementation.  In addition to this, \citet{smith_using_2012} has
+found that it was possible to integrate the peer assessment process
+without having to significantly alter the existing course material,
+and the students taking part enjoyed the experience. This shows
+promise, as it could indicate many \ac{CS} courses (that
+offer coursework meeting the requirements), could be modified to
+include their own peer assessment exercises.
+
+Peer assessment can prove to be a very valuable experience for
+students. \citet{falchikov_improving_2013} has collected various case
+studies of past peer assessments, and the following aspects can be
+found:
+\begin{itemize}
+\item If the marking criteria are properly explained, there is often
+  no significant difference between the marks awarded by students and
+  those that would be awarded by teachers. This would tend to indicate
+  that students do assess each other fairly.
+\item One of the most important aspects of peer assessment is the
+  ability of the student to learn how to assess other students and
+  from this learn how to critically assess and improve their own work.
+\item It is important to make sure students feel confident, otherwise
+  they may not assess their peers as honestly as they might otherwise
+  have done. Some students will feel conflicted about marking their
+  peers, particularly if they might have to give low marks.
+\item During peer assessment more benefits may come from students
+  assessing multiple solutions, rather than each focusing on one.
+\end{itemize}
+
+% \paragraph{Summary of Peer Assessment}
+% The process of peer assessment holds much value for all of the
+% participants in the educational process, and can provide some skills
+% that can be carried beyond students time in education. It can be used
+% to provide more immediate feedback, help students to learn as they
+% evaluate solutions and create this feedback, and could be integrated
+% with some existing coursework assignments. Beyond just letting
+% students learn about how to grade against a mark scheme, peer
+% assessment can often teach students a lot about the subject material
+% itself, letting them gain a deeper understanding about it. Peer
+% assessment also helps to grow students ability to critically evaluate
+% both their own, and others, work. Students who are to engage in Peer
+% assessment should be given sufficient help so that they can perform
+% the assessment with confidence, and work with multiple peers to get
+% the full positive effects of peer assessment.
+
+
+\section{Informed Peer-Testing Requirements}
+
+\subsection{Initial Requirements}
+
+\begin{itemize}
+\item Each student can submit a solution
+\item Students are paired before the system enters in peer-testing mode
+\item When entering the peer-testing mode, each student can submit
+  tests, which are run against her peer's solution.
+\item Student can submit a test with feedback to her peer.
+\end{itemize}
+
+\subsection{Focus Group Discussions with Teachers}
+
+
+
+\begin{itemize}
+\item Teachers' feedback and marking of tests and feedback submitted
+  by students. The tester gives feedback, and then the developer responds how they would take this on board. Then the teacher could give their input as well (either individually or on a per-test basis).
+Feedback could be given after testing has been done within groups of students 
+  % item 1 in notes 2017-01-31
+\item
+  Ability to track the students' attempts at testing their own submission and their peer's submissions. A form of testing-based learners log. 
+Tracking everything a student has done and putting this in one place could offer a way for a teacher to give feedback [on a given coursework] 
+  % item 2 in notes 2017-01-31
+
+\item
+
+  Evaluation of tests submitted: evaluate the coverage of the tests submitted, evaluation of the performance in terms of memory and time, categorising test cases based on the specification (the categories could be provided). Suggestion to use a naming convension for tests. 
+This was the suggestion that a pipeline system could be introduced
+where uploaded files (either solutions or test cases) are analysed and
+subsequently processed by plugins (existing framework for code
+similarity could be used here). 
+Another pipeline would be introduced for the actual running of tests where more data is collected. 
+
+  % item 3 and 7 in notes 2017-01-31
+
+
+\item
+  Matching peers could be done automatically and then modified manually. Information provided or used for automation could be initial tests submitted, metrics on the submitted code, campus, gender. Peers could be organised in pairs or in groups. 
+
+  This is out of the current platform
+
+  % item 5 in notes 2017-01-31
+
+\item Anonymity.
+
+
+
+  Should peer-testing be anonymous? This would require to hide identifications in submitted files (or to ask the students to do so). This would allow for teacher-crafted submissions and tests to be included as peer submissions. 
+An alternative is to sanitized the solutions submitted to keep identities anonymous.
+Anonymity has a potential advantage which is that it includes gender
+anonymity, and campus anonymity.
+
+  % item 6 in notes 2017-01-31
+
+\item
+Testing owns implementation should be allowed form day 1. The ability to craft tests based on someone else's implementation could also be allowed prior to peer-testing (black-box testing). Some own tests could be made private so that they are not shared with peers. Tests could be crafted based on input only, the expected output is then produced by a standard solution.
+
+Alternative option is to perform some default tests on uploaded
+submissions. This would go beyond peer-testing.
+
+
+  % item 8 in notes 2017-01-31
+
+\item
+  Tests as I/O vs Unit testing
+
+  % item 8 in notes 2017-01-31
+
+  
+\item
+
+  The coursework specification needs to provide interfaces where
+  testing will be conducted. The coursework could be broken down into
+  smaller bits and some small bits could be tested among the students
+  (without individual teacher feedback).
+
+    % item 9 in notes 2017-01-31
+
+\item
+  Testing framework should not hide the technicality from the
+  students: commandline ran should be displayed, raw submission should
+  be allowed even if they fail preset verifications (message should indicate the issues and some change suggestions).
+
+
+      % item 10 in notes 2017-01-31
+
+\end{itemize}
+
+
+\subsubsection{Software Testing}
+
+%% Mostly from McGregor_BSc-2017
+
+When considering the testing of software, there are several ways that
+this can be done. To produce a We platform that enables peer-assessment,
+an appropriate testing methodology will need to be selected. Based on
+suggested testing styles from  \citet{laboon_friendly_2016},
+some testing methodologies were considered for inclusion:
+\begin{description}
+\item[Linting] Performing basic checks for 'smells' of bad code
+  design, such as identifying unused variables or methods. Not
+  particularly useful from a perspective of checking code is correct,
+  but is still useful in terms of producing good quality code.
+\item[Unit testing] The use of xUnit style tests. Often used in
+  \ac{TDD}, these could be useful in detecting flaws if
+  written post-development by a peer assessor. This would need the
+  assessor to be familiar with how to write xUnit style tests, and how
+  they should be structured, or it would not be viable.
+\item[Expected output testing] Running a program with some input and
+  comparing the output to what is expected. The issue here is that the
+  peer assessor first needs to know what the correct output is. Unlike
+  unit testing, this would simply involve a series of inputs, and a
+  series of expected outputs, and the task of checking the correctness
+  from these tests is left to the website.
+\item[Scenario Testing] Simulate an actual usage scenario. Assessors
+  would use solutions as if they were third party libraries (a
+  \emph{black box}), and develop their own programs that would use
+  these as if in an actual use case. These programs would perform
+  checks to make sure the solutions being tested were running as
+  expected. This is more involved than unit or expected output
+  testing, as it might be better placed to discover side effects of
+  continued use of the solution.
+\item[Property based testing] Using a proof checker or random testing
+  such as QuickCheck to ensure that a program is acting correctly. This
+  would place additional overhead onto the students as assessors, as
+  they would need to learn and understand the annotations used by a
+  proof checker, but could provide a lot of coverage of possible
+  inputs.
+\end{description}
+
+\subsubsection{Anonymity}
+
+%% Mostly from McGregor_BSc-2017
+
+One issue that can arise when students are interacting with each other
+from a perspective of evaluating each other is their anonymity. During
+a peer assessment / automated testing experiment performed by
+\citet{sitthiworachart_effective_2004}, the students remarked about
+the use of anonymity. One students response suggested that in a
+non-anonymous peer assessment exercise, their marking would be
+influenced if they knew who it was they were marking. Another student
+said they would decline to take part if the peer assessment was not
+conducted anonymously. What can be drawn from these comments is that
+anonymity is clearly very important to those taking part in the peer
+assessment. But the opinions of anonymity might not correlate with the
+actual effect it has.
+
+To study the effect that anonymity has, as opposed to just opinions
+about it, a study was conducted by \citet{li_role_2016}. This study
+aimed to investigate just how effective anonymity is when it comes to
+making peer assessment more effective, and whether any negative impact
+from a lack of anonymity can be mitigated.
+%
+This quasi-experimental study was conducted with some in-training
+teachers, and aimed to see which is the most effective method of /
+using / while conducting a peer assessment exercise: Having assessors
+and assessees know each others identities, remain anonymous, or know
+identities while having received training. The training in this case
+involved watching a video that described some of the stresses and
+concerns that arise during peer assessment, and various forms of
+discussion regarding this.
+%
+The study did not cover the case of being anonymous and getting
+training. This was because the training was intended as a fallback for
+when anonymity is not possible. But this does invite the question of
+just how effective would anonymity be if training were offered as
+well.
+%
+The study found: that ``anonymity improves student performance in peer
+assessment'', that if anonymity cannot be guaranteed, negative effects
+arising from this can be offset using training,and that anonymity does
+not reduce the pressure and tension related with peer assessment.
+
+
+
+\subsection{Experiment, Questionnaire and Focus Group Discussion with Students}
+
+
+
+\begin{itemize}
+\item Peer-feedback needs to be a peer-dialogue
+\item Training needs to be provided to make sure the peer-testing
+  platform is used effectively
+\item ...
+\end{itemize}
+
+
+\section{Peer-Testing Platform}
+
+
+\subsection{Interface between programming and testing artifacts}
+
+\subsection{Peer-testing stages}
+
+
+Table~\ref{tab:stages}
+
+\begin{table*}
+  \centering
+  \begin{tabularx}{\hsize}{clc@{}c@{}c@{}cLL}
+    \toprule
+    \multicolumn{2}{l}{\bf Stage}
+    & \rot{Solutions upload}
+    & \rot{Tests upload}
+    & \rot{Self-testing}
+    & \rot{Peer-testing}
+    & \bf Students
+    & \bf Teachers \\
+    % Stage & \rot{Vertical} &  \\
+    \midrule
+    0 & Coursework Setup
+    & \NoCheck
+    & \NoCheck
+    & \NoCheck
+    & \NoCheck
+    & Not involved at this stage.
+    & Setting Coursework specification, and program
+    interfaces. Enrolling students and setting up
+    peer-groups. Preparing oracle solution and tests. \\
+    \cmidrule(rl){2-8}
+    1 & Development \& Self-Testing
+    & \Check
+    & \Check
+    & \Check
+    & \NoCheck
+    & Develop and upload solutions and tests. Run own tests on own
+    solutions and on oracle solution. Run provided tests on own
+    solutions.
+    & Observing individual progress. Amending peer-groups. Adding
+    extra tests or solutions. \\
+    \cmidrule(rl){2-8}
+    2 & Peer-Testing \& Feedback
+    & \NoCheck
+    & \Check
+    & \Check
+    & \Check
+    & Run tests on peers' solutions, review peers' code to send
+      feedback. Receive tests and feedback. Enter discussions with peers.
+    & Monitoring students discussions. Prepare individual feedback. \\
+    \cmidrule(rl){2-8}
+    3 & Teachers' Feedback
+    & \NoCheck
+    & \NoCheck
+    & \NoCheck
+    & \NoCheck
+    & Submit an experience report detailing how they would take
+    on-board feedback they received to improve their program and how
+    they compare their solution with their peers.
+    & Provide group feedback at group level.
+    \\
+    \bottomrule
+  \end{tabularx}
+  \caption{Peer-testing stages implemented in the Web platform}
+  \begin{minipage}{.8\linewidth}
+    The table indicates for each stage whether students are allowed to
+     submit
+    artifacts solutions, to submit test cases, to test their own
+    implementation, to view and test their peers solutions. It
+    also describes the expected actions by students and teachers
+    participants. 
+  \end{minipage}
+  \label{tab:stages}
+\end{table*}
+
+\subsection{Feedback discussion}
+
+
+\subsection{Internal naming convention}
+
+\section{Related Works}
+
+\subsection{Peer-Feedback and Peer-Assessment}
+
+
+
+
+
+
+%% Mostly from McGregor_BSc-2017
+
+A study by \citet{davies_computerized_2000} was conducted using a peer
+testing system in a university's communications and networking
+module. This peer testing system aimed to help students easily provide
+feedback on reports, in addition to attempting to locate plagiarism.
+
+The \ac{CAP} provided an interface to let students read the report of
+another student. They could then provide feedback on the report and
+follow references on the report to identify any \textit{copy \& paste}
+plagiarism.
+
+\citet{davies_computerized_2000} conducted an experiment which
+followed the results students achieved over a sequence of 4 tasks
+(prepare a report, answer multiple choice test, engage in peer marking
+of the reports, answer a final multiple choice test).  The experiment
+looked to see if the peer marking was at all helpful in improving the
+marks of students between the two tests. The results found that the
+peer marking was very useful for students who had initially performed
+poorly. Student comments on the experience would suggest that they
+found the peer assessment process both enjoyable and
+informative. There is also evidence from this feedback indicating the
+importance of maintaining anonymity, as some students felt it would be
+difficult to do the marking non-anonymously.  This study also revealed
+that students learnt a lot from the ``repetitive nature of the
+marking''.
+
+Other Peer-Assessment systems
+\cite{Aropa} \cite{WebPA}
+
+%% Mostly from McGregor_BSc-2017
+
+\citet{goldwasser_gimmick_2002} started a peer testing initiative on a
+Data Structures course.  The main objective of this was to get
+students taking the course to submit, along with coursework, a test
+case to run on the program with the aim of finding bugs in other
+students programs. The main objective in this case was to focus
+learning on software testing, and the peer testing aspect was
+secondary, however the study does hold many parallels with our
+platform.
+
+The submitted coursework solutions would be collected, along with each
+test case. Then, using an automated system each of the test cases
+would be run against each of the solutions. The major downside to this
+being that there is $x^2$ complexity in terms of the submission count.
+
+% \citet{goldwasser_gimmick_2002} offers some advice for potential
+% future implementations of such an automated testing system:
+% \begin{itemize}
+% \item To prevent some students falling behind due to having buggy
+%   input parsers, have the lecturer provide a standard implementation
+%   to to all students. Similarly, output needs to be handled in a
+%   standardised way.
+%  \item A limit should be placed on how large a test case a student can
+%    submit.
+%  \item The automated testing system should be able to handle the case
+%    where a solution works correctly, produces the wrong output,
+%    crashes, or does not terminate.
+%  \item Additionally, the testing system should be able to recover and
+%    restart from a given position without having to re-run all test
+%    cases, or re-run specific test cases if one of the submissions
+%    should change
+% \end{itemize}
+
+
+
+
+%% Mostly from McGregor_BSc-2017
+
+To determine whether students can benefit from peer assessment in an
+online, \textit{technology-enhanced} environment, a research project
+was conducted by \citet{keppell_peer_2006}. This project
+involved some university lecturers, who re-structured their courses to
+involve more peer learning, with the aid of a \ac{VLE}.
+
+The project took place over three different case studies. The
+different studies used journal, discussion and file sharing features
+of the \ac{VLE} to enhance two courses in fashion design, art education
+and the design of a new learning website. Based on the evidence
+collected during these case studies, it was found that:
+\begin{itemize}
+\item Students found this assessment to be fairer than just against
+  teacher;
+\item Students appreciated the ongoing peer critique performed through
+  reflective journals;
+\item Teachers felt the instant nature of feedback was very useful;
+\item The support offered by the assisting technology of the \ac{VLE}
+  encouraged collaboration.
+\end{itemize}
+The authors of the project also suggest that unless the peer
+assessment within the \acp{VLE} is a marked process (against a
+students grade), students may be unwilling to participate.
+
+
+
+%% Mostly from McGregor_BSc-2017
+
+In the 1990s, the University of Nottingham produced \emph{Ceilidh}, a
+system that had the intent of automating and improving the assessment
+process for C Language Coursework. Later improvements were made by
+Heriot-Watt University adding support for \ac{SML}
+\cite{foubister_automatic_1997}, the system was later renamed
+CourseMarker \cite{higgins_coursemarker_2003}. This tool was used to
+guide students through the coursework, and then check the correctness
+of submissions. Ceilidh offered a skeleton answer to students, which
+pointed out any special language features that should be used. The
+submitted solutions are checked for correctness with a mixture of
+verifying output against a model solution, and checking the style of
+the code (e.g line count, use of certain function names, etc).  In
+particular for \ac{SML}, students were asked to provide the types for
+written functions, as an additional test of understanding.
+
+In their study, \citet{foubister_automatic_1997}
+investigated if such a system used for automatic assessment of
+students would be useful. To check this, the results of the final exam
+mark were compared to those marks from previous years where Ceilidh
+was not used. The study found that there was no real improvement made
+by Ceilidh, but most importantly there were no detrimental
+effects. Some positive side effects were observed: the time taken for
+students to receive feedback on the coursework was markedly decreased,
+and the tracking of progress offered by the tool allowed teachers to
+more easily identify any students that were having serious
+difficulties.
+
+\subsection{Collaborative Programming Learning}
+
+%% Mostly from McGregor_BSc-2017
+As an aside to peer assessment, one optional feature of such an
+implementation could be to offer automated testing. If a lecturer so
+wished, they could use the system with a pre-submitted test case. In
+effect, acting as a peer to each student, so that they could receive
+test results immediately (or as quickly as the test completes) upon
+submission.
+%
+The effectiveness of an automated testing tool (as a sole means of
+feedback, outside peer assessment) was investigated by
+\citet{farnqvist_competition_2016} within a Data Structures
+Course.
+%
+This study investigated how introducing a competitive element to a
+Data Structures and Algorithms \ac{CS} course might help students to
+learn. The survey took place over two runs of the course over 2011 and
+2012. In the 2011 course, lab contests were graded manually, and a
+voluntary contest used an automated grader. In the 2012 course, the
+lab assignments were marked using an automated grader for testing
+correctness and efficiency, and by human lab assistants to check code
+quality. The automated grader in use was
+\textit{Kattis}~\cite{enstrom_five_2011}.
+% 
+This experiment showed the attitudes of some students towards the use
+of an automated grader. Students found this automated grading to be
+more fair than the manual equivalent. The study also found that
+``students put in more effort in the course thanks to automated
+assessment''.  The study found that competition positively affected
+student behaviour. The element that was most useful for the contest
+aspect of this was the autograder. The automated marking and tracking
+of marks proved useful in motivating students, by offering a
+leader-board.
+
+%% Mostly from McGregor_BSc-2017
+\citet{Rue+Hic+Par+Lev+Mem+Pla+Mar_CCS-2016} introduce the programming
+contest \emph{Build-it, Break-it, Fix-it} that uses the concept of a
+peer security testing to judge the success of various programming
+assignments. This success is measured both in terms of general
+correctness and specifically in the context of security. Although the
+contest was used in the context of a \ac{MOOC}, its aim is
+specifically targeting security and therefore could not directly be
+employed for educational programming peer-assessment.
+
+The contest requires participants to \textit{build} a working solution
+that matches functional specifications, as well as being as secure as
+possible. If the solution can be built and the functionality verified
+by an automated system, then the team can move on to the next
+stage. Following this, testers will attempt to \textit{break} the
+security of the solution, and points will be allocated according to a
+zero-sum-game. The builders can then gain points by \textit{fixing}
+their solutions.
+Throughout the contest, there is a central web-based infrastructure
+that manages running the contest website (with scoreboards, etc.),
+listening to builder git repositories, and also running and recording
+test results.
+
+Compare with Code Hunt and other coding-gaming platforms \cite{CHESE}.
+
+
+\section{Conclusion}
+
+
+\subsection{Future Works}
+
+
+\begin{itemize}
+\item Git-integrated as is \cite{Rue+Hic+Par+Lev+Mem+Pla+Mar_CCS-2016}
+\item Improved security
+\end{itemize}
+
+
+
+
+
+%% Acknowledgments
+\begin{acks}                            %% acks environment is optional
+                                        %% contents suppressed with 'anonymous'
+This work was partly supported by a QAA funding at Heriot-Watt University.
+  %% Commands \grantsponsor{<sponsorID>}{<name>}{<url>} and
+  %% \grantnum[<url>]{<sponsorID>}{<number>} should be used to
+  %% acknowledge financial support and will be used by metadata
+  %% extraction tools.
+  % This material is based upon work supported by the
+  % \grantsponsor{GS100000001}{National Science
+  %   Foundation}{http://dx.doi.org/10.13039/100000001} under Grant
+  % No.~\grantnum{GS100000001}{nnnnnnn} and Grant
+  % No.~\grantnum{GS100000001}{mmmmmmm}.  Any opinions, findings, and
+  % conclusions or recommendations expressed in this material are those
+  % of the author and do not necessarily reflect the views of the
+  % National Science Foundation.
+\end{acks}
+
+%% Bibliography
+\bibliography{Peer-testing}
+
+
+%% Appendix
+%\appendix
+%\section{Appendix}
+%Text of appendix \ldots
+
+\begin{acronym}[MOOC]
+  \acro{CAP}{Computerised Assessment with Plagiarism}
+  \acro{CS}{Computer Science}
+  \acro{MOOC}{Massive Open Online Course}
+  \acro{SML}{Standard ML}
+  \acro{TDD}{Test-Driven Development}
+  \acro{VLE}{Virtual Learning Environment}
+\end{acronym}
+
+\end{document}
