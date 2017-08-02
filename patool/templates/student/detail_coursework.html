@@ -48,7 +48,7 @@
     <a href="{% url 'solution' cw.id %}">(Re-)Submit Solution</a>
     {% endif %}
     {% for sub, files in solution %}
-        <h3>{{ sub.student_name }}</h3>
+        <h3>{{ sub.display_name }}</h3>
         <ul>
         {% for f in files%}
             <li><a href="{% url 'download_file' sub.id f %}?show=1">{{ f }}</a></li>
@@ -59,9 +59,9 @@
     <p></p>
     {% for sub, files, can_del in tests %}
     <div class="submission test">
-        <h3>{{ sub.student_name }}</h3>
+        <h3>{{ sub.display_name }}</h3>
         {% if can_del %}
-        <form action="{% url 'delsub'%}" method="post" onsubmit="return window.confirm('Are you sure you want to delete {{sub.student_name}}?');">
+        <form action="{% url 'delsub'%}" method="post" onsubmit="return window.confirm('Are you sure you want to delete {{sub.display_name}}?);">
             {% csrf_token %}
             <input type="hidden" name="sub_id" value="{{sub.id}}" />
             <input type="Submit" value="❌ Delete this Test Case" />
@@ -102,7 +102,7 @@
         {% endif %}
         <p>View results for running tests:</p>
         <ul>{% for tm, sol, test in tms %}
-            <li>[<a href="{% url 'tm' tm.id %}">view</a>] {{ sol }} against {{ test }}</li>
+            <li>[<a href="{% url 'tm' tm.id %}">view</a>] {{ sol }} (v{{tm.solution_version}}) against {{ test }} (v{{tm.test_version}})</li>
         {% endfor %}</ul>
 
     {% endfor %}

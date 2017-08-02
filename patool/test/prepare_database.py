@@ -49,3 +49,9 @@ def prepare_database():
     c = cu("connie@pt.macs.hw.ac.uk", email="connie@pt.macs.hw.ac.uk", password="Ganymede")
     c.groups.add(s)
     c.save()
+
+    course = m.Course(name="Example Course", code="EX2017A")
+    course.save()
+    m.EnrolledUser(login=l, course=course).save()
+    m.EnrolledUser(login=a, course=course).save()
+    m.EnrolledUser(login=c, course=course).save()

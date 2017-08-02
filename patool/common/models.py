@@ -114,13 +114,11 @@ class Submission(m.Model):
     coursework = m.ForeignKey(Coursework, m.CASCADE)
     creator = m.ForeignKey(User, m.CASCADE)
     type = m.CharField(max_length=1, choices=SubmissionType.POSSIBLE_TYPES)
-    student_name = m.CharField(max_length=64, null=True)
-    peer_name = m.CharField(max_length=64, null=True)
-    teacher_name = m.CharField(max_length=64, null=True)
+    display_name = m.CharField(max_length=64, null=True)
     latest_version = m.IntegerField(default=0)
 
     def __str__(self):
-        return str(self.coursework) + " - " + self.teacher_name
+        return str(self.coursework) + " - " + self.display_name
 
     def path(self):
         """Give path where submission is stored"""
@@ -131,7 +129,7 @@ class Submission(m.Model):
                                 str(self.coursework.course.name),
                                 str(self.coursework.name),
                                 "descriptors",
-                                self.type,
+                                self.display_name,
                                 self.id)
         if self.type == SubmissionType.TEST_RESULT:
             return os.path.join(settings.BASE_DIR,
@@ -146,7 +144,7 @@ class Submission(m.Model):
                             str(self.coursework.name),
                             "students",
                             str(self.creator),
-                            self.type,
+                            self.display_name,
                             self.id)
 
     def originals_path(self, version=None):

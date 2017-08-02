@@ -31,17 +31,17 @@ def test_match_view(request, test_match_id):
     ]
     group = fh.feedback_group_for_test_match(test_match)
     comment_list = [(c.submit_date, c.comment,
-                    fh.nick_for_user_in_group(c.user, group, request.user))
+                    fh.nick_for_comment(c.user, group, request.user))
                     for c in cm.Comment.objects.filter(object_pk=test_match_id)]
-    names = fh.get_name_for_test_match(request.user, test_match)
+    names = fh.detail_test_match_anon_names(request.user, test_match, group)
     details = {
         "test_match": test_match,
-        "solution_name": names[0],
-        "test_name": names[1],
+        "solution_name": names[1],
+        "test_name": names[2],
         "can_submit": perm == p.TestMatchMode.WRITE,
-        "test_files": test_match.test.get_files(),
+        "test_files": test_match.test.get_files(test_match.test_version),
         "result_files": test_match.result.get_files(),
-        "solution_files": test_match.solution.get_files(),
+        "solution_files": test_match.solution.get_files(test_match.solution_version),
         "user_owns_test": test_match.test.creator == request.user,
         "user_owns_sol": test_match.solution.creator == request.user,
         "crumbs": crumbs,

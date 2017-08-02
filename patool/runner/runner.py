@@ -63,7 +63,7 @@ def run_signature_test(solution):
     and we wish to run it against the appropriate
     signature test for that coursework"""
     # TODO may want separate method for testing compilation results?
-    tm = matcher.create_self_test(solution.id, "S", solution.coursework, solution.creator)
+    tm = matcher.create_self_test_for_new_solution(solution)
     run_test_on_thread(tm)
 
 
@@ -86,9 +86,7 @@ def store_results(content, tm):
                               coursework=tm.coursework,
                               creator=tm.test.creator,
                               type=m.SubmissionType.TEST_RESULT,
-                              student_name="Test Results",
-                              peer_name="Test Results",
-                              teacher_name="Results")
+                              display_name="Test Results")
     result_sub.save()
     result_sub.save_content_file(content, "results.txt")
     return result_sub

@@ -60,4 +60,5 @@ def attachment_file(file, filename):
      as an http attachment"""
     response = FileResponse(open(file, "rb"))
     response['Content-Disposition'] = 'attachment; filename="%s"' % filename
+    response['Content-Length'] = os.stat(file).st_size
     return response

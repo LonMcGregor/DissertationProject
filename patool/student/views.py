@@ -48,40 +48,49 @@ def re_version_submission(submission, new_files):
     for each in new_files:
         submission.save_uploaded_file(each)
     return "New version of files for '%s' has been uploaded. You should re-run " \
-           "any tests again to use the new version." % submission.student_name
+           "any tests again to use the new version." % submission.display_name
 
 
 def save_new_solution(request, cw_instance):
-    s_name = "My Solution"
-    p_name = "Solution"
-    t_name = str(request.user) + " Sol"
-    sub = save_new_submission(cw_instance, request, m.SubmissionType.SOLUTION, s_name, p_name,
-                              t_name)
+    name = "Solution"
+    sub = save_new_submission(cw_instance, request, m.SubmissionType.SOLUTION, name)
     r.run_signature_test(sub)
     return "Your solution has been tested using the signature test. You should check the " \
            "results of this test to make sure that our solution is written correctly "
 
 
+TEST_DISP_NAME_PREFIX = "Test Case #"
+
+def count_highest_test(user, coursework):
+    """Count the number of tests @user has submitted for
+    @coursework so we can find out what number to give
+    to the new one. Recall some may be deleted, so
+    x.count() is not accurate enough of a solution."""
+    current = m.Submission.objects.filter(coursework=coursework, creator=user, type=m.SubmissionType.TEST_CASE)
+    if current.count() == 0:
+        return 1
+    ids = [m.display_name[len(TEST_DISP_NAME_PREFIX):] for m in current]
+    ids.sort()
+    return int(ids[-1]) + 1
+
+
 def save_new_test(request, cw_instance):
-    current = m.Submission.objects.filter(coursework=cw_instance, creator=request.user).count()
-    # todo note this counting will end up being incorrect if user deletes something
-    # todo it may end up being better to dynamically generate names
-    s_name = "My Test Case #%s" % str(current + 1)
-    p_name = "Test Case #%s" % str(current + 1)
-    t_name = str(request.user) + " Test #%s" % str(current + 1)
-    save_new_submission(cw_instance, request, m.SubmissionType.TEST_CASE, s_name, p_name, t_name)
+    """Save the submission for the newly created test in
+    @request for @cw_instance"""
+    current = count_highest_test(request.user, cw_instance)
+    name = "%s%s" % (TEST_DISP_NAME_PREFIX, str(current))
+    save_new_submission(cw_instance, request, m.SubmissionType.TEST_CASE, name)
     return "You can run your newly uploaded test against the oracle to make sure that you are " \
-           "testing for the correct output "
+           "testing for the correct output. You can delete test cases that are not run against" \
+           " anything yet."
 
 
 @transaction.atomic
-def save_new_submission(cw_instance, request, file_type, s_name, p_name, t_name):
+def save_new_submission(cw_instance, request, file_type, name):
     """Do the atomic database actions required to save the new files"""
     submission = m.Submission(id=m.new_random_slug(m.Submission), coursework=cw_instance,
                               creator=request.user, type=file_type,
-                              student_name=s_name,
-                              peer_name=p_name,
-                              teacher_name=t_name)
+                              display_name=name)
     submission.save()
     for each in request.FILES.getlist('chosen_files'):
         submission.save_uploaded_file(each)
@@ -97,7 +106,7 @@ def upload_test(request, cw, tid=None):
     if old_test is None:
         msg = "Upload Test Case for coursework"
     else:
-        msg = "Upload new version for " + old_test.student_name
+        msg = "Upload new version for " + old_test.display_name
     detail = {
         "msg": msg,
         "allow_upload": cw.state in [m.CourseworkState.UPLOAD, m.CourseworkState.FEEDBACK],
@@ -175,7 +184,7 @@ def single_coursework(request, cw):
 def detail_self_test_matches(user, coursework):
     """For self testing for a @use rin a @coursework,
     prepare the match form and list results"""
-    tms = [(tm, tm.solution.student_name, tm.test.student_name) for tm in
+    tms = [(tm, tm.solution.display_name, tm.test.display_name) for tm in
            m.TestMatch.objects.filter(type=m.TestType.SELF, coursework=coursework) if
            tm.solution.creator == user or tm.test.creator == user]
     match_form = generate_self_match_form(coursework, user)
@@ -215,12 +224,14 @@ def generate_self_match_form(cw, user, post=None):
     test match form for self testing purposes.
     If the form is to be used in validating a @post request,
     this may also be passed in"""
-    usable_tests = [(test.id, test.student_name) for test in m.Submission.objects.filter(
+    usable_tests = [(test.id, test.display_name) for test in m.Submission.objects.filter(
         coursework=cw, creator=user, type=m.SubmissionType.TEST_CASE)]
-    usable_tests.append(('S', 'Signature Test'))
-    testable_sols = [(sol.id, sol.student_name) for sol in m.Submission.objects.filter(
+    testable_sols = [(sol.id, sol.display_name) for sol in m.Submission.objects.filter(
         coursework=cw, creator=user, type=m.SubmissionType.SOLUTION)]
-    testable_sols.append(('O', 'Oracle Solution'))
+    sig = m.Submission.objects.get(coursework=cw, type=m.SubmissionType.SIGNATURE_TEST)
+    usable_tests.append((sig.id, sig.display_name))
+    orc = m.Submission.objects.get(coursework=cw, type=m.SubmissionType.ORACLE_EXECUTABLE)
+    testable_sols.append((orc.id, orc.display_name))
     if post is None:
         return f.EasyMatchForm(usable_tests, testable_sols)
     return f.EasyMatchForm(usable_tests, testable_sols, post)
@@ -236,16 +247,19 @@ def generate_peer_match_form(cw, user, group, post=None):
     all_sols = m.Submission.objects.filter(coursework=cw,
                                            creator__in=user_objects,
                                            type=m.SubmissionType.SOLUTION)
-    tests = [(t.id, t.student_name) for t in
+    tests = [(t.id, t.display_name) for t in
              m.Submission.objects.filter(coursework=cw, creator=user,
                                          type=m.SubmissionType.TEST_CASE)]
-    sols = []
-    for member, nickname in all_users:
-        sols.extend([(item.id, item.student_name if item.creator == user else
-                      nickname + item.peer_name) for item in
-                     all_sols.filter(creator=member, type=m.SubmissionType.SOLUTION)])
-    tests.append(('S', 'Signature Test'))
-    sols.append(('O', 'Oracle Solution'))
+    sols = [
+        (item.id, fh.nick_for_display(group, user, item)) for item in
+        m.Submission.objects.filter(coursework=cw,
+        creator__in=user_objects,
+        type__in=m.SubmissionType.SOLUTION)
+    ]
+    sig = m.Submission.objects.get(coursework=cw, type=m.SubmissionType.SIGNATURE_TEST)
+    tests.append((sig.id, sig.display_name))
+    orc = m.Submission.objects.get(coursework=cw, type=m.SubmissionType.ORACLE_EXECUTABLE)
+    sols.append((orc.id, orc.display_name))
     if post is None:
         return f.EasyMatchForm(tests, sols, initial={"feedback_group": group.id})
     return f.EasyMatchForm(tests, sols, post)

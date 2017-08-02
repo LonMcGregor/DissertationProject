@@ -184,27 +184,21 @@ def create_coursework_update(user, request, course_code):
 
     descriptor = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                               creator=user, type=m.SubmissionType.CW_DESCRIPTOR,
-                              student_name="Coursework Descriptor",
-                              peer_name="Coursework Descriptor",
-                              teacher_name="Descriptor")
+                              display_name="Coursework Descriptor")
     descriptor.save()
     for each in request.FILES.getlist('descriptor'):
         descriptor.save_uploaded_file(each)
 
     oracle_exec = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                                creator=user, type=m.SubmissionType.ORACLE_EXECUTABLE,
-                               student_name="Oracle Solution",
-                               peer_name="Oracle Solution",
-                               teacher_name="Oracle")
+                               display_name="Oracle Solution")
     oracle_exec.save()
     for each in request.FILES.getlist('oracle_exec'):
         oracle_exec.save_uploaded_file(each)
 
     sig = m.Submission(id=m.new_random_slug(m.Submission), coursework=coursework,
                        creator=user, type=m.SubmissionType.SIGNATURE_TEST,
-                       student_name="Signature Test",
-                       peer_name="Signature Test",
-                       teacher_name="Signature")
+                       display_name="Signature Test")
     sig.save()
     for each in request.FILES.getlist('signature'):
         sig.save_uploaded_file(each)
@@ -299,10 +293,10 @@ def view_coursework(request, c):
 def generate_teacher_easy_match_form(coursework, post=None):
     """Given an instance of @coursework, generate a
     relevant easymatchform"""
-    tests = [(t.id, t.teacher_name) for t in m.Submission.objects.filter(
+    tests = [(t.id, t.display_name) for t in m.Submission.objects.filter(
         coursework=coursework,
         type__in=[m.SubmissionType.TEST_CASE, m.SubmissionType.SIGNATURE_TEST])]
-    solutions = [(s.id, s.teacher_name) for s in m.Submission.objects.filter(
+    solutions = [(s.id, s.display_name) for s in m.Submission.objects.filter(
         coursework=coursework,
         type__in=[m.SubmissionType.SOLUTION, m.SubmissionType.ORACLE_EXECUTABLE])]
     if post is None:

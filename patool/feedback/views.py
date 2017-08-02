@@ -11,6 +11,7 @@ from . import models as m
 from common.permissions import require_teacher
 import common.permissions as p
 
+PEER_NICK_PREFIX = "Peer #"
 
 @login_required()
 @require_teacher
@@ -47,7 +48,7 @@ def save_new_feedback_group(students, coursework):
     for student in new_students_list:
         m.FeedbackMembership(group=group,
                              user=User.objects.get(username=student),
-                             nickname="Peer #%s" % str(count)).save()
+                             nickname="%s%s" % (PEER_NICK_PREFIX, str(count))).save()
         count += 1
     return group
 
@@ -69,13 +70,16 @@ def modify_existing_feedback_group(feedback_group, new_students):
         exists = m.FeedbackMembership.objects.filter(user=current_user, group=feedback_group)
         if exists.count() != 1:
             m.FeedbackMembership(user=current_user,
-                                 group=feedback_group).save()
+                                 group=feedback_group,
+                                 nickname="%s%s" % (PEER_NICK_PREFIX, str(count))).save()
+            count += 1
 
 
 def get_member_count_for_naming(existing_members):
     """Determine the highest number assigned to a peer's nickname
-    in @existing_members in order to name more without collision"""
-    ids = [m.nickname[6:] for m in existing_members]
+    in @existing_members in order to name more without collision.
+    assumes that prefix is 'Peer #' in nicknames"""
+    ids = [m.nickname[len(PEER_NICK_PREFIX):] for m in existing_members]
     ids.sort()
     return int(ids[-1]) + 1
 
