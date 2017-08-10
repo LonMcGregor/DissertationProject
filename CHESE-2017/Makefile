@@ -17,7 +17,7 @@ clean: FORCE_MAKE
 	rm -fr auto
 
 %.pdf : %.tex FORCE_MAKE
-	latexmk -pdf -bibtex -use-make $<
+	latexmk -pdf -bibtex  -silent -quiet -use-make $<
 
 # dia
 %.eps: %.dia
